@@ -1,0 +1,21 @@
+Como vai funcionar o hell internamente?
+
+A ideia é o haskell mandar, e o script servir só pra dafinir as builds.
+Inclusive, script provavelmente só será rodado quando precisar refazer o db
+(quando o script de construção tiver sido atualizado).
+
+No lua, quem manda é a table 'hell', que uns campos interessantes, bem
+explicadinhos no 'src/hell.lua', dá uma olhadinha lá =]
+
+
+Esquema simplificado do fluxo do rolê
+=====================================
+
+1. DB tá atualizado?
+	1.a não => Roda o script e atualiza o DB
+	1.b sim => continua no 2. =P
+2. Target existe?
+	2.a não => ERROR ('target inexistente!')
+	2.b sim => continua no 3. =P
+3. Verifica dependências
+4. Executa comandos

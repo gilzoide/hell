@@ -1,0 +1,60 @@
+Como vai chamar o comando hell?
+
+USO:
+====
+	hell [OPTIONS...] [TARGET] { build | clean | install | uninstall }
+
+flags:
+	-f file|--file=file	-> especifica o arquivo a ser usado como script
+	-j N|--jobs=N	-> especifica o número de 'jobs' a serem executados em
+paralelo
+	-s|--silent		-> não escreve na stdout
+	-v|--verbose	-> mais informações: nível 1 => mostra todos os comandos
+rodados, ignorando o campo 'echo'; nível 2 => debug do próprio hell, não é pra
+usuário
+	-l|--list-targets	-> lista quais as targets que existem no script
+	-V|--version	-> mostra versão do software. Deve ficar em '0.1.0' por
+bastante tempo xP
+	-h|--help		-> mostra ajuda, padrão ou não (assim como no scons, você
+pode sobrescrever mensagem de ajuda)
+	-H|--help-options	-> mostra ajuda padrão de opções do hell
+	-c|--create-db-only	-> só cria o db, base pro haskell manjar o que tem que
+fazer
+	-n|--no-exec	-> não executa os comandos especificados, só os mostra
+
+
+
+COMANDOS:
+=========
+ao chamar o hell sem -VhH, ele espera um comando a ser executado. Os comandos
+esperados são um desses: build, clean, install, uninstall. Se nenhum comando
+for especificado, o padrão usado é 'build'.
+
+build: executa os comandos de 'build'
+clean: limpa todas as saídas de comandos 'build'
+install: executa os comandos de 'install'
+uninstall: limpa todas as saídas de comandos 'install'
+
+
+
+TARGETS:
+========
+ao chamar o hell sem -VhH, ele espera uma Target a ser construída.
+A target nada mais é que uma table que contém as builds. Por padrão, a table
+chamada é a própria _G, a table global do Lua, ou seja, as builds que estão
+"de fora". Pode-se chamar tables dentro de tables usando a própria notação do
+Lua, 'table.outra_table'.
+
+`hell yeah clean`, `hell yeah.man`, `hell is.on.fire install`
+
+
+
+SCRIPTS:
+========
+por padrão, hell procura por arquivos de script do hell. Poderia ter os
+chamado de 'hellfile.lua' (estilo o makefile), mas soletrei errado e acabou virando
+'hellfire.lua' (literalmente "fogo do inferno"), e fiquei com preguiça de
+mudar (ou será que a zoeira foi mais forte? xP). Pros que não curtem a ideia,
+pode-se usar o 'hellbuild.lua', que é mais pacífico.
+
+Qualquer nome de script pode ser especificado com a flag -f|--file
