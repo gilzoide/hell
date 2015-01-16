@@ -52,9 +52,9 @@ Lua, 'table.outra_table'.
 SCRIPTS:
 ========
 por padrão, hell procura por arquivos de script do hell. Poderia ter os
-chamado de 'hellfile.lua' (estilo o makefile), mas soletrei errado e acabou virando
-'hellfire.lua' (literalmente "fogo do inferno"), e fiquei com preguiça de
+chamado de 'hellfile' (estilo o makefile), mas soletrei errado e acabou virando
+'hellfire' (literalmente "fogo do inferno"), e fiquei com preguiça de
 mudar (ou será que a zoeira foi mais forte? xP). Pros que não curtem a ideia,
-pode-se usar o 'hellbuild.lua', que é mais pacífico.
+pode-se usar o 'hellbuild', que é mais pacífico.
 
 Qualquer nome de script pode ser especificado com a flag -f|--file

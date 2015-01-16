@@ -13,9 +13,11 @@ hell = {
 	-- ao conferir arquivos de entrada com o glob, usar as entradas em 
 	-- um comando só?
 	multinput = true,
+	-- deixa ninguém mexer em campos que não existem
+	__newindex = function ()
+		error ("If you praise for your life, don't mess with HELL (the Table)!")
+	end
 }
 
--- deixa ninguém mexer em campos que não existem
-hell.__newindex = function (t, k, v)
-	error ("If you praise for your life, don't mess with HELL (the Table)!")
-end
+-- pro __newindex funfar (que metamétodos só servem pra metatables)
+setmetatable (hell, hell)

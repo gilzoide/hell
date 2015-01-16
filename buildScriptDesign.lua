@@ -2,32 +2,32 @@
 
 --[[		Uma função build, que constrói qualquer coisa!			]]--
 -- baseado na extensão
-build { src = 'oi_mundo.c' }
-build { src = 'eita_sô.java' }
+build { input = 'oi_mundo.c' }
+build { input = 'eita_sô.java' }
 -- como construtor padrão, pra extensões/arquivos desconhecidos, simplesmente copia (construtor `copy' (cópia), oi c++ =P)
-build { src = 'readme.txt', out = 'copia.txt' }
+build { input = 'readme.txt', out = 'copia.txt' }
 -- talvez fazer até um recursivo, usando o DirTreeIterator (http://lua-users.org/wiki/DirTreeIterator) ou outro paranauê
-build { src = 'src_dir_for_a_java_pkg', opts = recurseOver '*.java' + preserveDirStructure }
+build { input = 'src_dir_for_a_java_pkg', recurseOver = '*.java', keepDirStructure = true }
 -- e, claro, um em q vc escolhe o construtor (regra a ser seguida pra construção) ;]
-build { src = 'oi.png doido.png minha_nossa.png', builder = convertPngToJpg }
+build { input = 'oi.png doido.png minha_nossa.png', builder = convertPngToJpg }
 -- talvez chamar a função build pelo construtor, pra n ter q por mais uma variável na table (pura frescura, mas pode ser bacana)
---	ideia: usar um método
-cpp.sharedLib:build { src = '*.cpp' }
+--	podemos chamar o builder como função através do metamétodo '__call'
+cpp.sharedLib { input = '*.cpp' }
 -- quaisquer adições ao construtor podem ser feitas a qualquer hora (caham, flags pra compiladores, links, talvez até otro binário pra executar a build!)
-build { src = 'mais_um.cc', flags = 'std=c++11 fpermissive', links = 'lua5.2', bin = 'llvm' }
+build { input = 'mais_um.cc', flags = 'std=c++11 fpermissive', links = 'lua5.2', bin = 'llvm' }
 -- e, claro, temos que poder declarar dependências, né
 --	e essas talvez devam poder incluir outras builds!
-build { src = 'construa-me.c', deps = 'construa-me.h' }
-build { src = 'construa-me.c', deps = build { src = 'dependencia.c', builder = c.staticLib } }
-num1 = build { src = 'blablabla' }
-build { src = 'construa-me.c', deps = { num1, 'outra.c' } }
+build { input = 'construa-me.c', deps = 'construa-me.h' }
+build { input = 'construa-me.c', deps = build { input = 'dependencia.c', builder = c.staticLib } }
+num1 = build { input = 'blablabla' }
+build { input = 'construa-me.c', deps = { num1, 'outra.c' } }
 
 --[[		Install: porque instalar software, mtas das vezes, é o que a gente quer!
 			installs são os targets pro comando `hell install` e `hell uninstall`, pra facilitar a vida		]]--
 -- install da build
 install { num1, out = '/usr/bin' }
 -- ou igual escreve a build mesmo, mas com a saída bonita, né
-install { src = 'construa-me.c', out = '$prefix/lib' }
+install { input = 'construa-me.c', out = '$prefix/lib' }
 
 
 --[[		Targets: estilo make, bom pra fazer builds diferentes, tipo de debug, ou sei lá		]]--
@@ -35,25 +35,25 @@ install { src = 'construa-me.c', out = '$prefix/lib' }
 --	como a table chama 'yeah', pra construir esse target é só mandar o comando `hell yeah`
 --	isso também rola pra installs, no caso acima pode mandar um `hell yeah install`
 yeah = {	
-	build { src = 'putz', out = 'copiou'},
-	install { src = 'grila', out = 'copiou_tambem'}
+	build { input = 'putz', out = 'copiou'},
+	install { input = 'grila', out = 'copiou_tambem'}
 }
 -- tables dentro de tables? não é problema!
 --	`hell yeah.man`
 yeah = {
 	man = {
-		build { src = 'tanto_faz' }
+		build { input = 'tanto_faz' }
 	}
 }
 
 
 --[[		Recursivo, permite a escalabilidade (que é um aspecto importante de build systems)!		]]--
 -- é só chamar o próximo script =P
-addHellBuild ('src/hellbuild.lua')
-feedHellFire ('src/hellfire.lua')
+addHellBuild ('src/hellbuild')
+feedHellFire ('src/hellfire')
 -- pode por dentro de target
 yeah = {
-	feedHellFire ('src/module/hellfire.lua')
+	feedHellFire ('src/module/hellfire')
 }
 
 
@@ -67,10 +67,10 @@ hell.outDir = 'build'
 -- silent/verbose, sendo que flags pro programa sobrepõem esse padrão aqui da linha de baixo
 hell.silent = true
 hell.verbose = true
-build { src = 'putz_grila.lua', silent = true }
+build { input = 'putz_grila.lua', silent = true }
 -- quem sabe até cor da saída (pqp, pra q?) =P
 hell.color = RED
-build { src = 'oi', color = BLUE }
+build { input = 'oi', color = BLUE }
 
 --[[		Uma meta é podermos criar regras facilmente, inclusive "on the fly"
 			pra isso, leia o `moduleScript.lua' que está neste diretório ;]			]]--
