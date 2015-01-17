@@ -44,6 +44,7 @@ builder.cmd = ''
 -- @note This method doesn't change the original builder,
 -- but rather returns a new one with the extended fields
 function builder:extend (appendix)
+	appendix = appendix or {}
 	local new = {}
 	setmetatable (new, builder)
 	-- merge fields from original builder
@@ -68,6 +69,10 @@ function builder.__newindex (t, k, v)
 	else
 		rawset (t, k, v)
 	end
+end
+
+builder.__call = function (self, t)
+	return subCmd (self:extend (t))
 end
 
 -- If we help hellbuilds, we are a...

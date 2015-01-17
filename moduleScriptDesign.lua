@@ -1,9 +1,15 @@
 -- como eu imagino que os módulos de regras de construção (builders) devem ser
 
+-- lembrando que builders são rodados direto do hell.lua, então não precisamos
+-- executar `require 'Builder'`. Funções auxiliares pra construção de Builders
+-- podem ser encontradas no 'hellutils.lua', esse pode requerir se precisar
+
+require 'hellutils'
+
 
 --[[		Builder é uma metatable com alguns campos padrão, a serem usados pra se montar os comandos a serem executados		]]--
 -- campos com '*' são considerados padrão para builders, q geralmente serão usados
-c = newBuilder {
+c = Builder {
 	bin = 'gcc',	-- * binário usado pra construção da saída desejada (bacana deixar separado pra poder ser sobreposto)
 	flags = 'Wall g O2',	-- * flags pro `bin'
 	ext = 'o',	-- * extensão de saída, maioria das vezes é padrão
@@ -17,7 +23,7 @@ c = newBuilder {
 --	Usando um pouco da abstração de Hierarquia, Builders internos herdam todos os campos dos seus pais
 --		os novos valores dos campos podem ser complementares aos iniciais (só avisar, com um '&' no começo), sendo assim concatenados
 --		por padrão, ele substitui. Pode-se forçar substituição com '!' (escape pro '&')
-c.sharedLib = newBuilder {
+c.sharedLib = Builder {
 	flags = '&c',	-- esse complementa flags
 	picFlags = flags .. 'fPIC',
 	soFlags = flags .. 'shared',
@@ -35,7 +41,7 @@ verb_cp = copy:extend {
 
 --[[		A imaginação é o limite aqui, pq podemos criar Builders pra qualquer coisa!
 			Pode-se fazer um builder pra manpage, zippar coisas, alguma extensão nova sua!		]]--
-myExt = newBuilder {
+myExt = Builder {
 	cmd = 'echo "minha extensão é construída com sucesso, e posso mandar esse builder pros meus amigos usuários!"'
 }
 

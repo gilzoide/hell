@@ -31,7 +31,7 @@ hell = {
 	-- um comando só?
 	multinput = true,
 	-- table com alguns específicos do sistema operacional
-	os = (package.config:sub (1, 1) == '/' and unix) or win,
+	os = package.config:sub (1, 1) == '/' and unix or win,
 	-- deixa ninguém mexer em campos que não existem
 	__newindex = function ()
 		error ("If you praise for your life, don't mess with HELL (the Table)!")

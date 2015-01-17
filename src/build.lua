@@ -1,14 +1,3 @@
---- Prefix each word in str with prefix
---
--- @param[in] str The string
--- @param[in] prefix The prefix to be used
---
--- @return The string str with prefix before every word
-function prefixEach (str, prefix)
-	return str:gsub ('%S+', prefix .. '%1')
-end
-
-
 --- Auxiliary function for substituting the fields in a command
 --
 -- @note When a field from t is nil, it's entry is substituted with ''
@@ -30,7 +19,7 @@ function subCmd (builder)
 			-- call the field's 'prepare_' function, if it exists, or return the
 			-- field, or an empty string
 			local field, prepare = builder[capture], builder['prepare_' .. capture]
-			return (prepare and prepare (field)) or field or ''
+			return prepare and prepare (field) or field or ''
 		end
 	end
 
