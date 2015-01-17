@@ -1,20 +1,24 @@
 --[[	Builder: the heart of the Hell build scripts	]]--
 
+require 'build'
+
 --- Auxiliary function for merging two fields
 --
 -- Fields are concatenated if the second starts with a '&',
--- and substituted otherwise. If the second doesn't exists,
--- use the original one.
+-- and substituted otherwise (the '&' may be escaped with a '!').
+-- If the second doesn't exist, use the original one.
 --
 -- @param[in] target The first field, to merged with
 -- @param[in] src The second field, for merging with the first
+-- @param[in] sep The separator to be used when concatting. Default = ' '
 --
 -- @return The merged fields
-local function mergeFields (target, src)
+local function mergeFields (target, src, sep)
+	sep = sep or ' '
 	-- if src is a string, we may want to concatenate
 	if type (src) == 'string' then 
 		if src:sub (1, 1) == '&' then
-			return target .. src:gsub ('&', ' ', 1)
+			return target .. src:gsub ('&', sep, 1)
 		elseif src:sub (1, 1) == '!' then
 			return src:sub (2)
 		else
@@ -27,6 +31,7 @@ local function mergeFields (target, src)
 		return target
 	end
 end
+
 
 -- the builder metatable
 local builder = {}
@@ -53,11 +58,11 @@ function builder:extend (appendix)
 	return new
 end
 
---- default fields for the new builders
+-- Builder's access to the methods
 builder.__index = builder
 
 --- If you want to put a builder inside a builder, extend it
-builder.__newindex = function (t, k, v)
+function builder.__newindex (t, k, v)
 	if getmetatable (v) == builder then
 		rawset (t, k, t:extend (v))
 	else
@@ -65,17 +70,22 @@ builder.__newindex = function (t, k, v)
 	end
 end
 
+-- If we help hellbuilds, we are a...
+builder.__metatable = 'hellbuilder'
+
 --- Builder constructor
 --
 -- @param[in] initializer A table with the fields for initializing the builder.
---	Fields can be extended.
+--	Fields will be extended.
 --
 -- @return A new Builder
 function Builder (initializer)
 	initializer = initializer or {}
 	local new = {}
 	setmetatable (new, builder)
-	-- get the fields from parent
+	-- copy the cmd field from builder, for the extend to work right
+	new.cmd = builder.cmd
+	-- get the fields from initializer
 	new = new:extend (initializer)
 
 	return new
