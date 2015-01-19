@@ -72,7 +72,7 @@ function builder.__newindex (t, k, v)
 end
 
 builder.__call = function (self, t)
-	return subCmd (self:extend (t))
+	return build (self:extend (t))
 end
 
 -- If we help hellbuilds, we are a...

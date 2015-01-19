@@ -1,4 +1,4 @@
---- Auxiliary function for substituting the fields in a command
+--- Substitute the fields in a command
 --
 -- @note When a field from t is nil, it's entry is substituted with ''
 -- (just like shell would do).
@@ -7,7 +7,7 @@
 -- @param[in] cmd The command to be formed
 --
 -- @return A string with the right command
-function subCmd (builder)
+function substCmd (builder)
 	assert (type (builder.cmd) == 'string', "[subCmd] Can't substitute command: builder.cmd isn't a string")
 
 	-- build the command substituting anything that starts with a '$'
@@ -24,4 +24,15 @@ function subCmd (builder)
 	end
 
 	return builder.cmd:gsub ('$([$%w]+)', sub)
+end
+
+
+--- The build function, for building anything!
+function build (builder)
+	new = {
+		__metatable = 'build',
+		cmd = substCmd (builder)
+	}
+	setmetatable (new, new)
+	table.insert (_G.hell.build, new)
 end

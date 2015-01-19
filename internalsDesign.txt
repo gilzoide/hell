@@ -3,8 +3,15 @@ Como vai funcionar o hell internamente?
 A ideia é o haskell mandar, e o script servir só pra dafinir as builds.
 Inclusive, script provavelmente só será rodado quando precisar refazer o db
 (quando o script de construção tiver sido atualizado).
+	Pensando bem, é útil podermos settar variáveis direto no script pela cli,
+	como por exemplo 'debug=1' (lembrando que os valores ficarão em strings).
+	Assim sendo, contando que cada chamada ao hell essas coisa podem mudar,
+	não tem muito como só rodar o script hora que o tal muda... Assim sendo,
+	acho melhor o lua mandar, ler opções de linha de comando, ler os scripts,
+	e daí sim chamar o haskell pra verificar dependências, quem mudou e quem
+	não, e soltar os comandos
 
-No lua, quem manda é a table 'hell', que uns campos interessantes, bem
+No lua, quem manda é a table 'hell', que tem uns campos interessantes, bem
 explicadinhos no 'src/hell.lua', dá uma olhadinha lá =]
 
 

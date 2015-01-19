@@ -3,7 +3,7 @@ Como vai chamar o comando hell?
 USO:
 ====
 	hell [OPTIONS...] [TARGET] { build | clean | install | uninstall }
-
+	
 flags:
 	-f file|--file=file	-> especifica o arquivo a ser usado como script
 	-j N|--jobs=N	-> especifica o número de 'jobs' a serem executados em
@@ -21,6 +21,7 @@ pode sobrescrever mensagem de ajuda)
 	-c|--create-db-only	-> só cria o db, base pro haskell manjar o que tem que
 fazer
 	-n|--no-exec	-> não executa os comandos especificados, só os mostra
+	-t|--tree		-> mostra árvore de dependências pra target especificada
 
 
 
