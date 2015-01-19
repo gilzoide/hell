@@ -7,27 +7,6 @@ function quit (msg, was_error)
 	os.exit (was_error and 0 or 1, true)
 end
 
---- Function for sourcing a hell build script.
---
--- As a default, it creates a new _ENV, for 'global' variables
--- being local to the script, so it doesn't affect the previous one. If you
--- like, you can pass your own _ENV so that it's shared between build scripts.
---
--- @param[in] script The script name, for loading
--- @param[in] env The script env. Default is creating a new one,
---  __indexing the old
---
--- @return The results from the script. Usualy none
-function addHellBuild (script, env)
-	env = env or { __index = _ENV }
-	setmetatable (env, env)
-	local file = loadfile (script, nil, env)
-	if not file then quit ("Can't find file \"" .. script .. "\"", true) end
-	return file ()
-end
---- Alias for addHellBuild (I do like this one more xD)
-feedHellFire = addHellBuild
-
 --[[		hell: the table that controls everything that's going on		]]--
 local win = {
 	name = 'windows',
@@ -44,6 +23,8 @@ local unix = {
 hell = {
 	-- the custom help message. If false, use default help string
 	help = false,
+	-- the target. If false, build/install everything!
+	target = false,
 	-- output directory: used for 'shadow builds'
 	-- if '', do the builds in the build scripts' own path
 	-- note that if `outdir = '.'`, hell uses the root script's path
@@ -75,11 +56,19 @@ local opts = (loadfile ('parseOpts.lua')) (...)
 --[[		And now, source our first hellbuild script.
 	It looks respectively into 'opts.file', './hellfire', './hellbuild'		]]--
 require 'Builder'
+require 'fireHandler'
 
 if opts.f then 
 	addHellBuild (opts.f)
 else
-	local script = loadfile ('./hellfire') or loadfile ('./hellbuild')
-	if not script then quit ("Can't find 'hellbuild' or 'hellfire' build scripts", true) end
+	local script = _addHellBuild ('./hellfire') or _addHellBuild ('./hellbuild')
+	if not script then
+		quit ("Can't find 'hellbuild' or 'hellfire' build scripts", true)
+	end
 	script ()
+end
+
+
+for k, v in pairs (hell.builds) do
+	print (k.cmd)
 end

@@ -7,7 +7,7 @@
 -- @param[in] cmd The command to be formed
 --
 -- @return A string with the right command
-function substCmd (builder)
+local function substCmd (builder)
 	assert (type (builder.cmd) == 'string', "[subCmd] Can't substitute command: builder.cmd isn't a string")
 
 	-- build the command substituting anything that starts with a '$'
@@ -23,16 +23,23 @@ function substCmd (builder)
 		end
 	end
 
-	return builder.cmd:gsub ('$([$%w]+)', sub)
+	return builder.cmd:gsub ('$([$%w_]+)', sub)
 end
-
 
 --- The build function, for building anything!
 function build (builder)
+	-- default builder: copy
+	if getmetatable (builder) ~= 'hellbuilder' then
+		builder = copy:extend (builder)
+	end
 	new = {
 		__metatable = 'build',
 		cmd = substCmd (builder)
 	}
 	setmetatable (new, new)
-	table.insert (_G.hell.build, new)
+	-- if no target specified, always add it to hell.builds
+	if not _G.hell.target then
+		_G.hell.builds[new] = true
+	end
+	return new
 end

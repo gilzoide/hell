@@ -1,4 +1,4 @@
---[[	Builder: the heart of the Hell build scripts	]]--
+--[[		Builder: the heart of the Hell build scripts		]]--
 
 require 'build'
 
@@ -16,11 +16,12 @@ require 'build'
 local function mergeFields (target, src, sep)
 	sep = sep or ' '
 	-- if src is a string, we may want to concatenate
-	if type (src) == 'string' then 
-		if src:sub (1, 1) == '&' then
-			return target .. src:gsub ('&', sep, 1)
-		elseif src:sub (1, 1) == '!' then
-			return src:sub (2)
+	if type (src) == 'string' then
+		local prefix, sufix = src:sub (1, 1), src:sub (2)
+		if prefix == '&' then
+			return target .. sep .. sufix
+		elseif prefix == '!' then
+			return sufix
 		else
 			return src
 		end
@@ -94,4 +95,16 @@ function Builder (initializer)
 	new = new:extend (initializer)
 
 	return new
+end
+
+--[[		Load all builders from the builders directory		]]--
+local function buildersIter ()
+	local dir = io.popen ('ls builders/*.lua')
+	return function ()
+		return dir:read ()
+	end
+end
+
+for f in buildersIter () do
+	dofile (f)
 end
