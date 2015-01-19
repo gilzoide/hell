@@ -39,7 +39,7 @@ function build (builder)
 	setmetatable (new, new)
 	-- if no target specified, always add it to hell.builds
 	if not _G.hell.target then
-		_G.hell.builds[new] = true
+		table.insert (_G.hell.builds, new)
 	end
 	return new
 end

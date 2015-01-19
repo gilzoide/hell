@@ -1,10 +1,14 @@
 --- Handles builds and installs, should be used as _ENV's __newindex
 local function build_install_Handler (t, k, v)
-	local meta = getmetatable (v)
-	if meta == 'build' then
-		_G.hell.builds[v] = true
-	elseif meta == 'install' then
-		_G.hell.installs[v] = true
+	if k == _G.hell.target then
+		local meta = getmetatable (v)
+		if meta == 'build' then
+			table.insert (_G.hell.builds, v)
+		elseif meta == 'install' then
+			table.insert (_G.hell.installs, v)
+		else
+			rawset (t, k, v)
+		end
 	else
 		rawset (t, k, v)
 	end
@@ -26,6 +30,9 @@ function _addHellBuild (script, env)
 	-- for the hell builds to work, we need this __newindex
 	env.__newindex = build_install_Handler
 	setmetatable (env, env)
+	if hell.verbose then
+		print ('hell: sourcing hellbuild: ' .. script)
+	end
 	return loadfile (script, nil, env)
 end
 --- Alias for _addHellBuild (I do like this one better xD)
@@ -43,10 +50,7 @@ _feedHellFire = _addHellBuild
 --
 -- @return The results from the script. Usualy none
 function addHellBuild (script, env)
-	local file, _, env = _addHellBuild (script, env)
-	if not file then
-		quit ("Can't find hellbuild file \"" .. script .. "\"", true)
-	end
+	local file = assert (_addHellBuild (script, env))
 	return file ()
 end
 --- Alias for addHellBuild (I do like this one better xD)

@@ -2,8 +2,7 @@ local util = require 'hellutils'
 
 local unix_copy = {
 	bin = 'cp',
-	flags = 'r',
-	prepare_flags = util.curryPrefixEach ('-'),
+	flags = '-r',
 	cmd = '$bin $flags $input $output'
 }
 
