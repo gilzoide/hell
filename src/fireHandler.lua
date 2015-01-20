@@ -30,9 +30,6 @@ function _addHellBuild (script, env)
 	-- for the hell builds to work, we need this __newindex
 	env.__newindex = build_install_Handler
 	setmetatable (env, env)
-	if hell.verbose then
-		print ('hell: sourcing hellbuild: ' .. script)
-	end
 	return loadfile (script, nil, env)
 end
 --- Alias for _addHellBuild (I do like this one better xD)
@@ -51,6 +48,7 @@ _feedHellFire = _addHellBuild
 -- @return The results from the script. Usualy none
 function addHellBuild (script, env)
 	local file = assert (_addHellBuild (script, env))
+	hellMsg ('sourcing hellbuild: ' .. script)
 	return file ()
 end
 --- Alias for addHellBuild (I do like this one better xD)

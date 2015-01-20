@@ -1,6 +1,6 @@
 --[[		Builder: the heart of the Hell build scripts		]]--
 
-require 'build'
+require 'build_install'
 
 --- Auxiliary function for merging two fields
 --

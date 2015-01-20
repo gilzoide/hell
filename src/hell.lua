@@ -7,6 +7,13 @@ function quit (msg, was_error)
 	os.exit (was_error and 0 or 1, true)
 end
 
+--- Prints a message from hell execution
+function hellMsg (msg)
+	if hell.verbose () ~= false then
+		print ('hell: ' .. msg)
+	end
+end
+
 --[[		hell: the table that controls everything that's going on		]]--
 local win = {
 	name = 'windows',
@@ -77,11 +84,27 @@ if opts.h or opts.H then
 	hellp ()
 end
 
--- Process the builds
-if #hell.builds == 0 then
-	quit ("Can't find any builds" .. (hell.target and ' in target "' .. hell.target .. '"' or ''))
-end
+-- Command to be executed (build | clean | install | uninstall)
+if opts.command == 'build' then
+	-- Process the builds
+	if #hell.builds == 0 then
+		quit ("Can't find any builds" .. (hell.target and ' in target "' .. hell.target .. '"' or ''))
+	end
 
-for k, v in ipairs (hell.builds) do
-	print (v.cmd)
+	for k, v in ipairs (hell.builds) do
+		print ((not hell.verbose () and v.echo) or v.cmd)
+	end
+elseif opts.command == 'clean' then
+-- clean
+elseif opts.command == 'install' then
+	-- Process the installs
+	if #hell.installs == 0 then
+		quit ("Can't find any installs" .. (hell.target and ' in target "' .. hell.target .. '"' or ''))
+	end
+
+	for k, v in ipairs (hell.installs) do
+		print ((not hell.verbose () and v.echo) or v.cmd)
+	end
+else -- opts.command == 'uninstall'
+
 end

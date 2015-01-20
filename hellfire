@@ -1,9 +1,5 @@
 hell.outdir = 'build'
 
 copy {
-	input = 'src/*.lua'
-}
-
-copy {
-	input = 'src/builders'
+	input = {'src/*.lua', 'src/builders'}
 }

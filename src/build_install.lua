@@ -32,14 +32,35 @@ function build (builder)
 	if getmetatable (builder) ~= 'hellbuilder' then
 		builder = copy:extend (builder)
 	end
-	new = {
+	local new = {
 		__metatable = 'build',
+		echo = builder.echo,
+		input = builder.input,
+		output = builder.output,
 		cmd = substCmd (builder)
 	}
 	setmetatable (new, new)
 	-- if no target specified, always add it to hell.builds
 	if not _G.hell.target then
 		table.insert (_G.hell.builds, new)
+	end
+	return new
+end
+
+--- The install function, which 
+function install (builder)
+	-- for install, always copy
+	local new = {
+		__metatable = 'install',
+		echo = builder.echo,
+		input = builder.input,
+		output = builder.output,
+		cmd = substCmd (copy:extend { input = builder.input })
+	}
+	setmetatable (new, new)
+	-- if no target specified, always add it to hell.installs
+	if not _G.hell.target then
+		table.insert (_G.hell.installs, new)
 	end
 	return new
 end

@@ -78,6 +78,10 @@ Check `hell -H` for help.", true)
 	var, val = arg:match ("(.-)=(.+)")
 	if val then
 		_ENV[var] = val
+	-- or the command (must be one the valid ones)
+	elseif ('build clean install uninstall'):match (arg) then
+		opts.command = arg
+	-- or target
 	elseif not hell.target then
 		hell.target = arg
 	else
@@ -88,8 +92,14 @@ Check `hell -H` for help.', true)
 end
 
 --[[		Now that we parsed the options, make them active!		]]--
+opts.command = opts.command or 'build'
 -- Verbose (if -v, true; if -s, false; else, nil)
-hell.verbose = opts.v or opts.s and false
+-- make it a function, so that the value is private
+local verbose = opts.v or opts.s and false
+function hell.verbose ()
+	return verbose
+end
+
 -- Version
 if opts.V then
 	quit ('hell 0.1.0')
