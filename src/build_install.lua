@@ -7,8 +7,8 @@
 -- @param[in] cmd The command to be formed
 --
 -- @return A string with the right command
-local function substCmd (builder)
-	assert (type (builder.cmd) == 'string', "[subCmd] Can't substitute command: builder.cmd isn't a string")
+local function subst (builder, field)
+	assert_quit (type (builder[field]) == 'string', "[subst] Can't substitute builder's " .. field .. ": it isn't a string", 3)
 
 	-- build the command substituting anything that starts with a '$'
 	-- (unless it's escaped with another '$')
@@ -19,25 +19,38 @@ local function substCmd (builder)
 			-- call the field's 'prepare_' function, if it exists, or return the
 			-- field, or an empty string
 			local field, prepare = builder[capture], builder['prepare_' .. capture]
-			return prepare and prepare (field) or field or ''
+			return prepare and prepare (field, builder) or field or ''
 		end
 	end
 
-	return builder.cmd:gsub ('$([$%w_]+)', sub)
+	return builder[field]:gsub ('$([$%w_]+)', sub)
 end
 
 --- The build function, for building anything!
 function build (builder)
-	-- default builder: copy
+	assert_quit (type (builder.input) == 'string', "Can't build something without an input field", 2)
+	-- if called build function explicitly, search for the builder
+	-- defaults to it's extension, or fallback to copy
 	if getmetatable (builder) ~= 'hellbuilder' then
-		builder = copy:extend (builder)
+		local auto_builder
+		if not builder.builder then
+			local ext = builder.input:match ('.-%.(%S+)') 
+			auto_builder = _ENV[ext] or copy
+		else
+			assert_quit (getmetatable (builder.builder) == 'hellbuilder',
+					"Trying to use an invalid builder", 2)
+			-- calling build with explicit builder field
+			auto_builder = builder.builder
+		end
+		builder = auto_builder:extend (builder)
 	end
+	-- the new build
 	local new = {
 		__metatable = 'build',
 		echo = builder.echo,
 		input = builder.input,
 		output = builder.output,
-		cmd = substCmd (builder)
+		cmd = subst (builder, 'cmd')
 	}
 	setmetatable (new, new)
 	-- if no target specified, always add it to hell.builds
@@ -55,7 +68,7 @@ function install (builder)
 		echo = builder.echo,
 		input = builder.input,
 		output = builder.output,
-		cmd = substCmd (copy:extend { input = builder.input })
+		cmd = subst (copy:extend { input = builder.input }, 'cmd')
 	}
 	setmetatable (new, new)
 	-- if no target specified, always add it to hell.installs

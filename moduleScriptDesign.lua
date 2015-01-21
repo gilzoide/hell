@@ -46,4 +46,17 @@ myExt = Builder {
 }
 
 
+--[[		Preparando os campos
+			Pode-se fazer o builder preparar algum campo antes de esse ser usado, pondo prefixo, sufixo, mudando extensão, você tem o poder!		]]--
+-- Para preparar um campo, use uma função que receba o campo e, opcionalmente, o próprio builder
+--	essa função deve ter como nome 'prepare_CAMPO', sendo CAMPO o campo a ser preparado.
+--	Várias funções auxiliares estarão disponíveis no arquivo 'hellutils.lua', cola lá que explica bem (en)
+c.linka = Builder {
+	-- ao por um valor no campo 'link', ele automagicamente põe o '-l' antes =]
+	-- as funções auxiliares podem ajudar bastante, lembre-se delas!
+	prepare_links = curryPrefixEach ('-l')
+}
+			
+
+
 --[[		Builders serão ligados dinamicamente ao buildSystem, então podem ser baixados diretamente e colocado script na pasta certa, e voilá!		]]--

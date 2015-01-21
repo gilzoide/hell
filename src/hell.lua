@@ -7,6 +7,31 @@ function quit (msg, was_error)
 	os.exit (was_error and 0 or 1, true)
 end
 
+--- Assertion with custom quit handler (function quit)
+--
+-- @param[in] cond The condition to be checked. If false, quit handler will
+--  be called.
+-- @param[in] msg The message to be displayed. There's no default, please
+--  provide one.
+-- @param[in] level Debug level, for showing where the problem happend.
+--  Set the level just like you would in debug.getinfo, as assert_quit already
+--  increments itself in the level.
+--
+-- @return If condition is true, it's returned (just like assert does)
+function assert_quit (cond, msg, level)
+	if not cond then
+		-- maybe we want to trace where the problem happened, so...
+		if level then
+			-- need to set level+1, so we don't count assert_quit itself
+			local script = debug.getinfo (level + 1)
+			msg = script.short_src .. ':' .. script.currentline .. ': ' .. msg
+		end
+		quit (msg, true)
+	else
+		return cond
+	end
+end
+
 --- Prints a message from hell execution
 function hellMsg (msg)
 	if hell.verbose () ~= false then
@@ -87,9 +112,7 @@ end
 -- Command to be executed (build | clean | install | uninstall)
 if opts.command == 'build' then
 	-- Process the builds
-	if #hell.builds == 0 then
-		quit ("Can't find any builds" .. (hell.target and ' in target "' .. hell.target .. '"' or ''))
-	end
+	assert_quit (#hell.builds ~= 0, "Can't find any builds" .. (hell.target and ' in target "' .. hell.target .. '"' or ''))
 
 	for k, v in ipairs (hell.builds) do
 		print ((not hell.verbose () and v.echo) or v.cmd)
@@ -98,9 +121,7 @@ elseif opts.command == 'clean' then
 -- clean
 elseif opts.command == 'install' then
 	-- Process the installs
-	if #hell.installs == 0 then
-		quit ("Can't find any installs" .. (hell.target and ' in target "' .. hell.target .. '"' or ''))
-	end
+	assert_quit (#hell.installs ~= 0, "Can't find any installs" .. (hell.target and ' in target "' .. hell.target .. '"' or ''))
 
 	for k, v in ipairs (hell.installs) do
 		print ((not hell.verbose () and v.echo) or v.cmd)

@@ -23,11 +23,11 @@ Or, you can use hell itself! (still not able to build, but the hellbuild is ther
 Installing
 ----------
 
-    $ make install
+    # make install
 
 or, with hell,
 
-    $ hell install
+    # hell install
 
 More Info
 ---------

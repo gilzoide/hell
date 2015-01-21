@@ -1,12 +1,13 @@
 hell.help = "e então, minha gente..."
 
 a = gcc {
-	input = 'oi'
+	input = 'oi.c',
+	links = 'sdl'
 }
 
-gcc {
-	echo = 'compilando mais um =P',
-	input = 'mais um'
+build {
+	input = 'outro.c',
+	output = 'oUtRo'
 }
 
 install (a)

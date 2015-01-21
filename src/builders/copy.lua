@@ -13,3 +13,6 @@ local win_copy = {
 
 copy = Builder ((hell.os.name == 'unix' and unix_copy) or win_copy)
 copy.prepare_input = util.concat
+copy.prepare_output = function (out, b)
+	return out or 'copy_of_' .. b.input
+end
