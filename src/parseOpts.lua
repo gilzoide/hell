@@ -79,7 +79,7 @@ Check `hell -H` for help.", true)
 	if val then
 		_ENV[var] = val
 	-- or the command (must be one the valid ones)
-	elseif ('build clean install uninstall'):match (arg) then
+	elseif (' build clean install uninstall '):match ('%s+' .. arg .. '%s+') then
 		opts.command = arg
 	-- or target
 	elseif not hell.target then

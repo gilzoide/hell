@@ -6,12 +6,9 @@ local function build_install_Handler (t, k, v)
 			table.insert (_G.hell.builds, v)
 		elseif meta == 'install' then
 			table.insert (_G.hell.installs, v)
-		else
-			rawset (t, k, v)
 		end
-	else
-		rawset (t, k, v)
 	end
+	rawset (t, k, v)
 end
 
 --- Function for sourcing a hell build script.
