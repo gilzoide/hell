@@ -1,34 +1,30 @@
---- Substitute the fields in a command
---
--- @note When a field from t is nil, it's entry is substituted with ''
--- (just like shell would do).
---
--- @param[in] t The table with the fields
--- @param[in] cmd The command to be formed
---
--- @return A string with the right command
-local function subst (builder, field)
-	assert_quit (type (builder[field]) == 'string', "[subst] Can't substitute builder's " .. field .. ": it isn't a string", 3)
+local util = require 'hellutils'
 
-	-- build the command substituting anything that starts with a '$'
-	-- (unless it's escaped with another '$')
-	local function sub (capture)
-		if capture:sub (1, 1) == '$' then
-			return capture
-		else
-			-- call the field's 'prepare_' function, if it exists, or return the
-			-- field, or an empty string
-			local field, prepare = builder[capture], builder['prepare_' .. capture]
-			return prepare and prepare (field, builder) or field or ''
+local BI = {}
+
+BI.builds = {}
+BI.installs = {}
+
+--- Auxiliary function for getting the builds from a table
+function BI.getBI (t, meta)
+	if type (t) ~= 'table' then
+		return nil
+	end
+
+	local ret = {}
+	for i, v in ipairs (t) do
+		if getmetatable (v) == meta then
+			table.insert (ret, v)
 		end
 	end
 
-	return builder[field]:gsub ('$([$%w_]+)', sub)
+	return ret
 end
 
 --- The build function, for building anything!
 function build (builder)
-	assert_quit (type (builder.input) == 'string', "Can't build something without an input field", 2)
+	assert_quit (type (builder.input) == 'string',
+			"Can't build something without an input field", 2)
 	-- if called build function explicitly, search for the builder
 	-- defaults to it's extension, or fallback to copy
 	if getmetatable (builder) ~= 'hellbuilder' then
@@ -50,13 +46,11 @@ function build (builder)
 		echo = builder.echo,
 		input = builder.input,
 		output = builder.output,
-		cmd = subst (builder, 'cmd')
+		cmd = util.substField (builder, 'cmd')
 	}
 	setmetatable (new, new)
-	-- if no target specified, always add it to hell.builds
-	if not _G.hell.target then
-		table.insert (_G.hell.builds, new)
-	end
+
+	table.insert (_G, new)
 	return new
 end
 
@@ -68,12 +62,14 @@ function install (builder)
 		echo = builder.echo,
 		input = builder.input,
 		output = builder.output,
-		cmd = subst (copy:extend { input = builder.input }, 'cmd')
+		cmd = util.substField (copy:extend { 
+					input = builder.output or builder.input 
+				}, 'cmd')
 	}
 	setmetatable (new, new)
-	-- if no target specified, always add it to hell.installs
-	if not _G.hell.target then
-		table.insert (_G.hell.installs, new)
-	end
+
+	table.insert (_G, new)
 	return new
 end
+
+return BI

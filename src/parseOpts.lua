@@ -82,8 +82,8 @@ Check `hell -H` for help.", true)
 	elseif (' build clean install uninstall '):match ('%s+' .. arg .. '%s+') then
 		opts.command = arg
 	-- or target
-	elseif not hell.target then
-		hell.target = arg
+	elseif not opts.target then
+		opts.target = arg
 	else
 		quit ('"' .. arg .. '" is not a valid option or variable attribution.\
 Check `hell -H` for help.', true)
@@ -94,11 +94,7 @@ end
 --[[		Now that we parsed the options, make them active!		]]--
 opts.command = opts.command or 'build'
 -- Verbose (if -v, true; if -s, false; else, nil)
--- make it a function, so that the value is private
-local verbose = opts.v or opts.s and false
-function hell.verbose ()
-	return verbose
-end
+opts.verbose = opts.v or opts.s and false
 
 -- Version
 if opts.V then

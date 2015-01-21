@@ -42,4 +42,42 @@ function t.concat (field)
 	return type (field) == 'table' and table.concat (field, ' ') or field
 end
 
+--- Substitute the fields in a command
+--
+-- @note When a field from t is nil, it's entry is substituted with ''
+-- (just like shell would do).
+--
+-- @param[in] builder The table with the fields
+-- @param[in] str The string to be substituted
+--
+-- @return A string with the substituted stuff
+function t.subst (builder, str)
+	assert_quit (type (str) == 'string', "[subst] Can't substitute parameter: it isn't a string", 3)
+
+	-- build the command substituting anything that starts with a '$'
+	-- (unless it's escaped with another '$')
+	local function sub (capture)
+		if capture:sub (1, 1) == '$' then
+			return capture
+		else
+			-- call the field's 'prepare_' function, if it exists, or return the
+			-- field, or an empty string
+			local field, prepare = builder[capture], builder['prepare_' .. capture]
+			return prepare and prepare (field, builder) or field or ''
+		end
+	end
+
+	return str:gsub ('$([$%w_]+)', sub)
+end
+
+--- Wrapper for the subst function, which uses a builder's field as string
+--
+-- @param[in] builder The table with the fields
+-- @param[in] field Builder's field to be substituted
+--
+-- @return A string with the substituted stuff
+function t.substField (builder, field)
+	return t.subst (builder, builder[field])
+end
+
 return t

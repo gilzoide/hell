@@ -1,16 +1,3 @@
---- Handles builds and installs, should be used as _ENV's __newindex
-local function build_install_Handler (t, k, v)
-	if k == _G.hell.target then
-		local meta = getmetatable (v)
-		if meta == 'build' then
-			table.insert (_G.hell.builds, v)
-		elseif meta == 'install' then
-			table.insert (_G.hell.installs, v)
-		end
-	end
-	rawset (t, k, v)
-end
-
 --- Function for sourcing a hell build script.
 --
 -- As a default, it creates a new _ENV, for 'global' variables
@@ -25,7 +12,6 @@ end
 function _addHellBuild (script, env)
 	env = env or { __index = _ENV }
 	-- for the hell builds to work, we need this __newindex
-	env.__newindex = build_install_Handler
 	setmetatable (env, env)
 	return loadfile (script, nil, env)
 end

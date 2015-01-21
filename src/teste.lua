@@ -1,8 +1,13 @@
 hell.help = "e então, minha gente..."
 
-a = gcc {
-	input = 'oi.c',
-	links = 'sdl'
+a = {
+	gcc {
+		input = 'oi.c',
+		links = 'sdl'
+	},
+	install {
+		input = 'readme.txt'
+	}
 }
 
 build {
@@ -10,4 +15,6 @@ build {
 	output = 'oUtRo'
 }
 
-install (a)
+feedHellFire ('mais_um_teste.lua', _ENV)
+
+install (a[1])
