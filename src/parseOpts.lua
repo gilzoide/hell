@@ -100,6 +100,7 @@ opts.verbose = opts.v or opts.s and false
 if opts.V then
 	quit ('hell 0.1.0')
 end
+
 -- Help! Should be called after sourcing the scripts, as it may override hell.help
 function hellp ()
 	local optionsString, help
@@ -125,9 +126,13 @@ Report bugs to <gilzoide@gmail.com>]])
 
 		optionsString = table.concat (optionsString, '\n')
 
-		help = help or optionsString
+		help = (help and help .. '\n\nUse `hell -H` for more help.')or optionsString
 		quit (help)
 	end
+end
+
+if opts.H then
+	hellp ()
 end
 
 return opts

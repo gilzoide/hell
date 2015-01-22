@@ -75,42 +75,48 @@ end
 --[[		And now, source our first hellbuild script.
 	It looks respectively into 'opts.file', './hellfire', './hellbuild'		]]--
 local BI = require 'build_install'
+local util = require 'hellutils'
 require 'Builder'
 require 'fireHandler'
 
 -- file specified
-local script
-if opts.f then 
-	script = _addHellBuild (opts.f)
-	assert_quit (script, "Can't find hellbuild \"" .. opts.f .. '"')
--- or the default ones
-else
-	script, err = _addHellBuild ('./hellfire')
+local script, err
+local build_scripts = {opts.f}
+table.insert (build_scripts, './hellfire')
+table.insert (build_scripts, './hellbuild')
+
+for i = #build_scripts, 1, -1 do
+	script, err = _addHellBuild (build_scripts[i])
 	if not script then
 		if not err:match ('open') then
-			quit ('lua: ' .. err, true)
-		else
-			script, err = _addHellBuild ('./hellbuild')
-			if not script and err:match ('open') then
-				quit ("Can't find 'hellbuild' or 'hellfire' build scripts", true)
-			else
-				quit ('lua: ' .. err, true)
-			end
+			quit ("lua: " .. err, true)
 		end
+	else
+		break
 	end
 end
-script ()
 
--- Called for help?
-if opts.h or opts.H then
+-- well, let's say the user asked for help but there's no hellbuild to source
+-- no need to let him down, right?
+if not script and opts.h then
 	hellp ()
 end
 
+assert_quit (script, "Can't find any build scripts. Tried \"" .. table.concat (build_scripts, '", "') .. '"')
+script ()
+
+-- Called for help?
+if opts.h then
+	hellp ()
+elseif opts.l then
+
+end
+
 opts.target = opts.target or '_G'
-local target = assert_quit (getNestedField (_G, opts.target),
+local target = assert_quit (util.getNestedField (_G, opts.target),
 		"Can't find target \"" .. opts.target .. '"')
 -- Command to be executed (build | clean | install | uninstall)
-if opts.command == 'build' then
+if opts.command == 'build' or opts.command == 'clean' then
 	if opts.target then
 		BI.builds = BI.getBI (target, 'build')
 	end
@@ -120,9 +126,7 @@ if opts.command == 'build' then
 	for k, v in ipairs (BI.builds) do
 		print ((not opts.verbose and v.echo) or v.cmd)
 	end
-elseif opts.command == 'clean' then
--- clean
-elseif opts.command == 'install' then
+else -- opts.command == 'install' or opts.command == 'uninstall'
 	if opts.target then
 		BI.installs = BI.getBI (target, 'install')
 	end
@@ -132,6 +136,4 @@ elseif opts.command == 'install' then
 	for k, v in ipairs (BI.installs) do
 		print ((not opts.verbose and v.echo) or v.cmd)
 	end
-else -- opts.command == 'uninstall'
-
 end

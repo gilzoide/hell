@@ -35,19 +35,3 @@ function addHellBuild (script, scope)
 end
 --- Alias for addHellBuild (I do like this one better xD)
 feedHellFire = addHellBuild
-
---- Auxiliary function: gets the nested field inside table t.
---
--- It works by recursing over tables until there's no more '.' in field name.
---
--- @param t The table which will be searched
--- @param field 
-function getNestedField (t, field)
-	if not field or not t then
-		return t
-	else
-		local current, rest = field:match ('(.-)%.(.+)')
-		current = current or field
-		return getNestedField (t[current], rest)
-	end
-end

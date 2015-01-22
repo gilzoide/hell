@@ -80,4 +80,21 @@ function t.substField (builder, field)
 	return t.subst (builder, builder[field])
 end
 
+--- Auxiliary function: gets the nested field inside table t.
+--
+-- It works by recursing over tables until there's no more '.' in field name.
+--
+-- @param t The table which will be searched
+-- @param field 
+local function getNestedField (t, field)
+	if not field or not t then
+		return t
+	else
+		local current, rest = field:match ('(.-)%.(.+)')
+		current = current or field
+		return getNestedField (t[current], rest)
+	end
+end
+t.getNestedField = getNestedField
+
 return t
