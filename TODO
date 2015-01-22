@@ -1,3 +1,2 @@
 + dependêêência
 + tentar linkar haskell no lua 5.2 (q o hslua só rola 5.1 ¬¬)
-- tentar proteger a table hell (de algum jeito), ou pelo menos a função verbose

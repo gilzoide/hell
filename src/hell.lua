@@ -79,11 +79,13 @@ require 'Builder'
 require 'fireHandler'
 
 -- file specified
+local script
 if opts.f then 
-	addHellBuild (opts.f, _G)
+	script = _addHellBuild (opts.f)
+	assert_quit (script, "Can't find hellbuild \"" .. opts.f .. '"')
 -- or the default ones
 else
-	local script, err = _addHellBuild ('./hellfire')
+	script, err = _addHellBuild ('./hellfire')
 	if not script then
 		if not err:match ('open') then
 			quit ('lua: ' .. err, true)
@@ -96,8 +98,8 @@ else
 			end
 		end
 	end
-	script ()
 end
+script ()
 
 -- Called for help?
 if opts.h or opts.H then

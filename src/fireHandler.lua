@@ -1,18 +1,15 @@
 --- Function for sourcing a hell build script.
 --
--- As a default, it creates a new _ENV, for 'global' variables
--- being local to the script, so it doesn't affect the previous one. If you
--- like, you can pass your own _ENV so that it's shared between build scripts.
+-- As a default, it uses the same _ENV as the previous one.
+-- If you may want to scope the script (say, to modify some variable locally,
+-- and then your changes are back to normal), just tell us!
 --
 -- @param[in] script The script name, for loading
--- @param[in] env The script env. Default is creating a new one,
---  __indexing the old
+-- @param[in] scope Should we scope _ENV? bool
 --
 -- @return The result from loadfile
-function _addHellBuild (script, env)
-	env = env or { __index = _ENV }
-	-- for the hell builds to work, we need this __newindex
-	setmetatable (env, env)
+function _addHellBuild (script, scope)
+	local env = scope and setmetatable ({}, { __index = _ENV }) or _ENV
 	return loadfile (script, nil, env)
 end
 --- Alias for _addHellBuild (I do like this one better xD)
@@ -25,12 +22,14 @@ _feedHellFire = _addHellBuild
 -- It's the preferred approach for the final user, but less flexible.
 --
 -- @param[in] script The script name, for loading
--- @param[in] env The script env. Default is creating a new one,
---  __indexing the old
+-- @param[in] scope Should we scope _ENV? bool 
+--
+-- @sa _addHellBuild
 --
 -- @return The results from the script. Usualy none
-function addHellBuild (script, env)
-	local file = assert (_addHellBuild (script, env))
+function addHellBuild (script, scope)
+	local file = _addHellBuild (script, scope)
+	assert_quit (file, "Can't load hellbuild \"" .. script .. '"', 2)
 	hellMsg ('sourcing hellbuild: ' .. script)
 	return file ()
 end

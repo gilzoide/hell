@@ -15,6 +15,6 @@ build {
 	output = 'oUtRo'
 }
 
-feedHellFire ('mais_um_teste.lua', _ENV)
+feedHellFire ('mais_um_teste.lua')
 
 install (a[1])
