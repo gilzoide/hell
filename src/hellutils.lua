@@ -7,8 +7,8 @@ local t = {}
 
 --- Prefix each word in str with prefix
 --
--- @param[in] str The string
--- @param[in] prefix The prefix to be used
+-- @param str The string
+-- @param prefix The prefix to be used
 --
 -- @return The string str with prefix before every word
 function t.prefixEach (str, prefix)
@@ -26,7 +26,7 @@ end
 -- 		prepare_includes = curryPrefixEach ('-I')
 -- 		prepare_defines = curryPrefixEach ('-D')
 --
--- @param[in] prefix The prefix to be curried in prefixEach
+-- @param prefix The prefix to be curried in prefixEach
 --
 -- @return prefixEach's result
 function t.curryPrefixEach (prefix)
@@ -35,7 +35,7 @@ end
 
 --- If field is a table, table.concat it; don't do a thing otherwise
 --
--- @param[in] field The field
+-- @param field The field
 --
 -- @return The field unpacked and concatenated, or unaltered
 function t.concat (field)
@@ -47,8 +47,8 @@ end
 -- @note When a field from t is nil, it's entry is substituted with ''
 -- (just like shell would do).
 --
--- @param[in] builder The table with the fields
--- @param[in] str The string to be substituted
+-- @param builder The table with the fields
+-- @param str The string to be substituted
 --
 -- @return A string with the substituted stuff
 function t.subst (builder, str)
@@ -72,8 +72,8 @@ end
 
 --- Wrapper for the subst function, which uses a builder's field as string
 --
--- @param[in] builder The table with the fields
--- @param[in] field Builder's field to be substituted
+-- @param builder The table with the fields
+-- @param field Builder's field to be substituted
 --
 -- @return A string with the substituted stuff
 function t.substField (builder, field)

@@ -4,8 +4,8 @@
 -- If you may want to scope the script (say, to modify some variable locally,
 -- and then your changes are back to normal), just tell us!
 --
--- @param[in] script The script name, for loading
--- @param[in] scope Should we scope _ENV? bool
+-- @param script The script name, for loading
+-- @param scope Should we scope _ENV? bool
 --
 -- @return The result from loadfile
 function _addHellBuild (script, scope)
@@ -21,8 +21,8 @@ _feedHellFire = _addHellBuild
 --
 -- It's the preferred approach for the final user, but less flexible.
 --
--- @param[in] script The script name, for loading
--- @param[in] scope Should we scope _ENV? bool 
+-- @param script The script name, for loading
+-- @param scope Should we scope _ENV? bool 
 --
 -- @sa _addHellBuild
 --
@@ -35,3 +35,19 @@ function addHellBuild (script, scope)
 end
 --- Alias for addHellBuild (I do like this one better xD)
 feedHellFire = addHellBuild
+
+--- Auxiliary function: gets the nested field inside table t.
+--
+-- It works by recursing over tables until there's no more '.' in field name.
+--
+-- @param t The table which will be searched
+-- @param field 
+function getNestedField (t, field)
+	if not field or not t then
+		return t
+	else
+		local current, rest = field:match ('(.-)%.(.+)')
+		current = current or field
+		return getNestedField (t[current], rest)
+	end
+end

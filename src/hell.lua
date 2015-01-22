@@ -9,11 +9,11 @@ end
 
 --- Assertion with custom quit handler (function quit)
 --
--- @param[in] cond The condition to be checked. If false, quit handler will
+-- @param cond The condition to be checked. If false, quit handler will
 --  be called.
--- @param[in] msg The message to be displayed. There's no default, please
+-- @param msg The message to be displayed. There's no default, please
 --  provide one.
--- @param[in] level Debug level, for showing where the problem happend.
+-- @param level Debug level, for showing where the problem happend.
 --  Set the level just like you would in debug.getinfo, as assert_quit already
 --  increments itself in the level.
 --
@@ -107,7 +107,7 @@ if opts.h or opts.H then
 end
 
 opts.target = opts.target or '_G'
-local target = assert_quit (_G[opts.target],
+local target = assert_quit (getNestedField (_G, opts.target),
 		"Can't find target \"" .. opts.target .. '"')
 -- Command to be executed (build | clean | install | uninstall)
 if opts.command == 'build' then

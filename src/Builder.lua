@@ -8,9 +8,9 @@ require 'build_install'
 -- and substituted otherwise (the '&' may be escaped with a '!').
 -- If the second doesn't exist, use the original one.
 --
--- @param[in] target The first field, to merged with
--- @param[in] src The second field, for merging with the first
--- @param[in] sep The separator to be used when concatting. Default = ' '
+-- @param target The first field, to merged with
+-- @param src The second field, for merging with the first
+-- @param sep The separator to be used when concatting. Default = ' '
 --
 -- @return The merged fields
 local function mergeFields (target, src, sep)
@@ -81,7 +81,7 @@ builder.__metatable = 'hellbuilder'
 
 --- Builder constructor
 --
--- @param[in] initializer A table with the fields for initializing the builder.
+-- @param initializer A table with the fields for initializing the builder.
 --	Fields will be extended.
 --
 -- @return A new Builder

@@ -49,8 +49,9 @@ Pode-se chamar tables dentro de tables usando a própria notação do
 Lua, 'table.outra_table'.
 	Chamar tables dentro de tables é um tanto quanto inútil, e mais difícil de
 	implementar. Ideia abandonada!
+		Ou não, já implementei, enóis xP
 
-`hell yeah clean` -- não pode mais `hell yeah.man`, `hell is.on.fire install`
+`hell yeah clean`, `hell yeah.man`, `hell is.on.fire install`
 
 
 
