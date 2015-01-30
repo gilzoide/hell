@@ -33,13 +33,49 @@ function t.curryPrefixEach (prefix)
 	return function (str) return t.prefixEach (str, prefix) end
 end
 
+--- Maps a function over a table
+--
+-- @return Strings with the results concatenated
+function t.fmap (field, f)
+	assert_quit (type (f) == 'function', "[fmap] Can't map a function if it ain't a function!", 2)
+
+	if type (field) ~= 'table' then
+		return f (field)
+	end
+
+	-- apply function over every value in field, keeping changes
+	local results = {}
+	for i, v in ipairs (field) do
+		results[i] = f (v)
+	end
+
+	return table.concat (results, ' ')
+end
+
+--- Function for doing nothing
+--
+-- It's useful for passing it into fmap, when you don't want to mess with things
+function t.id (a)
+	return a
+end
+
 --- If field is a table, table.concat it; don't do a thing otherwise
 --
 -- @param field The field
 --
 -- @return The field unpacked and concatenated, or unaltered
 function t.concat (field)
-	return type (field) == 'table' and table.concat (field, ' ') or field
+	return t.fmap (field, t.id)
+end
+
+
+--- Changes a file name's extension to the `new' one
+function t.changeExtension (file_name, new)
+	-- drop the dot from filename, if there should be no extension
+	if new ~= '' then
+		new = '.' .. new
+	end
+	return file_name:gsub ('(%.?.-)%..*', '%1' .. new)
 end
 
 --- Substitute the fields in a command
@@ -62,8 +98,11 @@ function t.subst (builder, str)
 		else
 			-- call the field's 'prepare_' function, if it exists, or return the
 			-- field, or an empty string
-			local field, prepare = builder[capture], builder['prepare_' .. capture]
-			return prepare and prepare (field, builder) or field or ''
+			local prepare = builder['prepare_' .. capture]
+			if prepare then
+				builder[capture] = prepare (builder[capture], builder)
+			end
+			return builder[capture] or ''
 		end
 	end
 

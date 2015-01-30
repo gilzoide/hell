@@ -36,13 +36,17 @@ end
 local win = {
 	name = 'windows',
 	architecture = os.getenv ('PROCESSOR_ARCHITECTURE'),
-	dir_sep = '\\'
+	dir_sep = '\\',
+	obj_ext = 'obj',
+	exe_ext = 'exe'
 }
 
 local unix = {
 	name = 'unix',
 	architecture = io.popen ('uname -m'):read (),
-	dir_sep = '/'
+	dir_sep = '/',
+	obj_ext = 'o',
+	exe_ext = ''
 }
 
 hell = {

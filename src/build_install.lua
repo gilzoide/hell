@@ -23,8 +23,9 @@ end
 
 --- The build function, for building anything!
 function build (builder)
-	assert_quit (type (builder.input) == 'string',
-			"Can't build something without an input field", 2)
+	assert_quit (type (tostring (builder.input)) == 'string',
+			"Can't build something without a valid input field.\
+Needed a string, got a " .. type (builder.input) .. '.', 2)
 	-- if called build function explicitly, search for the builder
 	-- defaults to it's extension, or fallback to copy
 	if getmetatable (builder) ~= 'hellbuilder' then
@@ -34,19 +35,20 @@ function build (builder)
 			auto_builder = _ENV[ext] or copy
 		else
 			assert_quit (getmetatable (builder.builder) == 'hellbuilder',
-					"Trying to use an invalid builder", 2)
+					"Trying to use an invalid Builder", 2)
 			-- calling build with explicit builder field
 			auto_builder = builder.builder
 		end
 		builder = auto_builder:extend (builder)
 	end
 	-- the new build
+	local new_cmd = util.substField (builder, 'cmd')
 	local new = {
 		__metatable = 'build',
 		echo = builder.echo,
 		input = builder.input,
-		output = builder.output,
-		cmd = util.substField (builder, 'cmd')
+		output = builder.output or builder.input,
+		cmd = new_cmd
 	}
 	setmetatable (new, new)
 
@@ -54,17 +56,18 @@ function build (builder)
 	return new
 end
 
---- The install function, which 
+--- The install function
 function install (builder)
 	-- for install, always copy
+	local new_cmd = util.substField (copy:extend {
+		input = builder.output or builder.input 
+	}, 'cmd')
 	local new = {
 		__metatable = 'install',
 		echo = builder.echo,
 		input = builder.input,
 		output = builder.output,
-		cmd = util.substField (copy:extend { 
-					input = builder.output or builder.input 
-				}, 'cmd')
+		cmd = new_cmd
 	}
 	setmetatable (new, new)
 
