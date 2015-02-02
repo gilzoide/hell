@@ -1,3 +1,8 @@
+--- @file parseOpts.lua
+-- Options, right?
+
+local int = require 'internals'
+
 -- all the hell options
 local hell_options = {
 	{'f', 'file', 'FILE', "Specify build script name. Defaults: hellbuild or hellfire"},
@@ -39,17 +44,17 @@ for i, arg in ipairs (args) do
 			if hell_options[var][3] then
 				opts[hell_options[var][1]] = val
 			else
-				quit (var .. " option doesn't accept values, sorry", true)
+				int.quit (var .. " option doesn't accept values, sorry", true)
 			end
 		elseif hell_options[check] then
 			if not hell_options[check][3] then
 				opts[hell_options[check][1]] = true
 			else
-				quit ("Value required for '--" .. check .. "' long option.", true)
+				int.quit ("Value required for '--" .. check .. "' long option.", true)
 			end
 		else
-			quit ("Long option not recognized.\
-      Check `hell -H` for help.", true)
+			int.quit ("Long option not recognized.\
+Check `hell -H` for help.", true)
 		end
 		goto continue
 	end
@@ -63,13 +68,13 @@ for i, arg in ipairs (args) do
 					opts[check] = args[i + 1]
 					skip = true
 				else
-					quit ("Value required for '-" .. check .. "' short option.", true)
+					int.quit ("Value required for '-" .. check .. "' short option.", true)
 				end
 			else
 				opts[check] = true
 			end
 		else
-			quit ("Short option not recognized.\
+			int.quit ("Short option not recognized.\
 Check `hell -H` for help.", true)
 		end
 		goto continue
@@ -85,7 +90,7 @@ Check `hell -H` for help.", true)
 	elseif not opts.target then
 		opts.target = arg
 	else
-		quit ('"' .. arg .. '" is not a valid option or variable attribution.\
+		int.quit ('"' .. arg .. '" is not a valid option or variable attribution.\
 Check `hell -H` for help.', true)
 	end
 	::continue::
@@ -98,7 +103,7 @@ opts.verbose = opts.v or opts.s and false
 
 -- Version
 if opts.V then
-	quit ('hell 0.1.0')
+	int.quit ('hell 0.1.0')
 end
 
 -- Help! Should be called after sourcing the scripts, as it may override hell.help
@@ -127,7 +132,7 @@ Report bugs to <gilzoide@gmail.com>]])
 		optionsString = table.concat (optionsString, '\n')
 
 		help = (help and help .. '\n\nUse `hell -H` for more help.')or optionsString
-		quit (help)
+		int.quit (help)
 	end
 end
 

@@ -1,4 +1,5 @@
---[[		Builder: the heart of the Hell build scripts		]]--
+--- @file Builder.lua
+-- Builder: the heart of the Hell build scripts
 
 require 'build_install'
 

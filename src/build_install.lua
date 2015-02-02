@@ -1,11 +1,15 @@
+--- @file build_install.lua
+-- build and install functions, vital pieces of the hell build system
+
 local util = require 'hellutils'
+local int = require 'internals'
 
 local BI = {}
 
 BI.builds = {}
 BI.installs = {}
 
---- Auxiliary function for getting the builds from a table
+--- Auxiliary function for getting the builds/installs from a table
 function BI.getBI (t, meta)
 	if type (t) ~= 'table' then
 		return nil
@@ -23,7 +27,7 @@ end
 
 --- The build function, for building anything!
 function build (builder)
-	assert_quit (type (tostring (builder.input)) == 'string',
+	int.assert_quit (type (tostring (builder.input)) == 'string',
 			"Can't build something without a valid input field.\
 Needed a string, got a " .. type (builder.input) .. '.', 2)
 	-- if called build function explicitly, search for the builder
@@ -34,7 +38,7 @@ Needed a string, got a " .. type (builder.input) .. '.', 2)
 			local ext = builder.input:match ('.-%.(%S+)') 
 			auto_builder = _ENV[ext] or copy
 		else
-			assert_quit (getmetatable (builder.builder) == 'hellbuilder',
+			int.assert_quit (getmetatable (builder.builder) == 'hellbuilder',
 					"Trying to use an invalid Builder", 2)
 			-- calling build with explicit builder field
 			auto_builder = builder.builder
