@@ -5,6 +5,28 @@
 
 local t = {}
 
+--- Glob function, returns all matches in a table
+--
+-- @note Currently it uses only `ls`, so don't really use it in windows
+-- (I'll use `dir` someday, and make it more crossplatform)
+--
+-- @param pattern The search pattern
+--
+-- @return Table with all filename matches
+function t.glob (pattern)
+	pattern = pattern or ''
+	local matches = {}
+	local ls = io.popen ('ls ' .. pattern)
+
+	for match in ls:lines () do
+		table.insert (matches, match)
+	end
+
+	ls:close ()
+
+	return matches
+end
+
 --- Prefix each word in str with prefix
 --
 -- @param str The string
