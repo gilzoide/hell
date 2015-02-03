@@ -1,37 +1,6 @@
 --- @file hell.lua
 -- The hell script executable
 
---- Quits the program with a message, and sign possible error
-function quit (msg, was_error)
-	io.stderr:write ('hell: ' .. msg .. '\n')
-	os.exit (was_error and 0 or 1, true)
-end
-
---- Assertion with custom quit handler (function quit)
---
--- @param cond The condition to be checked. If false, quit handler will
---  be called.
--- @param msg The message to be displayed. There's no default, please
---  provide one.
--- @param level Debug level, for showing where the problem happend.
---  Set the level just like you would in debug.getinfo, as assert_quit already
---  increments itself in the level.
---
--- @return If condition is true, it's returned (just like assert does)
-function assert_quit (cond, msg, level)
-	if not cond then
-		-- maybe we want to trace where the problem happened, so...
-		if level then
-			-- need to set level+1, so we don't count assert_quit itself
-			local script = debug.getinfo (level + 1)
-			msg = script.short_src .. ':' .. script.currentline .. ': ' .. msg
-		end
-		quit (msg, true)
-	end
-
-	return cond
-end
-
 --[[		hell: the table that controls everything that's going on		]]--
 local win = {
 	name = 'windows',
@@ -60,30 +29,21 @@ hell = {
 	-- doesn't make sense when not shadow building (when outdir not especified)
 	-- Ex: if input is at './src', output goes to the '$outdir/src' dir
 	keepDirStructure = nil,
-	-- ao conferir arquivos de entrada com o glob, usar as entradas em 
-	-- um comando só?
-	multinput = true,
 	-- table with some SO especific stuff
 	os = package.config:sub (1, 1) == '/' and unix or win,
 }
 
 local opts = (assert (loadfile ('parseOpts.lua'))) (...)
 
---- Prints a message from hell execution
-function hellMsg (msg)
-	if opts.verbose ~= false then
-		print ('hell: ' .. msg)
-	end
-end
-
 --[[		And now, source our first hellbuild script.
 	It looks respectively into 'opts.file', './hellfire', './hellbuild'		]]--
 local BI = require 'build_install'
 local util = require 'hellutils'
+local int = require 'internals'
 require 'Builder'
 require 'fireHandler'
 
--- file specified
+-- first script to load
 local script, err
 local build_scripts = {opts.f}
 table.insert (build_scripts, './hellfire')
@@ -106,7 +66,7 @@ if not script and opts.h then
 	hellp ()
 end
 
-assert_quit (script, "Can't find any build scripts. Tried \"" .. table.concat (build_scripts, '", "') .. '"')
+int.assert_quit (script, "Can't find any build scripts. Tried \"" .. table.concat (build_scripts, '", "') .. '"')
 script ()
 
 -- Called for help?
@@ -117,7 +77,7 @@ elseif opts.l then
 end
 
 opts.target = opts.target or '_G'
-local target = assert_quit (util.getNestedField (_G, opts.target),
+local target = int.assert_quit (util.getNestedField (_G, opts.target),
 		"Can't find target \"" .. opts.target .. '"')
 -- Command to be executed (build | clean | install | uninstall)
 if opts.command == 'build' or opts.command == 'clean' then
@@ -125,7 +85,7 @@ if opts.command == 'build' or opts.command == 'clean' then
 		BI.builds = BI.getBI (target, 'build')
 	end
 	-- Process the builds
-	assert_quit (#BI.builds ~= 0, "Can't find any builds" .. (opts.target and ' in target "' .. opts.target .. '"' or ''))
+	int.assert_quit (#BI.builds ~= 0, "Can't find any builds" .. (opts.target and ' in target "' .. opts.target .. '"' or ''))
 
 	for k, v in ipairs (BI.builds) do
 		print ((not opts.verbose and v.echo) or v.cmd)
@@ -135,7 +95,7 @@ else -- opts.command == 'install' or opts.command == 'uninstall'
 		BI.installs = BI.getBI (target, 'install')
 	end
 	-- Process the installs
-	assert_quit (#BI.installs ~= 0, "Can't find any installs" .. (opts.target and ' in target "' .. opts.target .. '"' or ''))
+	int.assert_quit (#BI.installs ~= 0, "Can't find any installs" .. (opts.target and ' in target "' .. opts.target .. '"' or ''))
 
 	for k, v in ipairs (BI.installs) do
 		print ((not opts.verbose and v.echo) or v.cmd)

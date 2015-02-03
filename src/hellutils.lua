@@ -3,6 +3,8 @@
 -- modules where needed, so it will reside somewhere in the 'package.path'.
 -- Enjoy the various facilities we're providing xD
 
+local int = require 'internals'
+
 local t = {}
 
 --- Glob function, returns all matches in a table
@@ -59,7 +61,7 @@ end
 --
 -- @return Strings with the results concatenated
 function t.fmap (field, f)
-	assert_quit (type (f) == 'function', "[fmap] Can't map a function if it ain't a function!", 2)
+	int.assert_quit (type (f) == 'function', "[fmap] Can't map a function if it ain't a function!", 2)
 
 	if type (field) ~= 'table' then
 		return f (field)
@@ -110,7 +112,7 @@ end
 --
 -- @return A string with the substituted stuff
 function t.subst (builder, str)
-	assert_quit (type (str) == 'string', "[subst] Can't substitute parameter: it isn't a string", 3)
+	int.assert_quit (type (str) == 'string', "[subst] Can't substitute parameter: it isn't a string", 3)
 
 	-- build the command substituting anything that starts with a '$'
 	-- (unless it's escaped with another '$')

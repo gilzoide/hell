@@ -1,3 +1,7 @@
+--[[	fireHandler.lua: hell script loading utilities		]]--
+
+local int = require 'internals'
+
 --- Function for sourcing a hell build script.
 --
 -- As a default, it uses the same _ENV as the previous one.
@@ -29,9 +33,14 @@ _feedHellFire = _addHellBuild
 -- @return The results from the script. Usualy none
 function addHellBuild (script, scope)
 	local file = _addHellBuild (script, scope)
-	assert_quit (file, "Can't load hellbuild \"" .. script .. '"', 2)
+	int.assert_quit (file, "Can't load hellbuild \"" .. script .. '"', 2)
 	hellMsg ('sourcing hellbuild: ' .. script)
-	return file ()
+	
+	-- pushes 
+
+	local ret = file ()
+
+	return ret
 end
 --- Alias for addHellBuild (I do like this one better xD)
 feedHellFire = addHellBuild
