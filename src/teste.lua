@@ -1,4 +1,5 @@
 hell.help = "e então, minha gente..."
+hell.outdir = "build"
 
 a = {
 	gcc {
@@ -15,7 +16,7 @@ build {
 	output = 'oUtRo'
 }
 
-feedHellFire ('mais_um_teste.lua')
+feedHellFire ('recursive/mais_um_teste.lua')
 
 -- target aninhada!
 a.c = {

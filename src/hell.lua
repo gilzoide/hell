@@ -50,7 +50,7 @@ table.insert (build_scripts, './hellfire')
 table.insert (build_scripts, './hellbuild')
 
 for i = #build_scripts, 1, -1 do
-	script, err = _addHellBuild (build_scripts[i])
+	script, err = int._addHellBuild (build_scripts[i])
 	if not script then
 		if not err:match ('open') then
 			quit ("lua: " .. err, true)
@@ -88,7 +88,7 @@ if opts.command == 'build' or opts.command == 'clean' then
 	int.assert_quit (#BI.builds ~= 0, "Can't find any builds" .. (opts.target and ' in target "' .. opts.target .. '"' or ''))
 
 	for k, v in ipairs (BI.builds) do
-		print ((not opts.verbose and v.echo) or v.cmd)
+		print ((not int.verbose and v.echo) or v.cmd)
 	end
 else -- opts.command == 'install' or opts.command == 'uninstall'
 	if opts.target then
@@ -98,6 +98,6 @@ else -- opts.command == 'install' or opts.command == 'uninstall'
 	int.assert_quit (#BI.installs ~= 0, "Can't find any installs" .. (opts.target and ' in target "' .. opts.target .. '"' or ''))
 
 	for k, v in ipairs (BI.installs) do
-		print ((not opts.verbose and v.echo) or v.cmd)
+		print ((not int.verbose and v.echo) or v.cmd)
 	end
 end

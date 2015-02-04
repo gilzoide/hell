@@ -1,44 +1,47 @@
---[[	fireHandler.lua: hell script loading utilities		]]--
+--- @file fireHandler.lua
+-- Hell script loading utilities
 
 local int = require 'internals'
 
+
 --- Function for sourcing a hell build script.
---
 -- As a default, it uses the same _ENV as the previous one.
 -- If you may want to scope the script (say, to modify some variable locally,
 -- and then your changes are back to normal), just tell us!
 --
 -- @param script The script name, for loading
--- @param scope Should we scope _ENV? bool
+-- @param scope Should we scope _ENV? bool 
 --
--- @return The result from loadfile
-function _addHellBuild (script, scope)
+-- @return The results from loadfile
+function int._addHellBuild (script, scope)
 	local env = scope and setmetatable ({}, { __index = _ENV }) or _ENV
 	return loadfile (script, nil, env)
 end
---- Alias for _addHellBuild (I do like this one better xD)
-_feedHellFire = _addHellBuild
 
 
---- Wrapper for the _addHellBuild function, which quits the program if couldn't
--- load script.
---
--- It's the preferred approach for the final user, but less flexible.
+--- Function for sourcing a hell build script.
+-- Wrapper for the _addHellBuild function, which only hell should use
 --
 -- @param script The script name, for loading
 -- @param scope Should we scope _ENV? bool 
 --
--- @sa _addHellBuild
---
 -- @return The results from the script. Usualy none
 function addHellBuild (script, scope)
-	local file = _addHellBuild (script, scope)
+	local file = int._addHellBuild (script, scope)
+
 	int.assert_quit (file, "Can't load hellbuild \"" .. script .. '"', 2)
-	hellMsg ('sourcing hellbuild: ' .. script)
+	int.hellMsg ('sourcing hellfire: ' .. script)
 	
-	-- pushes 
+	local function takeDirectory (str)
+		return str:match ("(.+)/.+") .. '/'
+	end
+	-- pushes path to internals.path, for knowing where we are
+	table.insert (int.path, takeDirectory (script))
 
 	local ret = file ()
+
+	-- and pop the path, as we will go back now
+	table.remove (int.path, #int.path)
 
 	return ret
 end

@@ -5,7 +5,7 @@ local t = {}
 
 --- Prints a message from hell execution
 function t.hellMsg (msg)
-	if opts.verbose ~= false then
+	if t.verbose ~= false then
 		print ('hell: ' .. msg)
 	end
 end
@@ -43,5 +43,10 @@ function t.assert_quit (cond, msg, level)
 	return cond
 end
 
+
+--- A stack for the paths, which will be used when sourcing a hellfire,
+-- for `build' and `install' to know where to look for inputs.
+-- First path is where we are now
+t.path = { os.getenv ("PWD") }
 
 return t

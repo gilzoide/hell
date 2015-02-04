@@ -99,7 +99,7 @@ end
 --[[		Now that we parsed the options, make them active!		]]--
 opts.command = opts.command or 'build'
 -- Verbose (if -v, true; if -s, false; else, nil)
-opts.verbose = opts.v or opts.s and false
+int.verbose = opts.v or opts.s and false
 
 -- Version
 if opts.V then
