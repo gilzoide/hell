@@ -47,6 +47,15 @@ end
 --- A stack for the paths, which will be used when sourcing a hellfire,
 -- for `build' and `install' to know where to look for inputs.
 -- First path is where we are now
-t.path = { os.getenv ("PWD") }
+t.path = {}
+
+function t.getPath ()
+	local dir = table.concat (t.path, hell.os.dir_sep, 1)
+	if dir ~= '' then
+		dir = dir .. hell.os.dir_sep
+	end
+
+	return dir
+end
 
 return t

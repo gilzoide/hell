@@ -57,10 +57,10 @@ Needed a string, got a " .. type (builder.input) .. '.', 2)
 		echo = builder.echo,
 		input = builder.input,
 		output = builder.output or builder.input,
-		cmd = new_cmd:gsub (builder.input, util.curryPrefixEach (table.concat (int.path, '/', 2)))
+		cmd = new_cmd:gsub (builder.input, util.curryPrefixEach (int.getPath ()))
 	}
 	if hell.outdir then
-		new.cmd = new.cmd:gsub (builder.output, hell.outdir .. '/' .. builder.output)
+		new.cmd = new.cmd:gsub (builder.output, hell.outdir .. hell.os.dir_sep .. builder.output)
 	end
 	setmetatable (new, new)
 

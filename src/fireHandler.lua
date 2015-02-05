@@ -15,8 +15,15 @@ local int = require 'internals'
 -- @return The results from loadfile
 function int._addHellBuild (script, scope)
 	local env = scope and setmetatable ({}, { __index = getfenv (1) }) or getfenv (1)
-	local file, err = loadfile (script)
+
+	local file, err = loadfile (int.getPath () .. script)
 	if file then
+		-- pushes path to internals.path, for knowing where we are
+		local function takeDirectory (str)
+			return str:match ("(.+)/.+")
+		end
+		table.insert (int.path, takeDirectory (script))
+
 		return setfenv (file, env)
 	else
 		return file, err
@@ -37,12 +44,6 @@ function addHellBuild (script, scope)
 	int.assert_quit (file, "Can't load hellbuild \"" .. script .. '"', 2)
 	int.hellMsg ('sourcing hellfire: ' .. script)
 	
-	local function takeDirectory (str)
-		return str:match ("(.+)/.+") .. '/'
-	end
-	-- pushes path to internals.path, for knowing where we are
-	table.insert (int.path, takeDirectory (script))
-
 	local ret = file ()
 
 	-- and pop the path, as we will go back now
