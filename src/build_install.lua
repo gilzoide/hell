@@ -30,7 +30,7 @@ local function getDefaultBuilder (builder)
 	local auto_builder
 	if not builder.builder then
 		local ext = builder.input:match ('.-%.(%S+)') 
-		auto_builder = _ENV[ext] or copy
+		auto_builder = getfenv(1)[ext] or copy
 	else
 		int.assert_quit (getmetatable (builder.builder) == 'hellbuilder',
 				"Trying to use an invalid Builder", 2)

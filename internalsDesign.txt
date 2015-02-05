@@ -25,9 +25,7 @@ explicadinhos no 'src/hell.lua', dá uma olhadinha lá =]
 Esquema simplificado do fluxo do rolê
 =====================================
 
-1. DB tá atualizado?
-	1.a não => Roda o script e atualiza o DB
-	1.b sim => continua no 2. =P
+1. Roda o script e manja as targets
 2. Target existe?
 	2.a não => ERROR ('target inexistente!')
 	2.b sim => continua no 3. =P

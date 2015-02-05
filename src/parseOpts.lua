@@ -27,61 +27,56 @@ end
 -- Note that 'opts' keep track of the options only in their short form
 local args = {...}
 local opts = {}
-local var, val
 local skip
 
 --[[	Parse the opts	]]--
 for i, arg in ipairs (args) do
+	local long = arg:match ("^%-%-(.+)")
+	local short = arg:match ("^%-(.+)")
+	local var, val = arg:match ("(.-)=(.+)")
+
+	-- skip flag: for options that need values
 	if skip then
 		skip = false
-		goto continue
-	end
 	-- long option
-	local check = arg:match ("^%-%-(.+)")
-	if check then
-		var, val = check:match ("([%w_%-]+)=(.+)")
+	elseif long then
+		var, val = long:match ("([%w_%-]+)=(.+)")
 		if val and hell_options[var] then 
 			if hell_options[var][3] then
 				opts[hell_options[var][1]] = val
 			else
 				int.quit (var .. " option doesn't accept values, sorry", true)
 			end
-		elseif hell_options[check] then
-			if not hell_options[check][3] then
-				opts[hell_options[check][1]] = true
+		elseif hell_options[long] then
+			if not hell_options[long][3] then
+				opts[hell_options[long][1]] = true
 			else
-				int.quit ("Value required for '--" .. check .. "' long option.", true)
+				int.quit ("Value required for '--" .. long .. "' long option.", true)
 			end
 		else
 			int.quit ("Long option not recognized.\
 Check `hell -H` for help.", true)
 		end
-		goto continue
-	end
 	-- short option
-	check = arg:match ("^%-(.+)")
-	if check then
-		if hell_options[check] then
+	elseif short then
+		if hell_options[short] then
 			-- with value, asks to skip the next
-			if hell_options[check][3] then
+			if hell_options[short][3] then
 				if args[i + 1] then
-					opts[check] = args[i + 1]
+					opts[short] = args[i + 1]
 					skip = true
 				else
-					int.quit ("Value required for '-" .. check .. "' short option.", true)
+					int.quit ("Value required for '-" .. short .. "' short option.", true)
 				end
 			else
-				opts[check] = true
+				opts[short] = true
 			end
 		else
 			int.quit ("Short option not recognized.\
 Check `hell -H` for help.", true)
 		end
-		goto continue
-	end
 	-- variable attribution
-	var, val = arg:match ("(.-)=(.+)")
-	if val then
+	elseif val then
 		_ENV[var] = val
 	-- or the command (must be one the valid ones)
 	elseif (' build clean install uninstall '):match ('%s+' .. arg .. '%s+') then
@@ -93,7 +88,6 @@ Check `hell -H` for help.", true)
 		int.quit ('"' .. arg .. '" is not a valid option or variable attribution.\
 Check `hell -H` for help.', true)
 	end
-	::continue::
 end
 
 --[[		Now that we parsed the options, make them active!		]]--

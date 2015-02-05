@@ -14,8 +14,13 @@ local int = require 'internals'
 --
 -- @return The results from loadfile
 function int._addHellBuild (script, scope)
-	local env = scope and setmetatable ({}, { __index = _ENV }) or _ENV
-	return loadfile (script, nil, env)
+	local env = scope and setmetatable ({}, { __index = getfenv (1) }) or getfenv (1)
+	local file, err = loadfile (script)
+	if file then
+		return setfenv (file, env)
+	else
+		return file, err
+	end
 end
 
 
