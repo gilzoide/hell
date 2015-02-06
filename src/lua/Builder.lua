@@ -38,21 +38,14 @@ end
 -- the builder metatable
 local builder = {}
 
---- The only mandatory field in a builder: the command to be run
-builder.cmd = ''
-
 --- Extending a builder is easy, just call this method!
 --
 -- @note This method doesn't change the original builder,
 -- but rather returns a new one with the extended fields
 function builder:extend (appendix)
 	appendix = appendix or {}
-	local new = {
-		-- note to self: deps should be instantiated here (and not in the 
-		-- `builder' table, as tables are always passed by reference)
-		deps = {}
-	}
-	setmetatable (new, builder)
+	local new = setmetatable ({}, builder)
+	new.deps = {}
 	-- merge fields from original builder
 	for k, v in pairs (self) do
 		new[k] = mergeFields (v, appendix[k])
@@ -70,7 +63,7 @@ builder.__index = builder
 
 --- If you want to put a builder inside a builder, extend it
 function builder.__newindex (t, k, v)
-	if getmetatable (v) == builder then
+	if getmetatable (v) == 'hellbuilder' then
 		rawset (t, k, t:extend (v))
 	else
 		rawset (t, k, v)
@@ -92,10 +85,9 @@ builder.__metatable = 'hellbuilder'
 -- @return A new Builder
 function Builder (initializer)
 	initializer = initializer or {}
-	local new = {}
-	setmetatable (new, builder)
+	local new = setmetatable ({}, builder)
 	-- copy the cmd field from builder, for the extend to work right
-	new.cmd = builder.cmd
+	new.cmd = initializer.cmd
 	-- get the fields from initializer
 	new = new:extend (initializer)
 

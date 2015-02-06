@@ -12,4 +12,4 @@ haskell : $(hs_src)
 	ghc --make -dynamic $^ -o build/main -outputdir build
 
 clean :
-	$(RM) build/*
+	$(RM) -r build/*

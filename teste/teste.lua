@@ -7,10 +7,13 @@ oi = build {
 }
 
 a = {
-	gcc {
+	build {
 		input = 'oi.c',
 		links = 'sdl',
 		deps = {oi}
+	},
+	c.shared {
+		input = 'shared.c'
 	},
 	install {
 		input = 'readme.txt'

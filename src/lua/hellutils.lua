@@ -64,7 +64,7 @@ function t.fmap (field, f)
 	int.assert_quit (type (f) == 'function', "[fmap] Can't map a function if it ain't a function!", 2)
 
 	if type (field) ~= 'table' then
-		return f (field)
+		return { f (field) }
 	end
 
 	-- apply function over every value in field, keeping changes
@@ -73,7 +73,7 @@ function t.fmap (field, f)
 		results[i] = f (v)
 	end
 
-	return table.concat (results, ' ')
+	return results
 end
 
 --- Function for doing nothing
@@ -89,7 +89,7 @@ end
 --
 -- @return The field unpacked and concatenated, or unaltered
 function t.concat (field)
-	return t.fmap (field, t.id)
+	return table.concat (t.fmap (field, t.id), ' ')
 end
 
 

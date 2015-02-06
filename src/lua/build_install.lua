@@ -55,14 +55,15 @@ end
 
 --- The build function, for building anything!
 function build (builder)
-	int.assert_quit (type (tostring (builder.input)) == 'string',
-			"Can't build something without a valid input field.\
-Needed a string, got a " .. type (builder.input) .. '.', 2)
 	-- if called build function explicitly, search for the builder
 	-- defaults to it's extension, or fallback to copy
 	if getmetatable (builder) ~= 'hellbuilder' then
 		builder = getDefaultBuilder (builder)
 	end
+	-- we need a command, man
+	int.assert_quit (type (builder.cmd) == 'string',
+			"Can't build something without a command.\
+Needed a string, got a " .. type (builder.input) .. '.', 2)
 	-- the new build
 	local new_cmd = util.substField (builder, 'cmd')
 	local new = {

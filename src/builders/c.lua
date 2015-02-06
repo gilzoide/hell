@@ -20,8 +20,8 @@ gcc = Builder {
 }
 
 -- In C, we must first build the object files, then the executable, so do it!
-function gcc.prepare_input (ins, b)
-	return util.fmap (ins, function (i)
+function gcc.prepare_input (inputs, b)
+	return table.concat (util.fmap (inputs, function (i)
 		local obj = b {
 			flags = '&-c',
 			input = i,
@@ -34,15 +34,36 @@ function gcc.prepare_input (ins, b)
 		-- set `obj' as a dependency
 		table.insert (b.deps, obj)
 		return obj.output
-	end)
+	end), ' ')
+end
+
+gcc.fpic = Builder {
+	flags = '&-c -fPIC',
+	prepare_input = util.id,
+	prepare_output = function (_, b)
+		return util.changeExtension (b.input, 'os')
+	end
+}
+
+-- Shared libraries!
+gcc.shared = Builder {
+	flags = '&-shared',
+	prepare_output = function (_, b)
+		return util.changeExtension (b.input, hell.os.shared_ext)
+	end
+}
+
+function gcc.shared.prepare_input (inputs, b)
+	return table.concat (util.fmap (inputs, function (i)
+		local obj = gcc.fpic {
+			input = i
+		}
+		-- set `obj' as a dependency
+		table.insert (b.deps, obj)
+		return obj.output 
+	end), ' ')
 end
 
 -- default C builder (cuz it's the only one we have), so that the build function
 -- can find it easily from the file's extension
 c = gcc
-
--- Shared libraries!
-c.shared = Builder {
-	flags = '&-shared',
-	
-}

@@ -63,7 +63,7 @@ for i = #build_scripts, 1, -1 do
 	script, err = int._addHellBuild (build_scripts[i])
 	if not script then
 		if not err:match ('open') then
-			quit ("lua: " .. err, true)
+			int.quit ("lua: " .. err, true)
 		end
 	else
 		break
