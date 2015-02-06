@@ -47,7 +47,11 @@ builder.cmd = ''
 -- but rather returns a new one with the extended fields
 function builder:extend (appendix)
 	appendix = appendix or {}
-	local new = {}
+	local new = {
+		-- note to self: deps should be instantiated here (and not in the 
+		-- `builder' table, as tables are always passed by reference)
+		deps = {}
+	}
 	setmetatable (new, builder)
 	-- merge fields from original builder
 	for k, v in pairs (self) do

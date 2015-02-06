@@ -1,19 +1,20 @@
 hell.help = "e então, minha gente..."
 hell.outdir = "build"
 
+oi = build {
+	input = 'outro.c',
+	output = 'oUtRo'
+}
+
 a = {
 	gcc {
 		input = 'oi.c',
-		links = 'sdl'
+		links = 'sdl',
+		deps = {oi}
 	},
 	install {
 		input = 'readme.txt'
 	}
-}
-
-build {
-	input = 'outro.c',
-	output = 'oUtRo'
 }
 
 feedHellFire ('recursive/mais_um_teste.lua')

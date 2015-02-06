@@ -49,6 +49,7 @@ local build_scripts = {opts.f}
 table.insert (build_scripts, './hellfire')
 table.insert (build_scripts, './hellbuild')
 
+int.hellMsg ('reading build script(s)')
 for i = #build_scripts, 1, -1 do
 	script, err = int._addHellBuild (build_scripts[i])
 	if not script then
@@ -66,8 +67,11 @@ if not script and opts.h then
 	hellp ()
 end
 
+-- process root build script
 int.assert_quit (script, "Can't find any build scripts. Tried \"" .. table.concat (build_scripts, '", "') .. '"')
 script ()
+
+int.hellMsg ("all set, let's see what we got")
 
 -- Called for help?
 if opts.h then
@@ -90,6 +94,9 @@ if opts.command == 'build' or opts.command == 'clean' then
 
 	for k, v in ipairs (BI.builds) do
 		print ((not int.verbose and v.echo) or v.cmd)
+		for _, dep in ipairs (v.deps or {}) do
+			print ('\t' .. ((not int.verbose and dep.echo) or dep.cmd))
+		end
 	end
 else -- opts.command == 'install' or opts.command == 'uninstall'
 	if opts.target then

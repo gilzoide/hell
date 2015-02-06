@@ -3,4 +3,3 @@
 + fazer o '-l' [list targets]
 
 + dependêêência
-+ tentar linkar haskell no lua 5.2 (q o hslua só rola 5.1 ¬¬)

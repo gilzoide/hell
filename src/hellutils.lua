@@ -59,7 +59,7 @@ end
 
 --- Maps a function over a table
 --
--- @return Strings with the results concatenated
+-- @return table with the results
 function t.fmap (field, f)
 	int.assert_quit (type (f) == 'function', "[fmap] Can't map a function if it ain't a function!", 2)
 
@@ -106,6 +106,8 @@ end
 --
 -- @note When a field from t is nil, it's entry is substituted with ''
 -- (just like shell would do).
+-- @note This function updates the fields in the builder, aswell as consumes
+-- the `prepare_*' functions, so be careful!
 --
 -- @param builder The table with the fields
 -- @param str The string to be substituted
@@ -125,6 +127,7 @@ function t.subst (builder, str)
 			local prepare = builder['prepare_' .. capture]
 			if prepare then
 				builder[capture] = prepare (builder[capture], builder)
+				builder['prepare_' .. capture] = nil
 			end
 			return builder[capture] or ''
 		end

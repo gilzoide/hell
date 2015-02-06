@@ -24,11 +24,14 @@ function gcc.prepare_input (ins, b)
 		local obj = build (b:extend {
 			flags = '&-c',
 			input = i,
+			deps = {},
 			prepare_input = util.id,
 			prepare_output = function (_, bb)
 				return util.changeExtension (bb.input, hell.os.obj_ext)
 			end
 		})
+		-- set `obj' as a dependency
+		table.insert (b.deps, obj)
 		return obj.output
 	end)
 end

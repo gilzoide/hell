@@ -40,6 +40,19 @@ local function getDefaultBuilder (builder)
 	return auto_builder:extend (builder)
 end
 
+local function getBuildPath (builder)
+	local str = ''
+	if hell.outdir then
+		str = hell.outdir .. hell.os.dir_sep
+	end
+
+	if hell.keepDirStructure or builder.keepDirStructure then
+		str = str .. int.getPath (2)
+	end
+
+	return str
+end
+
 --- The build function, for building anything!
 function build (builder)
 	int.assert_quit (type (tostring (builder.input)) == 'string',
@@ -57,11 +70,14 @@ Needed a string, got a " .. type (builder.input) .. '.', 2)
 		echo = builder.echo,
 		input = builder.input,
 		output = builder.output or builder.input,
-		cmd = new_cmd:gsub (builder.input, util.curryPrefixEach (int.getPath ()))
+		deps = builder.deps,
+		cmd = util.substField (builder:extend {
+			prepare_input = util.curryPrefixEach (int.getPath ()),
+			prepare_output = function (out, b)
+				return getBuildPath (b) .. out
+			end
+		}, 'cmd')
 	}
-	if hell.outdir then
-		new.cmd = new.cmd:gsub (builder.output, hell.outdir .. hell.os.dir_sep .. builder.output)
-	end
 	setmetatable (new, new)
 
 	table.insert (_G, new)

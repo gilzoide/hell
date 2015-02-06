@@ -49,8 +49,15 @@ end
 -- First path is where we are now
 t.path = {}
 
-function t.getPath ()
-	local dir = table.concat (t.path, hell.os.dir_sep, 1)
+--- Get the path for the current hellbuild, from `from' to the end
+--
+-- @param from Trace path from which level? Default = 1 (root hellbuild)
+--
+-- @return The path trace, from `from' until the end
+function t.getPath (from)
+	from = from or 1
+
+	local dir = table.concat (t.path, hell.os.dir_sep, from)
 	if dir ~= '' then
 		dir = dir .. hell.os.dir_sep
 	end
