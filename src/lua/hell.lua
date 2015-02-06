@@ -1,23 +1,32 @@
 --- @file hell.lua
 -- The hell script executable
 
+
+-- get OS. As linux/freebsd/solaris are all alike, we gather them as unix.
+-- note that MacOSX is called "darwin" here (haskell puts it that way)
+local OSes = {
+	windows = {
+		obj_ext = 'obj',
+		shared_ext = 'dll',
+		exe_ext = 'exe'
+	},
+	unix = {
+		obj_ext = 'o',
+		shared_ext = 'so',
+		exe_ext = ''
+	},
+	darwin = {
+		obj_ext = 'o',
+		shared_ext = 'dynlib',
+		exe_ext = ''
+	}
+}
+
+local os = OSes[getOS ()] or OSes.unix
+os.name = getOS ()
+os.dir_sep = package.config:sub (1, 1)
+
 --[[		hell: the table that controls everything that's going on		]]--
-local win = {
-	name = 'windows',
-	architecture = os.getenv ('PROCESSOR_ARCHITECTURE'),
-	dir_sep = '\\',
-	obj_ext = 'obj',
-	exe_ext = 'exe'
-}
-
-local unix = {
-	name = 'unix',
-	architecture = io.popen ('uname -m'):read (),
-	dir_sep = '/',
-	obj_ext = 'o',
-	exe_ext = ''
-}
-
 hell = {
 	-- the custom help message. If nil/false, use default help string
 	help = nil,
@@ -30,7 +39,7 @@ hell = {
 	-- Ex: if input is at './src', output goes to the '$outdir/src' dir
 	keepDirStructure = nil,
 	-- table with some SO especific stuff
-	os = package.config:sub (1, 1) == '/' and unix or win,
+	os = os
 }
 
 local opts = (assert (loadfile ('parseOpts.lua'))) (...)

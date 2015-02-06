@@ -19,9 +19,10 @@ gcc = Builder {
 	cmd = '$bin $flags $input -o $output $links'
 }
 
+-- In C, we must first build the object files, then the executable, so do it!
 function gcc.prepare_input (ins, b)
 	return util.fmap (ins, function (i)
-		local obj = build (b:extend {
+		local obj = b {
 			flags = '&-c',
 			input = i,
 			deps = {},
@@ -29,7 +30,7 @@ function gcc.prepare_input (ins, b)
 			prepare_output = function (_, bb)
 				return util.changeExtension (bb.input, hell.os.obj_ext)
 			end
-		})
+		}
 		-- set `obj' as a dependency
 		table.insert (b.deps, obj)
 		return obj.output
@@ -39,3 +40,9 @@ end
 -- default C builder (cuz it's the only one we have), so that the build function
 -- can find it easily from the file's extension
 c = gcc
+
+-- Shared libraries!
+c.shared = Builder {
+	flags = '&-shared',
+	
+}
