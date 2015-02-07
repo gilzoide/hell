@@ -2,6 +2,7 @@
 -- Builder: the heart of the Hell build scripts
 
 require 'build_install'
+local util = require 'hellutils'
 
 --- Auxiliary function for merging two fields
 --
@@ -48,7 +49,11 @@ function builder:extend (appendix)
 	new.deps = {}
 	-- merge fields from original builder
 	for k, v in pairs (self) do
-		new[k] = mergeFields (v, appendix[k])
+		local new_field = mergeFields (v, appendix[k])
+		if type (new_field) == 'table' then
+			new_field = util.cloneTable (new_field)
+		end
+		new[k] = new_field
 	end
 	-- and get the new fields from the appendix
 	for k, v in pairs (appendix) do
@@ -70,7 +75,7 @@ function builder.__newindex (t, k, v)
 	end
 end
 
-function builder.__call (self, t)
+function builder:__call (t)
 	return build (self:extend (t))
 end
 
@@ -86,8 +91,6 @@ builder.__metatable = 'hellbuilder'
 function Builder (initializer)
 	initializer = initializer or {}
 	local new = setmetatable ({}, builder)
-	-- copy the cmd field from builder, for the extend to work right
-	new.cmd = initializer.cmd
 	-- get the fields from initializer
 	new = new:extend (initializer)
 

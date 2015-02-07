@@ -1,6 +1,7 @@
 --- @file hell.lua
 -- The hell script executable
 
+local hs = ...
 
 -- get OS. As linux/freebsd/solaris are all alike, we gather them as unix.
 -- note that MacOSX is called "darwin" here (haskell puts it that way)
@@ -22,8 +23,8 @@ local OSes = {
 	}
 }
 
-local os = OSes[getOS ()] or OSes.unix
-os.name = getOS ()
+local os = OSes[hs.getOS ()] or OSes.unix
+os.name = hs.getOS ()
 os.dir_sep = package.config:sub (1, 1)
 
 --[[		hell: the table that controls everything that's going on		]]--
@@ -42,7 +43,7 @@ hell = {
 	os = os
 }
 
-local opts = (assert (loadfile ('parseOpts.lua'))) (...)
+local opts = (assert (loadfile ('parseOpts.lua'))) (select (2, ...))
 
 --[[		And now, source our first hellbuild script.
 	It looks respectively into 'opts.file', './hellfire', './hellbuild'		]]--
@@ -98,14 +99,20 @@ if opts.command == 'build' or opts.command == 'clean' then
 	if opts.target then
 		BI.builds = BI.getBI (target, 'build')
 	end
-	-- Process the builds
 	int.assert_quit (#BI.builds ~= 0, "Can't find any builds" .. (opts.target and ' in target "' .. opts.target .. '"' or ''))
 
+	-- Process the builds in Haskell
+	print ('\nfrom haskell:')
+	hs.processBuilds (BI.builds)
+	print ('\nfrom lua:')
 	for k, v in ipairs (BI.builds) do
-		print ((not int.verbose and v.echo) or v.cmd)
 		for _, dep in ipairs (v.deps or {}) do
 			print ('\t' .. ((not int.verbose and dep.echo) or dep.cmd))
+			for _, dep2 in ipairs (dep or {}) do
+				print ('\t\t' .. ((not int.verbose and dep2.echo) or dep2.cmd))
+			end
 		end
+		print ((not int.verbose and v.echo) or v.cmd)
 	end
 else -- opts.command == 'install' or opts.command == 'uninstall'
 	if opts.target then
@@ -114,7 +121,5 @@ else -- opts.command == 'install' or opts.command == 'uninstall'
 	-- Process the installs
 	int.assert_quit (#BI.installs ~= 0, "Can't find any installs" .. (opts.target and ' in target "' .. opts.target .. '"' or ''))
 
-	for k, v in ipairs (BI.installs) do
-		print ((not int.verbose and v.echo) or v.cmd)
-	end
+	hs.processInstalls (BI.installs)
 end

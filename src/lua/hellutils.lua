@@ -7,6 +7,14 @@ local int = require 'internals'
 
 local t = {}
 
+function t.cloneTable (src)
+	local new = {}
+	for k, v in pairs (src) do
+		new[k] = v
+	end
+	return new
+end
+
 --- Glob function, returns all matches in a table
 --
 -- @note Currently it uses only `ls`, so don't really use it in windows

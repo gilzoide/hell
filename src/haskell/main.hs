@@ -1,23 +1,30 @@
 import System.Environment (getArgs)
 import System.IO (hPutStrLn, stderr)
-import Scripting.Lua
+import Scripting.Lua as Lua
+import Foreign.C.Types (CInt)
 
 import HS_Utils
 
 main = do
-	l <- newstate
-	openlibs l
-	loadfile l "hell.lua"
+	l <- Lua.newstate
+	Lua.openlibs l
+	Lua.loadfile l "hell.lua"
 
 	-- register utilities in lua
 	registerHSUtils l
 
+	-- pass arguments
 	args <- getArgs
-	mapM_ (pushstring l) args
-	ret <- pcall l (length args) 0 0
+	mapM_ (Lua.pushstring l) args
+
+	-- call main chunk
+	ret <- Lua.pcall l (1 + length args) 0 0
 	if ret  /= 0 then do
-		err <- tostring l (-1)
+		{-Lua.getglobal2 l "debug.traceback"-}
+		{-Lua.insert l (-2)-}
+		{-Lua.call l 1 1-}
+		err <- Lua.tostring l (-1)
 		hPutStrLn stderr err
 	else return ()
 
-	close l
+	Lua.close l

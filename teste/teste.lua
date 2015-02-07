@@ -10,7 +10,7 @@ a = {
 	build {
 		input = 'oi.c',
 		links = 'sdl',
-		deps = {oi}
+		--deps = {oi}
 	},
 	c.shared {
 		input = 'shared.c'
@@ -19,6 +19,7 @@ a = {
 		input = 'readme.txt'
 	}
 }
+
 
 feedHellFire ('recursive/mais_um_teste.lua')
 
