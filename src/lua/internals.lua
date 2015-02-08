@@ -51,7 +51,9 @@ t.path = {}
 
 --- Get the path for the current hellbuild, from `from' to the end
 --
--- @param from Trace path from which level? Default = 1 (root hellbuild)
+-- @param from Trace path from which level?
+-- 		Default = 1 : root hellbuild
+-- 		2 : script's relative path to root build
 --
 -- @return The path trace, from `from' until the end
 function t.getPath (from)

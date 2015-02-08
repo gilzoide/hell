@@ -26,6 +26,7 @@ function BI.getBI (t, meta)
 end
 
 
+--- Gets the default builder, based on input's extension
 local function getDefaultBuilder (builder)
 	local auto_builder
 	if not builder.builder then
@@ -40,6 +41,8 @@ local function getDefaultBuilder (builder)
 	return auto_builder:extend (builder)
 end
 
+
+--- get the build path, it's important for the commands to be executed 
 local function getBuildPath (builder)
 	local str = ''
 	if hell.outdir then
@@ -52,6 +55,7 @@ local function getBuildPath (builder)
 
 	return str
 end
+
 
 --- The build function, for building anything!
 function build (builder)

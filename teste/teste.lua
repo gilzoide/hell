@@ -6,11 +6,16 @@ oi = build {
 	output = 'oUtRo'
 }
 
+cara = build {
+	input = 's.c',
+	deps = {oi}
+}
+
 a = {
 	build {
 		input = 'oi.c',
 		links = 'sdl',
-		--deps = {oi}
+		deps = {cara}
 	},
 	c.shared {
 		input = 'shared.c'

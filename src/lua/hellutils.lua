@@ -5,7 +5,10 @@
 
 local int = require 'internals'
 
+-- `hs' is the forward declaration of the haskell library that `hell.lua'
+-- will give us
 local t = {}
+
 
 function t.cloneTable (src)
 	local new = {}
@@ -14,6 +17,7 @@ function t.cloneTable (src)
 	end
 	return new
 end
+
 
 --- Glob function, returns all matches in a table
 --
@@ -24,18 +28,11 @@ end
 --
 -- @return Table with all filename matches
 function t.glob (pattern)
-	pattern = pattern or ''
-	local matches = {}
-	local ls = io.popen ('ls ' .. pattern)
+	pattern = int.getPath () .. pattern
 
-	for match in ls:lines () do
-		table.insert (matches, match)
-	end
-
-	ls:close ()
-
-	return matches
+	return int.hs.glob (pattern)
 end
+
 
 --- Prefix each word in str with prefix
 --
@@ -65,6 +62,7 @@ function t.curryPrefixEach (prefix)
 	return function (str) return t.prefixEach (str, prefix) end
 end
 
+
 --- Maps a function over a table
 --
 -- @return table with the results
@@ -84,12 +82,14 @@ function t.fmap (field, f)
 	return results
 end
 
+
 --- Function for doing nothing
 --
 -- It's useful for passing it into fmap, when you don't want to mess with things
 function t.id (a)
 	return a
 end
+
 
 --- If field is a table, table.concat it; don't do a thing otherwise
 --
@@ -109,6 +109,7 @@ function t.changeExtension (file_name, new)
 	end
 	return file_name:gsub ('(%.?.-)%..*', '%1' .. new)
 end
+
 
 --- Substitute the fields in a command
 --
@@ -144,6 +145,7 @@ function t.subst (builder, str)
 	return str:gsub ('$([$%w_]+)', sub)
 end
 
+
 --- Wrapper for the subst function, which uses a builder's field as string
 --
 -- @param builder The table with the fields
@@ -153,6 +155,7 @@ end
 function t.substField (builder, field)
 	return t.subst (builder, builder[field])
 end
+
 
 --- Auxiliary function: gets the nested field inside table t.
 --
@@ -170,5 +173,6 @@ local function getNestedField (t, field)
 	end
 end
 t.getNestedField = getNestedField
+
 
 return t

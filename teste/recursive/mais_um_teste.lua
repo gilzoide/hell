@@ -3,6 +3,5 @@ b = {
 		input = {'b.c', 'd.c'},
 		output = 'hello_world',
 		keepDirStructure = true,
-		--deps = {}
 	}
 }

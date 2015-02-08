@@ -1,22 +1,23 @@
-module HS_Utils (registerHSUtils) where
+module HS_Utils (registerHSUtils, pushList) where
 
 import qualified Scripting.Lua as Lua
 import Foreign.C.Types (CInt)
+import Control.Monad (foldM_)
 -- What we will register
 import qualified System.Directory as Dir
+import qualified System.FilePath as Path
 import qualified System.Info as Info
+import System.FilePath.Glob (glob)
+
 
 registerHSUtils :: Lua.LuaState -> IO ()
 registerHSUtils l = do
 	Lua.newtable l
-	pushFunctions [
-		("getOS", (return Info.os :: IO String)),
-		("getArch", return Info.arch :: IO String)]
-	pushRawFunctions [
-		("processBuilds", processBuilds),
-		("processInstalls", processInstalls)]
+	pushFunToTable ("getOS", return Info.os :: IO String)
+	pushFunToTable ("getArch", return Info.arch :: IO String)
+	pushRawFunctions [("processBI", processBI),
+		("glob", glob')]
 	where
-		pushFunctions = mapM_ pushFunToTable
 		pushRawFunctions = mapM_ pushRawFunToTable
 		pushFunToTable (name, f) = do
 			Lua.pushstring l name
@@ -28,15 +29,33 @@ registerHSUtils l = do
 			Lua.settable l (-3)
 
 
-processBuilds :: Lua.LuaState -> IO CInt
-processBuilds l = do
+glob' :: Lua.LuaState -> IO CInt
+glob' l = do
+	valid <- Lua.isstring l (-1)
+	if valid then do
+		pattern <- Lua.tostring l (-1)
+		Lua.pop l 1
+		-- get list of relative paths from current directory
+		currDir <- Dir.getCurrentDirectory
+		fullpaths <- glob pattern
+		let paths = map (Path.makeRelative currDir) fullpaths
+		-- and push the whole list as a table
+		pushList l paths
+		return 1
+	else do
+		Lua.pushnil l
+		Lua.pushstring l "[glob] Can't glob against a non string pattern!"
+		return 2
+
+
+processBI :: Lua.LuaState -> IO CInt
+processBI l = do
 	-- first key
 	Lua.pushnil l
 	printCmdRec
 	where
 		printCmdRec = do
 			size <- Lua.gettop l
-			{-putStrLn $ " size: " ++ show size-}
 			theresMore <- Lua.next l (-2)
 			if theresMore then do
 				-- process dependencies first
@@ -54,6 +73,17 @@ processBuilds l = do
 				Lua.pop l 1
 				return 0
 
-processInstalls :: Lua.LuaState -> IO CInt
-processInstalls l = do
-	return 0
+-- | Pushes a List into a LuaState
+-- @note This function pushes a new table into the stack, even if list
+-- passed is empty
+pushList :: Lua.StackValue a => Lua.LuaState -> [a] -> IO ()
+pushList l lst = do
+	Lua.newtable l
+	foldM_ pushListItem 1 lst
+	where
+		pushListItem :: Lua.StackValue a => Int -> a -> IO Int
+		pushListItem n item = do
+			Lua.push l n
+			Lua.push l item
+			Lua.settable l (-3)
+			return $ n + 1

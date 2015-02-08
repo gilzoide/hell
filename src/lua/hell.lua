@@ -1,7 +1,10 @@
 --- @file hell.lua
 -- The hell script executable
 
-local hs = ...
+local int = require 'internals'
+local args
+int.hs, args = ...
+local util = require 'hellutils'
 
 -- get OS. As linux/freebsd/solaris are all alike, we gather them as unix.
 -- note that MacOSX is called "darwin" here (haskell puts it that way)
@@ -23,8 +26,8 @@ local OSes = {
 	}
 }
 
-local os = OSes[hs.getOS ()] or OSes.unix
-os.name = hs.getOS ()
+local os = OSes[int.hs.getOS ()] or OSes.unix
+os.name = int.hs.getOS ()
 os.dir_sep = package.config:sub (1, 1)
 
 --[[		hell: the table that controls everything that's going on		]]--
@@ -40,22 +43,22 @@ hell = {
 	-- Ex: if input is at './src', output goes to the '$outdir/src' dir
 	keepDirStructure = nil,
 	-- table with some SO especific stuff
-	os = os
+	os = os,
+	-- let users use the utils!
+	utils = util
 }
 
-local opts = (assert (loadfile ('parseOpts.lua'))) (select (2, ...))
+local opts = (assert (loadfile ('parseOpts.lua'))) (args)
 
 --[[		And now, source our first hellbuild script.
 	It looks respectively into 'opts.file', './hellfire', './hellbuild'		]]--
 local BI = require 'build_install'
-local util = require 'hellutils'
-local int = require 'internals'
 require 'Builder'
 require 'fireHandler'
 
 -- first script to load
 local script, err
-local build_scripts = {opts.f}
+local build_scripts = { opts.f }
 table.insert (build_scripts, './hellfire')
 table.insert (build_scripts, './hellbuild')
 
@@ -102,18 +105,18 @@ if opts.command == 'build' or opts.command == 'clean' then
 	int.assert_quit (#BI.builds ~= 0, "Can't find any builds" .. (opts.target and ' in target "' .. opts.target .. '"' or ''))
 
 	-- Process the builds in Haskell
-	print ('\nfrom haskell:')
-	hs.processBuilds (BI.builds)
-	print ('\nfrom lua:')
-	for k, v in ipairs (BI.builds) do
-		for _, dep in ipairs (v.deps or {}) do
-			print ('\t' .. ((not int.verbose and dep.echo) or dep.cmd))
-			for _, dep2 in ipairs (dep or {}) do
-				print ('\t\t' .. ((not int.verbose and dep2.echo) or dep2.cmd))
-			end
-		end
-		print ((not int.verbose and v.echo) or v.cmd)
-	end
+	--print ('\nfrom haskell:')
+	int.hs.processBI (BI.builds)
+	--print ('\nfrom lua:')
+	--for k, v in ipairs (BI.builds) do
+		--for _, dep in ipairs (v.deps or {}) do
+			--print ('\t' .. ((not int.verbose and dep.echo) or dep.cmd))
+			--for _, dep2 in ipairs (dep or {}) do
+				--print ('\t\t' .. ((not int.verbose and dep2.echo) or dep2.cmd))
+			--end
+		--end
+		--print ((not int.verbose and v.echo) or v.cmd)
+	--end
 else -- opts.command == 'install' or opts.command == 'uninstall'
 	if opts.target then
 		BI.installs = BI.getBI (target, 'install')
@@ -121,5 +124,5 @@ else -- opts.command == 'install' or opts.command == 'uninstall'
 	-- Process the installs
 	int.assert_quit (#BI.installs ~= 0, "Can't find any installs" .. (opts.target and ' in target "' .. opts.target .. '"' or ''))
 
-	hs.processInstalls (BI.installs)
+	int.hs.processBI (BI.installs)
 end

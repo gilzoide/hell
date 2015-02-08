@@ -15,10 +15,10 @@ main = do
 
 	-- pass arguments
 	args <- getArgs
-	mapM_ (Lua.pushstring l) args
+	pushList l args
 
 	-- call main chunk
-	ret <- Lua.pcall l (1 + length args) 0 0
+	ret <- Lua.pcall l 2 0 0
 	if ret  /= 0 then do
 		{-Lua.getglobal2 l "debug.traceback"-}
 		{-Lua.insert l (-2)-}
