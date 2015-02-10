@@ -44,6 +44,30 @@ function t.assert_quit (cond, msg, level)
 end
 
 
+--- Iterator that returns only values from `rawget`
+--
+-- @param t The table
+--
+-- @return The iterator
+function t.rawpairs (t)
+	local key = nil
+	local value
+
+	return function ()
+		repeat
+			key, value = next (t, key)
+			value = rawget (t, key)
+		until key == nil or value ~= nil
+
+		if key == nil then
+			return nil
+		else
+			return key, value
+		end
+	end
+end
+
+
 --- A stack for the paths, which will be used when sourcing a hellfire,
 -- for `build' and `install' to know where to look for inputs.
 -- First path is where we are now

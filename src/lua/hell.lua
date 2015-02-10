@@ -57,19 +57,20 @@ require 'Builder'
 require 'fireHandler'
 
 -- first script to load
-local script, err
+local script, err, env
 local build_scripts = { opts.f }
 table.insert (build_scripts, './hellfire')
 table.insert (build_scripts, './hellbuild')
 
 int.hellMsg ('reading build script(s)')
 for i = #build_scripts, 1, -1 do
-	script, err = int._addHellBuild (build_scripts[i])
+	script, err = int._addHellBuild (build_scripts[i], true)
 	if not script then
 		if not err:match ('open') then
 			int.quit ("lua: " .. err, true)
 		end
 	else
+		env = err
 		break
 	end
 end
@@ -89,14 +90,20 @@ int.hellMsg ("all set, let's see what we got")
 -- Called for help?
 if opts.h then
 	hellp ()
-elseif opts.l then
+end
 
+opts.target = opts.target or ''
+local target = int.assert_quit (util.getNestedField (env, opts.target),
+		"Can't find target \"" .. opts.target .. '"')
+
+-- mayge get available targets?
+if opts.l then
+	int.hellMsg ("Listing available targets:")
+	BI.listTargets (env)
+	return
 end
 
 
-opts.target = opts.target or '_G'
-local target = int.assert_quit (util.getNestedField (_G, opts.target),
-		"Can't find target \"" .. opts.target .. '"')
 -- Command to be executed (build | clean | install | uninstall)
 if opts.command == 'build' or opts.command == 'clean' then
 	if opts.target then

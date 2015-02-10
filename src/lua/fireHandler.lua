@@ -12,7 +12,8 @@ local int = require 'internals'
 -- @param script The script name, for loading
 -- @param scope Should we scope _ENV? bool 
 --
--- @return The results from loadfile
+-- @return The script loaded, and it's env (which may be canged) if file loaded
+-- @return Nil and error message, if didn't load well
 function int._addHellBuild (script, scope)
 	local env = scope and setmetatable ({}, { __index = getfenv (1) }) or getfenv (1)
 
@@ -24,9 +25,9 @@ function int._addHellBuild (script, scope)
 		end
 		table.insert (int.path, takeDirectory (script))
 
-		return setfenv (file, env)
+		return setfenv (file, env), env
 	else
-		return file, err
+		return nil, err
 	end
 end
 
@@ -37,9 +38,9 @@ end
 -- @param script The script name, for loading
 -- @param scope Should we scope _ENV? bool 
 --
--- @return The results from the script. Usualy none
+-- @return The results from the script, and the environment
 function addHellBuild (script, scope)
-	local file = int._addHellBuild (script, scope)
+	local file, env = int._addHellBuild (script, scope)
 
 	int.assert_quit (file, "Can't load hellbuild \"" .. script .. '"', 2)
 	int.hellMsg ('sourcing hellfire: ' .. script)
@@ -47,9 +48,9 @@ function addHellBuild (script, scope)
 	local ret = file ()
 
 	-- and pop the path, as we will go back now
-	table.remove (int.path, #int.path)
+	table.remove (int.path)
 
-	return ret
+	return ret, env
 end
 --- Alias for addHellBuild (I do like this one better xD)
 feedHellFire = addHellBuild

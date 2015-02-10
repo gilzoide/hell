@@ -26,6 +26,56 @@ function BI.getBI (t, meta)
 end
 
 
+--- List all targets from table `t'
+--
+-- @note ListTargets uses rawpairs, so that we don't recurse over tables we
+-- know won't have any builds/installs (as lua libs)
+--
+-- @param The table (should be called with the first script environment)
+function BI.listTargets (t)
+	local ret = {}
+	local acum = {}
+
+	--- Get all available targets in table `t'
+	--
+	-- @param acum Table acumulating the current table name
+	--  (with dot notation "outer.inner"), so we can write it nicely
+	-- @param t The value being checked (probably a table)
+	-- @param current Name of the current value being checked, so that we don't
+	--  always need to be pushing and popping from `acum'
+	local function listTargets (t, current)
+		--print ('  listing: ' .. current)
+		if type (t) ~= 'table' then
+			return nil
+		elseif getmetatable (t) == 'build' or getmetatable (t) == 'install' then
+			return true
+		end
+
+		local thisIsATarget = false
+
+		table.insert (acum, current)
+		-- look at every entry in `t': if any have a "build"/"install" metatable
+		-- inside, mark this as target
+		for k, v in int.rawpairs (t) do
+			if listTargets (v, k) then
+				thisIsATarget = true
+			end
+		end
+
+		if thisIsATarget and current then
+			table.insert (ret, table.concat (acum, '.'))
+		end
+		table.remove (acum)
+	end
+
+	listTargets (t)
+	-- print targets in reverse, as the recursion fetches them in this order
+	for i = #ret, 1, -1 do
+		print (ret[i])
+	end
+end
+
+
 --- Gets the default builder, based on input's extension
 local function getDefaultBuilder (builder)
 	local auto_builder

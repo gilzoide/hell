@@ -172,7 +172,13 @@ local function getNestedField (t, field)
 		return getNestedField (t[current], rest)
 	end
 end
-t.getNestedField = getNestedField
+function t.getNestedField (t, field)
+	if field == '' then
+		return t
+	else
+		return getNestedField (t, field)
+	end
+end
 
 
 return t
