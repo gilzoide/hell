@@ -10,16 +10,19 @@ local util = require 'hellutils'
 -- note that MacOSX is called "darwin" here (haskell puts it that way)
 local OSes = {
 	windows = {
+		prefix = os.getenv ("APPDATA"),
 		obj_ext = 'obj',
 		shared_ext = 'dll',
 		exe_ext = 'exe'
 	},
 	unix = {
+		prefix = '/usr',
 		obj_ext = 'o',
 		shared_ext = 'so',
 		exe_ext = ''
 	},
 	darwin = {
+		prefix = '/usr',
 		obj_ext = 'o',
 		shared_ext = 'dynlib',
 		exe_ext = ''
@@ -64,7 +67,7 @@ table.insert (build_scripts, './hellbuild')
 
 int.hellMsg ('reading build script(s)')
 for i = #build_scripts, 1, -1 do
-	script, err = int._addHellBuild (build_scripts[i], true)
+	script, err = int._addHellBuild (build_scripts[i], true, 1)
 	if not script then
 		if not err:match ('open') then
 			int.quit ("lua: " .. err, true)
@@ -106,7 +109,7 @@ end
 
 -- Command to be executed (build | clean | install | uninstall)
 if opts.command == 'build' or opts.command == 'clean' then
-	if opts.target then
+	if opts.target ~= '' then
 		BI.builds = BI.getBI (target, 'build')
 	end
 	int.assert_quit (#BI.builds ~= 0, "Can't find any builds" .. (opts.target and ' in target "' .. opts.target .. '"' or ''))
@@ -125,7 +128,7 @@ if opts.command == 'build' or opts.command == 'clean' then
 		--print ((not int.verbose and v.echo) or v.cmd)
 	--end
 else -- opts.command == 'install' or opts.command == 'uninstall'
-	if opts.target then
+	if opts.target ~= '' then
 		BI.installs = BI.getBI (target, 'install')
 	end
 	-- Process the installs

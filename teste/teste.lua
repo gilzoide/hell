@@ -20,9 +20,9 @@ a = {
 	c.shared {
 		input = 'shared.c'
 	},
-	install {
+	install ({
 		input = 'readme.txt'
-	}
+	}, 'lib')
 }
 
 
@@ -44,4 +44,4 @@ a.c = {
 
 e = {}
 
-install (a[1])
+install (a[1], 'bin')

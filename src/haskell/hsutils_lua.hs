@@ -2,7 +2,7 @@ module HS_Utils (registerHSUtils, pushList) where
 
 import qualified Scripting.Lua as Lua
 import Foreign.C.Types (CInt)
-import Control.Monad (foldM_)
+import Control.Monad (foldM)
 -- What we will register
 import qualified System.Directory as Dir
 import qualified System.FilePath as Path
@@ -29,6 +29,8 @@ registerHSUtils l = do
 			Lua.settable l (-3)
 
 
+-- | Haskell raw glob function to Lua. Expects a string, returns table of paths,
+-- or nil plus error message
 glob' :: Lua.LuaState -> IO CInt
 glob' l = do
 	valid <- Lua.isstring l (-1)
@@ -43,6 +45,7 @@ glob' l = do
 		pushList l paths
 		return 1
 	else do
+		Lua.pop l 1
 		Lua.pushnil l
 		Lua.pushstring l "[glob] Can't glob against a non string pattern!"
 		return 2
@@ -55,7 +58,6 @@ processBI l = do
 	printCmdRec
 	where
 		printCmdRec = do
-			size <- Lua.gettop l
 			theresMore <- Lua.next l (-2)
 			if theresMore then do
 				-- process dependencies first
@@ -76,10 +78,10 @@ processBI l = do
 -- | Pushes a List into a LuaState
 -- @note This function pushes a new table into the stack, even if list
 -- passed is empty
-pushList :: Lua.StackValue a => Lua.LuaState -> [a] -> IO ()
+pushList :: Lua.StackValue a => Lua.LuaState -> [a] -> IO Int
 pushList l lst = do
 	Lua.newtable l
-	foldM_ pushListItem 1 lst
+	foldM pushListItem 1 lst
 	where
 		pushListItem :: Lua.StackValue a => Int -> a -> IO Int
 		pushListItem n item = do

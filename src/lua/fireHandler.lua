@@ -10,12 +10,15 @@ local int = require 'internals'
 -- and then your changes are back to normal), just tell us!
 --
 -- @param script The script name, for loading
--- @param scope Should we scope _ENV? bool 
+-- @param scope Should we scope _ENV? bool
+-- @param level Level of fenv. Used as a "gambiarra", only for it to work.
+--  Lua 5.2 would be really better for this, but hslua...
 --
 -- @return The script loaded, and it's env (which may be canged) if file loaded
 -- @return Nil and error message, if didn't load well
-function int._addHellBuild (script, scope)
-	local env = scope and setmetatable ({}, { __index = getfenv (1) }) or getfenv (1)
+function int._addHellBuild (script, scope, level)
+	level = level or 3
+	local env = scope and setmetatable ({}, { __index = getfenv (level) }) or getfenv (level)
 
 	local file, err = loadfile (int.getPath () .. script)
 	if file then

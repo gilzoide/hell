@@ -44,7 +44,6 @@ function BI.listTargets (t)
 	-- @param current Name of the current value being checked, so that we don't
 	--  always need to be pushing and popping from `acum'
 	local function listTargets (t, current)
-		--print ('  listing: ' .. current)
 		if type (t) ~= 'table' then
 			return nil
 		elseif getmetatable (t) == 'build' or getmetatable (t) == 'install' then
@@ -117,9 +116,9 @@ function build (builder)
 	-- we need a command, man
 	int.assert_quit (type (builder.cmd) == 'string',
 			"Can't build something without a command.\
-Needed a string, got a " .. type (builder.input) .. '.', 2)
+Needed a string, got a " .. type (builder.cmd) .. '.', 2)
 	-- the new build
-	local new_cmd = util.substField (builder, 'cmd')
+	util.substField (builder, 'cmd')
 	local new = {
 		__metatable = 'build',
 		echo = builder.echo,
@@ -135,26 +134,40 @@ Needed a string, got a " .. type (builder.input) .. '.', 2)
 	}
 	setmetatable (new, new)
 
-	table.insert (_G, new)
+	table.insert (BI.builds, new)
 	return new
 end
 
 --- The install function
-function install (builder)
-	-- for install, always copy
-	local new_cmd = util.substField (copy:extend {
-		input = builder.output or builder.input 
-	}, 'cmd')
+--
+-- @note Build will be installed in "$(prefix)/$(dir)" directory.
+-- prefix can come directly from command line options, or use the OS default.
+function install (builder, dir)
+	int.assert_quit (type (dir) == 'string',
+		"Can't install without knowing where to (second parameter should be a string).", 2)
+	dir = (prefix or hell.os.prefix) .. hell.os.dir_sep .. dir
+	int.assert_quit (type (builder.output or builder.input) == 'string',
+			"Can't install without output or input fields.", 2)
+
+	if builder.cmd then
+		util.substField (builder, 'cmd')
+	end
+
+	builder = copy:extend {
+		input = builder.output or builder.input,
+	}
+	builder.output = dir .. hell.os.dir_sep .. builder.input
+
 	local new = {
 		__metatable = 'install',
-		echo = builder.echo,
 		input = builder.input,
 		output = builder.output,
-		cmd = new_cmd
+		deps = builder.deps,
+		cmd = util.substField (builder, 'cmd')
 	}
 	setmetatable (new, new)
 
-	table.insert (_G, new)
+	table.insert (BI.installs, new)
 	return new
 end
 

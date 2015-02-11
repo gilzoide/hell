@@ -11,7 +11,7 @@ local win_copy = {
 	cmd = '$bin $input $output'
 }
 
-copy = Builder ((hell.os.name == 'unix' and unix_copy) or win_copy)
+copy = Builder ((hell.os.name == 'windows' and win_copy) or unix_copy)
 copy.prepare_input = function (input, b)
 	return table.concat (util.fmap (input, function (i)
 		return '"' .. i .. '"'

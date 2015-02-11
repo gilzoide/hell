@@ -77,7 +77,7 @@ Check `hell -H` for help.", true)
 		end
 	-- variable attribution
 	elseif val then
-		_ENV[var] = val
+		getfenv ()[var] = val
 	-- or the command (must be one the valid ones)
 	elseif (' build clean install uninstall '):match ('%s+' .. arg .. '%s+') then
 		opts.command = arg
@@ -89,6 +89,7 @@ Check `hell -H` for help.", true)
 Check `hell -H` for help.', true)
 	end
 end
+
 
 --[[		Now that we parsed the options, make them active!		]]--
 opts.command = opts.command or 'build'
@@ -126,7 +127,7 @@ Report bugs to <gilzoide@gmail.com>]])
 		optionsString = table.concat (optionsString, '\n')
 
 		help = (help and help .. '\n\nUse `hell -H` for more help.')or optionsString
-		int.quit (help)
+		int.quit ('help:\n' .. help)
 	end
 end
 
