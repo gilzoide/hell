@@ -9,7 +9,7 @@ lua : $(lua_src)
 	cp -R $(builders) build
 
 haskell : $(hs_src)
-	ghc --make -dynamic $^ -o build/main -outputdir build
+	ghc --make -dynamic $^ -o build/hell -outputdir build
 
 clean :
 	$(RM) -r build/*

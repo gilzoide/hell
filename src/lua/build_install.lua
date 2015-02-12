@@ -79,8 +79,14 @@ end
 local function getDefaultBuilder (builder)
 	local auto_builder
 	if not builder.builder then
-		local ext = builder.input:match ('.-%.(%S+)') 
-		auto_builder = getfenv(1)[ext] or copy
+		if type (builder.input) == 'table' then
+			input_example = builder.input[1]
+		else
+			input_example = builder.input
+		end
+
+		local ext = input_example:match ('.-%.(%S+)')
+		auto_builder = getfenv(2)[ext] or copy
 	else
 		int.assert_quit (getmetatable (builder.builder) == 'hellbuilder',
 				"Trying to use an invalid Builder", 2)

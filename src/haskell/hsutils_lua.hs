@@ -33,19 +33,24 @@ registerHSUtils l = do
 -- or nil plus error message
 glob' :: Lua.LuaState -> IO CInt
 glob' l = do
-	valid <- Lua.isstring l (-1)
+	valid <- Lua.isstring l (-2)
 	if valid then do
-		pattern <- Lua.tostring l (-1)
-		Lua.pop l 1
-		-- get list of relative paths from current directory
-		currDir <- Dir.getCurrentDirectory
-		fullpaths <- glob pattern
-		let paths = map (Path.makeRelative currDir) fullpaths
-		-- and push the whole list as a table
-		pushList l paths
-		return 1
+		pattern <- Lua.tostring l (-2)
+		baseDir <- ((Lua.tostring l (-1)) >>= Dir.canonicalizePath)
+		Lua.pop l 2
+		-- get list of paths, and make them relative from `baseDir'
+		fullpaths <- glob (baseDir Path.</> pattern)
+		if fullpaths == [] then do
+			-- no matches: push nil
+			Lua.pushnil l
+			return 1
+		else do
+			let paths = map (Path.makeRelative baseDir) fullpaths
+			-- push the whole list as a table
+			pushList l paths
+			return 1
 	else do
-		Lua.pop l 1
+		Lua.pop l 2
 		Lua.pushnil l
 		Lua.pushstring l "[glob] Can't glob against a non string pattern!"
 		return 2

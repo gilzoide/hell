@@ -28,9 +28,7 @@ end
 --
 -- @return Table with all filename matches
 function t.glob (pattern)
-	pattern = int.getPath () .. pattern
-
-	return int.hs.glob (pattern)
+	return int.hs.glob (pattern, int.getPath ())
 end
 
 

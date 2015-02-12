@@ -1,5 +1,13 @@
 hell.outdir = 'build'
 
 copy {
-	input = {'src/*.lua', 'src/builders'}
+	input = 'src/lua/*.lua'
+}
+copy {
+	input = 'src/builders'
+}
+build {
+	input = 'src/haskell/*.hs',
+	flags = '&-dynamic',
+	output = 'hell'
 }
