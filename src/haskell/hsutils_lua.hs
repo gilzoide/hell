@@ -2,7 +2,7 @@ module HS_Utils (registerHSUtils, pushList) where
 
 import qualified Scripting.Lua as Lua
 import Foreign.C.Types (CInt)
-import Control.Monad (foldM)
+import Control.Monad (foldM_)
 -- What we will register
 import qualified System.Directory as Dir
 import qualified System.FilePath as Path
@@ -83,10 +83,10 @@ processBI l = do
 -- | Pushes a List into a LuaState
 -- @note This function pushes a new table into the stack, even if list
 -- passed is empty
-pushList :: Lua.StackValue a => Lua.LuaState -> [a] -> IO Int
+pushList :: Lua.StackValue a => Lua.LuaState -> [a] -> IO ()
 pushList l lst = do
 	Lua.newtable l
-	foldM pushListItem 1 lst
+	foldM_ pushListItem 1 lst
 	where
 		pushListItem :: Lua.StackValue a => Int -> a -> IO Int
 		pushListItem n item = do
