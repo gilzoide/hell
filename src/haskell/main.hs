@@ -12,7 +12,7 @@ main = do
 
 	-- push traceback before loading file, so pcall calls the main chunk right
 	-- will be passed as the error handling function, so it's easier for
-	-- debugging hell!
+	-- debugging this hell!
 	Lua.getglobal2 l "debug.traceback"
 
 	Lua.loadfile l "hell.lua"

@@ -97,18 +97,49 @@ local function getDefaultBuilder (builder)
 end
 
 
---- get the build path, it's important for the commands to be executed 
-local function getBuildPath (builder)
-	local str = ''
-	if hell.outdir then
-		str = hell.outdir .. hell.os.dir_sep
-	end
+local function _build (builder, prepare)
+	util.substField (builder, 'cmd')
 
-	if hell.keepDirStructure or builder.keepDirStructure then
-		str = str .. int.getPath (2)
-	end
+	builder.input = util.concat (builder.input)
+	builder.output = util.getBuildPath (builder) .. (builder.output or builder.input)
+	-- the new build
+	local new = {
+		__metatable = 'build',
+		echo = builder.echo,
+		deps = builder.deps,
+		input = builder.input,
+		output = builder.output,
+		cmd = util.substField (builder:extend {
+			prepare_input = prepare
+		}, 'cmd')
+	}
+	setmetatable (new, new)
 
-	return str
+	table.insert (BI.builds, new)
+	return new
+end
+
+
+--- Pipe a `source' build into `target' build
+--
+-- A "pipe build" is a build that will be piped into the `target' build.
+-- That means `source' will be built as a dependency for `target', and will
+-- not be returned, so that only `target' has its reference.
+--
+-- @return Source's output file name, as it may be needed for setting `target's
+--  input
+function pipeBuild (target, source)
+	int.assert_quit (getmetatable (target) == 'hellbuilder',
+			"Can't pipe a build into something that ain't a hellbuilder.", 2)
+
+	source.pipe = false
+	local new = _build (target:extend (source), util.id)
+
+	table.insert (target.deps, new)
+	-- flag that shows `target' is formed by pipe builds
+	target.pipe = true
+	--print (new.output)
+	return new.output
 end
 
 
@@ -123,24 +154,9 @@ function build (builder)
 	int.assert_quit (type (builder.cmd) == 'string',
 			"Can't build something without a command.\
 Needed a string, got a " .. type (builder.cmd) .. '.', 2)
-	-- the new build
-	util.substField (builder, 'cmd')
-	local new = {
-		__metatable = 'build',
-		echo = builder.echo,
-		input = builder.input,
-		output = builder.output or builder.input,
-		deps = builder.deps,
-		cmd = util.substField (builder:extend {
-			prepare_input = util.curryPrefixEach (int.getPath ()),
-			prepare_output = function (out, b)
-				return getBuildPath (b) .. out
-			end
-		}, 'cmd')
-	}
-	setmetatable (new, new)
 
-	table.insert (BI.builds, new)
+	local prepare_input = builder.pipe and util.curryPrefixEach (int.getPath ()) or util.id
+	local new = _build (builder, prepare_input)
 	return new
 end
 

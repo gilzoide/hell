@@ -2,7 +2,7 @@
 
 hell.outdir = 'build'
 
-a = hell.utils.glob ("../**/*.lua")
+a = hell.utils.glob ("**.lua")
 
 build {
 	input = a

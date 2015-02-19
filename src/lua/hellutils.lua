@@ -179,4 +179,19 @@ function t.getNestedField (t, field)
 end
 
 
+--- Get the build path, it's important for the commands to be executed 
+function t.getBuildPath (builder)
+	local str = ''
+	if hell.outdir then
+		str = hell.outdir .. hell.os.dir_sep
+	end
+
+	if hell.keepDirStructure or builder.keepDirStructure then
+		str = str .. int.getPath (2)
+	end
+
+	return str
+end
+
+
 return t
