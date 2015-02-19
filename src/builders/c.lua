@@ -1,4 +1,4 @@
-local util = require 'hellutils'
+local util = hell.utils
 
 -- Get the linking options for C compiling
 -- If there ain't a pkg-config for it, just add the '-l' preffix
@@ -27,9 +27,6 @@ function gcc.prepare_input (inputs, b)
 			input = i,
 			deps = {},
 			prepare_input = util.id,
-			--function (inp, bb)
-				--return util.prefixEach (inp, util.getBuildPath (bb))
-			--end,
 			prepare_output = function (_, bb)
 				return util.changeExtension (bb.input, hell.os.obj_ext)
 			end
@@ -55,12 +52,9 @@ gcc.shared = Builder {
 
 function gcc.shared.prepare_input (inputs, b)
 	return table.concat (util.fmap (inputs, function (i)
-		local obj = gcc.fpic {
+		return pipeBuild (b, gcc.fpic:extend {
 			input = i
-		}
-		-- set `obj' as a dependency
-		table.insert (b.deps, obj)
-		return obj.output 
+		})
 	end), ' ')
 end
 

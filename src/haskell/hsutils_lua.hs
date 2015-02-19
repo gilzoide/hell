@@ -6,7 +6,9 @@ import Foreign.C.Types (CInt)
 import qualified System.Directory as Dir
 import qualified System.FilePath as Path
 import qualified System.Info as Info
+
 import System.FilePath.Glob (glob)
+import Data.List (isPrefixOf)
 
 
 -- | Register what we need in the LuaState, in a new table
@@ -15,8 +17,20 @@ registerHSUtils l = do
 	Lua.newtable l
 	Lua.pushFunctions l [("getOS", return Info.os :: IO String),
 		("getArch", return Info.arch :: IO String)]
+	Lua.pushFunToTable l ("lazyPrefix", lazyPrefix)
 	Lua.pushRawFunctions l [("processBI", processBI),
 		("glob", glob')]
+
+
+-- | Utility that prefixes a string into another one, if target string
+-- ain't already prefixed
+--
+-- @param str The string to be prefixed
+-- @param prefix The prefix to be put, if needed
+lazyPrefix :: String -> String -> IO String
+lazyPrefix str prefix = return result
+	where
+		result = if prefix `isPrefixOf` str then str else prefix ++ str
 
 
 -- | Haskell raw glob function to Lua. Expects a string, returns table of paths,

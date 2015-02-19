@@ -97,11 +97,11 @@ local function getDefaultBuilder (builder)
 end
 
 
-local function _build (builder, prepare)
+local function _build (builder)
 	util.substField (builder, 'cmd')
 
-	builder.input = util.concat (builder.input)
-	builder.output = util.getBuildPath (builder) .. (builder.output or builder.input)
+	-- prefix output with buildPath, if needed
+	builder.output = util.lazyPrefix ((builder.output or builder.input), util.getBuildPath (builder))
 	-- the new build
 	local new = {
 		__metatable = 'build',
@@ -110,7 +110,7 @@ local function _build (builder, prepare)
 		input = builder.input,
 		output = builder.output,
 		cmd = util.substField (builder:extend {
-			prepare_input = prepare
+			prepare_input = not builder.pipe and util.curryPrefixEach (int.getPath ())
 		}, 'cmd')
 	}
 	setmetatable (new, new)
@@ -132,13 +132,13 @@ function pipeBuild (target, source)
 	int.assert_quit (getmetatable (target) == 'hellbuilder',
 			"Can't pipe a build into something that ain't a hellbuilder.", 2)
 
-	source.pipe = false
-	local new = _build (target:extend (source), util.id)
+	local new = _build (target:extend (source), function (i, b)
+		return util.lazyPrefix (i, int.getPath ())
+	end)
 
+	target.pipe = true
 	table.insert (target.deps, new)
 	-- flag that shows `target' is formed by pipe builds
-	target.pipe = true
-	--print (new.output)
 	return new.output
 end
 
@@ -155,9 +155,7 @@ function build (builder)
 			"Can't build something without a command.\
 Needed a string, got a " .. type (builder.cmd) .. '.', 2)
 
-	local prepare_input = builder.pipe and util.curryPrefixEach (int.getPath ()) or util.id
-	local new = _build (builder, prepare_input)
-	return new
+	return _build (builder)
 end
 
 --- The install function

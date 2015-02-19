@@ -43,6 +43,17 @@ function t.prefixEach (str, prefix)
 end
 
 
+--- Prefix `str' with `prefix', if it ain't already prefixed by it.
+--
+-- @param str The string
+-- @param prefix The prefix to be used if needed
+--
+-- @return The final string
+function t.lazyPrefix (str, prefix)
+	return int.hs.lazyPrefix (str, prefix)
+end
+
+
 --- Curry the prefixEach function with the prefix
 --
 -- For preparing a field, it's often useful to just prefix it. Rewriting the 
