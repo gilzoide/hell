@@ -2,14 +2,19 @@ import System.Environment (getArgs)
 import System.IO (hPutStrLn, stderr)
 import Text.Printf
 import System.CPUTime
-import Scripting.Lua as Lua
-import Foreign.C.Types (CInt)
 
 import HS_Utils
+import Lua_Utils as Lua
 
 main = do
 	l <- Lua.newstate
 	Lua.openlibs l
+
+	-- push traceback before loading file, so pcall calls the main chunk right
+	-- will be passed as the error handling function, so it's easier for
+	-- debugging hell!
+	Lua.getglobal2 l "debug.traceback"
+
 	Lua.loadfile l "hell.lua"
 
 	-- register utilities in lua
@@ -17,17 +22,14 @@ main = do
 
 	-- pass arguments
 	args <- getArgs
-	pushList l args
+	Lua.pushList l args
 
 	-- let's count the script run time
 	start <- getCPUTime
 	-- call main chunk
-	ret <- Lua.pcall l 2 0 0
+	ret <- Lua.pcall l 2 0 (-4)
 	end <- getCPUTime
 	if ret  /= 0 then do
-		{-Lua.getglobal2 l "debug.traceback"-}
-		{-Lua.insert l (-2)-}
-		{-Lua.call l 1 1-}
 		err <- Lua.tostring l (-1)
 		hPutStrLn stderr err
 	else do
