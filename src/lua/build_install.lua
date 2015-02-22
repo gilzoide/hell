@@ -132,9 +132,8 @@ function pipeBuild (target, source)
 	int.assert_quit (getmetatable (target) == 'hellbuilder',
 			"Can't pipe a build into something that ain't a hellbuilder.", 2)
 
-	local new = _build (target:extend (source), function (i, b)
-		return util.lazyPrefix (i, int.getPath ())
-	end)
+	source.pipe = false
+	local new = _build (target:extend (source))
 
 	target.pipe = true
 	table.insert (target.deps, new)
