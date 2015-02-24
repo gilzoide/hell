@@ -43,3 +43,11 @@ pushList l lst = do
 			push l item
 			settable l (-3)
 			return $ n + 1
+
+
+-- | Call Hell's messager, which prints `msg' if "silence" option is not set
+callHellMsg :: LuaState -> String -> IO ()
+callHellMsg l msg = do
+	getglobal2 l "package.loaded.internals.hellMsg"
+	pushstring l msg
+	call l 1 0

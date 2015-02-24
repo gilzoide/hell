@@ -1,6 +1,7 @@
 import System.Environment (getArgs)
 import System.IO (hPutStrLn, stderr)
-import Text.Printf
+{-import Text.Printf-}
+import Numeric
 import System.CPUTime
 
 import HS_Utils
@@ -10,7 +11,7 @@ main = do
 	l <- Lua.newstate
 	Lua.openlibs l
 
-	-- push traceback before loading file, so pcall calls the main chunk right
+	-- push traceback before loading file, so pcall calls the main chunk right;
 	-- will be passed as the error handling function, so it's easier for
 	-- debugging this hell!
 	Lua.getglobal2 l "debug.traceback"
@@ -34,7 +35,6 @@ main = do
 		hPutStrLn stderr err
 	else do
 		let diff = (fromIntegral (end - start)) / (10^12)
-		printf "Script execution time: %.3f s\n" (diff :: Double)
+		Lua.callHellMsg l $ "Script execution time: " ++ (showFFloat (Just 4) diff "s")
 
 	Lua.close l
-
