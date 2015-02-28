@@ -32,14 +32,51 @@ function t.glob (pattern)
 end
 
 
---- Prefix each word in str with prefix
+--- Maps a function over a table
+--
+-- @param field The target
+-- @param f The function
+-- @param force_table Bool: do you want the result to be a table, even if
+--  `target' ain't a table?
+--
+-- @return table with the results
+function t.fmap (field, f, force_table)
+	int.assert_quit (type (f) == 'function', "[fmap] Can't map a function if it ain't a function!", 2)
+
+	if type (field) ~= 'table' then
+		return force_table and { f (field) } or f (field)
+	end
+
+	-- apply function over every value in field, keeping changes
+	local results = {}
+	for i, v in ipairs (field) do
+		results[i] = f (v)
+	end
+
+	return results
+end
+
+
+--- Prefix a string `str' with `prefix'
+function t.prefix (str, prefix)
+	return prefix .. str
+end
+
+
+--- Curried version of `prefix' function
+function t.curryPrefix (prefix)
+	return function (str) return t.prefix (str, prefix) end
+end
+
+
+--- Prefix each string in `str' with prefix
 --
 -- @param str The string
 -- @param prefix The prefix to be used
 --
 -- @return The string str with prefix before every word
 function t.prefixEach (str, prefix)
-	return str:gsub ('%S+', prefix .. '%1')
+	return t.fmap (str, t.curryPrefix (prefix))
 end
 
 
@@ -72,26 +109,6 @@ function t.curryPrefixEach (prefix)
 end
 
 
---- Maps a function over a table
---
--- @return table with the results
-function t.fmap (field, f)
-	int.assert_quit (type (f) == 'function', "[fmap] Can't map a function if it ain't a function!", 2)
-
-	if type (field) ~= 'table' then
-		return { f (field) }
-	end
-
-	-- apply function over every value in field, keeping changes
-	local results = {}
-	for i, v in ipairs (field) do
-		results[i] = f (v)
-	end
-
-	return results
-end
-
-
 --- Function for doing nothing
 --
 -- It's useful for passing it into fmap, when you don't want to mess with things
@@ -106,7 +123,7 @@ end
 --
 -- @return The field unpacked and concatenated, or unaltered
 function t.concat (field)
-	return table.concat (t.fmap (field, t.id), ' ')
+	return table.concat (t.fmap (field, t.id, true), ' ')
 end
 
 
@@ -140,14 +157,7 @@ function t.subst (builder, str)
 		if capture:sub (1, 1) == '$' then
 			return capture
 		else
-			-- call the field's 'prepare_' function, if it exists, or return the
-			-- field, or an empty string
-			local prepare = builder['prepare_' .. capture]
-			if prepare then
-				builder[capture] = prepare (builder[capture], builder)
-				builder['prepare_' .. capture] = nil
-			end
-			return builder[capture] or ''
+			return t.concat (builder[capture]) or ''
 		end
 	end
 

@@ -1,11 +1,10 @@
 import System.Environment (getArgs)
 import System.IO (hPutStrLn, stderr)
-{-import Text.Printf-}
 import Numeric
 import System.CPUTime
 
 import HS_Utils
-import Lua_Utils as Lua
+import qualified Lua_Utils as Lua
 
 main = do
 	l <- Lua.newstate

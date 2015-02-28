@@ -20,18 +20,18 @@ gcc = Builder {
 }
 
 -- In C, we must first build the object files, then the executable, so do it!
-function gcc.prepare_input (inputs, b)
-	return table.concat (util.fmap (inputs, function (i)
+function gcc.prepare_input (i, b)
+	return util.fmap (i, function (ii)
 		return pipeBuild (b, {
 			flags = '&-c',
-			input = i,
+			input = ii,
 			deps = {},
 			prepare_input = util.id,
 			prepare_output = function (_, bb)
 				return util.changeExtension (bb.input, hell.os.obj_ext)
 			end
 		})
-	end), ' ')
+	end)
 end
 
 gcc.fpic = Builder {
@@ -45,17 +45,17 @@ gcc.fpic = Builder {
 -- Shared libraries!
 gcc.shared = Builder {
 	flags = '&-shared',
-	prepare_output = function (_, b)
-		return util.changeExtension (b.input, hell.os.shared_ext)
+	prepare_output = function (o, b)
+		return util.changeExtension (util.concat (b.input), hell.os.shared_ext)
 	end
 }
 
-function gcc.shared.prepare_input (inputs, b)
-	return table.concat (util.fmap (inputs, function (i)
+function gcc.shared.prepare_input (i, b)
+	return util.fmap (i, function (ii)
 		return pipeBuild (b, gcc.fpic:extend {
-			input = i
+			input = ii
 		})
-	end), ' ')
+	end)
 end
 
 -- default C builder (cuz it's the only one we have), so that the build function

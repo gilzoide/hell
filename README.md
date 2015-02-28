@@ -20,10 +20,11 @@ Or, you can use hell itself! (still not able to build, but the hellbuild is ther
 
     $ hell
 
-As build dependencies, we need some Haskell stuff (that can be found with cabal):
+As build dependencies, we need some Haskell stuff (which can be found and
+installed with cabal):
 - hslua
 - glob
-- fgl
+<!--- fgl-->
 
 Installing
 ----------

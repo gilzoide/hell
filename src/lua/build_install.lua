@@ -98,20 +98,48 @@ end
 
 
 local function _build (builder)
-	util.substField (builder, 'cmd')
+	-- both input and outputs will have, apart from the original "prepare_"
+	-- function, another one. Thus we need to apply the original within the new
+	-- one
+	local original_prepare_input = builder.prepare_input or util.id
+	local original_prepare_output = builder.prepare_output or util.id
 
-	-- prefix output with buildPath, if needed
-	builder.output = util.lazyPrefix ((builder.output or builder.input), util.getBuildPath (builder))
+	local new_prepare_input = function (i, b)
+		local parcial_result = original_prepare_input (i, b)
+		-- only prefix input path if it's not a pipeBuild
+		if not builder.pipe then
+			parcial_result = util.fmap (parcial_result, util.curryPrefixEach (int.getPath ()))
+		end
+		return parcial_result
+	end
+	local new_prepare_output = function (o, b)
+		local parcial_result = original_prepare_output (o, b)
+		return util.lazyPrefix (parcial_result, util.getBuildPath (b))
+	end
+	
+	-- call all the "prepare_" functions, starting with "output"
+	-- (output is special, cuz we need to prepare the output first,
+	-- as it often is based on the input field, that's why it's called first)
+	builder.output = new_prepare_output (builder.output, builder)
+	builder.prepare_output = nil
+	-- and the other ones
+	for k, v in pairs (builder) do
+		local capture = k:match ('prepare_(.+)')
+		if capture then
+			builder[capture] = v (builder[capture], builder)
+			builder[k] = nil
+		end
+	end
 	-- the new build
+	local new_cmd = util.substField (builder, 'cmd')
+
 	local new = {
 		__metatable = 'build',
 		echo = builder.echo,
 		deps = builder.deps,
 		input = builder.input,
 		output = builder.output,
-		cmd = util.substField (builder:extend {
-			prepare_input = not builder.pipe and util.curryPrefixEach (int.getPath ())
-		}, 'cmd')
+		cmd = new_cmd
 	}
 	setmetatable (new, new)
 
