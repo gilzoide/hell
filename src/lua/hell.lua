@@ -99,7 +99,7 @@ opts.target = opts.target or ''
 local target = int.assert_quit (util.getNestedField (env, opts.target),
 		"Can't find target \"" .. opts.target .. '"')
 
--- mayge get available targets?
+-- maybe get available targets?
 if opts.l then
 	int.hellMsg ("Listing available targets:")
 	BI.listTargets (env)
@@ -114,25 +114,19 @@ if opts.command == 'build' or opts.command == 'clean' then
 	end
 	int.assert_quit (#BI.builds ~= 0, "Can't find any builds" .. (opts.target and ' in target "' .. opts.target .. '"' or ''))
 
+	-- let's clean stuff instead of building
+	if opts.command == 'clean' then
+		BI.builds = BI.makeClean (BI.builds)
+	end
+
 	-- Process the builds in Haskell
-	--print ('\nfrom haskell:')
 	int.hs.processBI (BI.builds)
-	--print ('\nfrom lua:')
-	--for k, v in ipairs (BI.builds) do
-		--for _, dep in ipairs (v.deps or {}) do
-			--print ('\t' .. ((not int.verbose and dep.echo) or dep.cmd))
-			--for _, dep2 in ipairs (dep or {}) do
-				--print ('\t\t' .. ((not int.verbose and dep2.echo) or dep2.cmd))
-			--end
-		--end
-		--print ((not int.verbose and v.echo) or v.cmd)
-	--end
 else -- opts.command == 'install' or opts.command == 'uninstall'
 	if opts.target ~= '' then
 		BI.installs = BI.getBI (target, 'install')
 	end
-	-- Process the installs
 	int.assert_quit (#BI.installs ~= 0, "Can't find any installs" .. (opts.target and ' in target "' .. opts.target .. '"' or ''))
 
+	-- Process the installs in Haskell
 	int.hs.processBI (BI.installs)
 end

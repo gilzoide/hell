@@ -18,8 +18,6 @@ bastante tempo xP
 	-h|--help		-> mostra ajuda, padrão ou não (assim como no scons, você
 pode sobrescrever mensagem de ajuda)
 	-H|--help-options	-> mostra ajuda padrão de opções do hell
-	-c|--create-db-only	-> só cria o db, base pro haskell manjar o que tem que
-fazer
 	-n|--no-exec	-> não executa os comandos especificados, só os mostra
 	-t|--tree		-> mostra árvore de dependências pra target especificada
 

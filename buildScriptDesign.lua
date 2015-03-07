@@ -6,11 +6,11 @@ build { input = 'oi_mundo.c' }
 build { input = 'eita_sô.java' }
 -- como construtor padrão, pra extensões/arquivos desconhecidos, simplesmente copia (construtor `copy' (cópia), oi c++ =P)
 build { input = 'readme.txt', out = 'copia.txt' }
--- talvez fazer até um recursivo, usando o DirTreeIterator (http://lua-users.org/wiki/DirTreeIterator) ou outro paranauê
-build { input = 'src_dir_for_a_java_pkg', recurseOver = '*.java', keepDirStructure = true }
+-- pode-se construir respeitando a hierarquia de diretório das entradas, pras saídas. Pode ser útil, por exemplo, pra pacotes java
+build { input = util.glob 'src/**.java', keepDirStructure = true }
 -- e, claro, um em q vc escolhe o construtor (regra a ser seguida pra construção) ;]
 build { input = 'oi.png doido.png minha_nossa.png', builder = convertPngToJpg }
--- talvez chamar a função build pelo construtor, pra n ter q por mais uma variável na table (pura frescura, mas pode ser bacana)
+-- pode chamar a função build pelo construtor, pra n ter q por mais uma variável na table (pura frescura, mas bacana)
 --	podemos chamar o builder como função através do metamétodo '__call'
 cpp.sharedLib { input = '*.cpp' }
 -- quaisquer adições ao construtor podem ser feitas a qualquer hora (caham, flags pra compiladores, links, talvez até otro binário pra executar a build!)

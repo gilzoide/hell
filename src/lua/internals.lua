@@ -71,7 +71,7 @@ end
 --- A stack for the paths, which will be used when sourcing a hellfire,
 -- for `build' and `install' to know where to look for inputs.
 -- First path is where we are now
-t.path = {}
+t.path = {'.'}
 
 --- Get the path for the current hellbuild, from `from' to the end
 --

@@ -19,7 +19,7 @@ Inclusive, script provavelmente só será rodado quando precisar refazer o db
 		Solução: roda pelo Haskell, chama o script, e depois faz suas treta.
 
 No Lua, quem manda é a table 'hell', que tem uns campos interessantes, bem
-explicadinhos no 'src/hell.lua', dá uma olhadinha lá =]
+explicadinhos no 'src/lua/hell.lua', dá uma olhadinha lá =]
 
 
 Esquema simplificado do fluxo do rolê

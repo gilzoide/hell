@@ -1,10 +1,11 @@
 -- como eu imagino que os módulos de regras de construção (builders) devem ser
 
 -- lembrando que builders são rodados direto do hell.lua, então não precisamos
--- executar `require 'Builder'`. Funções auxiliares pra construção de Builders
--- podem ser encontradas no 'hellutils.lua', esse pode requerir se precisar
+-- executar `require 'Builder'`. 
+-- Funções auxiliares pra construção de Builders podem ser encontradas no módulo
+-- 'hellutils.lua', que é encontrado em `hell.utils'
 
-require 'hellutils'
+local util = hell.utils
 
 
 --[[		Builder é uma metatable com alguns campos padrão, a serem usados pra se montar os comandos a serem executados		]]--
@@ -54,7 +55,7 @@ myExt = Builder {
 c.linka = Builder {
 	-- ao por um valor no campo 'link', ele automagicamente põe o '-l' antes =]
 	-- as funções auxiliares podem ajudar bastante, lembre-se delas!
-	prepare_links = curryPrefixEach ('-l')
+	prepare_links = util.curryPrefixEach ('-l')
 }
 			
 

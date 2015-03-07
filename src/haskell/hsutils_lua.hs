@@ -60,8 +60,9 @@ glob' l = do
 		return 2
 
 
--- | Process builds/installs. Expects a table passed as argument (from Lua)
--- Builds the z
+-- | Process builds/installs.
+-- Expects argument from Lua:
+--  @param builds A table with all the builders
 processBI :: Lua.LuaCFunction
 processBI l = do
 	-- first key

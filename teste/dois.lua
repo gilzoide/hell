@@ -7,3 +7,7 @@ a = hell.utils.glob ("**.lua")
 build {
 	input = a
 }
+
+remove {
+	input = 'doido'
+}

@@ -2,7 +2,7 @@
 -- Builder: the heart of the Hell build scripts
 
 require 'build_install'
-local util = require 'hellutils'
+local util = hell.utils
 
 --- Auxiliary function for merging two fields
 --
@@ -98,13 +98,6 @@ function Builder (initializer)
 end
 
 --[[		Load all builders from the builders directory		]]--
-local function buildersIter ()
-	local dir = io.popen ('ls builders/*.lua')
-	return function ()
-		return dir:read ()
-	end
-end
-
-for f in buildersIter () do
+for _, f in ipairs (util.glob ('builders/*.lua')) do
 	dofile (f)
 end

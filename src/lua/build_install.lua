@@ -218,4 +218,48 @@ function install (builder, dir)
 	return new
 end
 
+
+--- Function for transforming builds in cleans
+function BI.makeClean (builds)
+	-- table with the processed builds, so that we don't process any build 
+	-- twice; saves us from falling into endless dependency cycles
+	local processed = {}
+	-- table with the cleaning builds, which will be returned
+	local cleans = {}
+
+	local remove = Builder {
+		bin = hell.os.name == 'windows' and 'del' or 'rm -rf',
+		cmd = '$bin $input'
+	}
+	--- Function for removing a build, and it's dependencies recursively
+	--
+	-- @note By removing, we mean creating a "build" that will remove the 
+	-- build given by argument
+	local function removeBuild (b)
+		if type (b) ~= 'table' then return nil end
+
+		local target = b.output
+		-- not processed yet, let's go!
+		if not processed[target] then
+			processed[target] = true
+
+			-- dependencies first
+			for _, bb in ipairs (b.deps) do
+				table.insert (cleans, removeBuild (bb))
+			end
+
+			return oi { input = target }
+		else
+			return nil
+		end
+	end
+
+	for _, b in ipairs (builds) do
+		table.insert (cleans, removeBuild (b))
+	end
+
+	return cleans
+end
+
+
 return BI

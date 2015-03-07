@@ -24,14 +24,13 @@ As build dependencies, we need some Haskell stuff (which can be found and
 installed with cabal):
 - hslua
 - glob
-<!--- fgl-->
 
 Installing
 ----------
 
     # make install
 
-or, with hell,
+or, with hell
 
     # hell install
 
