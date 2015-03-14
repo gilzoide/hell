@@ -8,6 +8,6 @@ build {
 	input = a
 }
 
-remove {
+build {
 	input = 'doido'
 }

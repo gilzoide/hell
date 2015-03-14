@@ -12,7 +12,8 @@ local win_copy = {
 }
 
 copy = Builder ((hell.os.name == 'windows' and win_copy) or unix_copy)
+copy.multinput = true
 copy.prepare_output = function (out, b)
-	local str = hell.outdir and '' or '"copy_of_' .. b.input .. '"'
+	local str = (hell.outdir and '' or 'copy_of_') .. b.input
 	return out or str
 end

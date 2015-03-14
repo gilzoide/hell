@@ -114,7 +114,7 @@ local function _build (builder)
 	end
 	local new_prepare_output = function (o, b)
 		local parcial_result = original_prepare_output (o, b)
-		return util.lazyPrefix (parcial_result, util.getBuildPath (b))
+		return util.lazyPrefix (parcial_result or "", util.getBuildPath (b))
 	end
 	
 	-- call all the "prepare_" functions, starting with "output"
@@ -182,7 +182,17 @@ function build (builder)
 			"Can't build something without a command.\
 Needed a string, got a " .. type (builder.cmd) .. '.', 2)
 
-	return _build (builder)
+	-- support for multinput: 
+	local all_builds = { builder }
+	if builder.multinput then
+		all_builds = util.fmap (builder.input, function (i) 
+			return builder:extend { input = i }
+		end, true)
+	end
+
+	-- return all builds unpacked (if not multinput, return the only
+	-- build as it would normally do
+	return unpack (util.fmap (all_builds, _build))
 end
 
 --- The install function
@@ -248,7 +258,7 @@ function BI.makeClean (builds)
 				table.insert (cleans, removeBuild (bb))
 			end
 
-			return oi { input = target }
+			return remove { input = target }
 		else
 			return nil
 		end

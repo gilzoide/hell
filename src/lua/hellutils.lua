@@ -208,7 +208,7 @@ function t.getBuildPath (builder)
 	end
 
 	if hell.keepDirStructure or builder.keepDirStructure then
-		str = str .. int.getPath (2)
+		str = str .. int.getPath (3)
 	end
 
 	return str
