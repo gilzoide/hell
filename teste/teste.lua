@@ -3,7 +3,8 @@ hell.outdir = "build"
 
 oi = build {
 	input = 'outro.c',
-	output = 'oUtRo'
+	output = 'oUtRo',
+	deps = {cara}
 }
 
 cara = build {

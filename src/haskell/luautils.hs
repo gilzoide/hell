@@ -44,6 +44,22 @@ pushList l lst = do
 			settable l (-3)
 			return $ n + 1
 
+-- | Takes a table at top of stack and makes a String list from it [0, 0, -]
+getStringList :: LuaState -> IO [String]
+getStringList l = do
+	pushnil l
+	getItem []
+	where
+		getItem lst = do
+			theresMore <- next l (-2)
+			if theresMore then do
+				item <- tostring l (-1)
+				-- pop value, keep key for next iteration
+				pop l 1
+				getItem $ item : lst
+			else return lst
+	
+
 
 -- | Call Hell's messager, which prints `msg' if "silence" option is not set
 callHellMsg :: LuaState -> String -> IO ()

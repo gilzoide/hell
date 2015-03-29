@@ -110,23 +110,25 @@ local function _build (builder)
 		if not builder.pipe then
 			parcial_result = util.fmap (parcial_result, util.curryPrefixEach (int.getPath ()))
 		end
-		return parcial_result
+		return util.fmap (parcial_result, util.id, true)
 	end
-	local new_prepare_output = function (o, b)
-		local parcial_result = original_prepare_output (o, b)
-		return util.lazyPrefix (parcial_result or "", util.getBuildPath (b))
+	local new_prepare_output = function (o, input)
+		local parcial_result = original_prepare_output (o, input)
+		return util.lazyPrefix (parcial_result or "", util.getBuildPath (builder))
 	end
 	
 	-- call all the "prepare_" functions, starting with "output"
 	-- (output is special, cuz we need to prepare the output first,
 	-- as it often is based on the input field, that's why it's called first)
-	builder.output = new_prepare_output (builder.output, builder)
+	builder.input = new_prepare_input (builder.input, builder)
+	builder.prepare_input = nil
+	builder.output = new_prepare_output (builder.output, builder.input[1])
 	builder.prepare_output = nil
 	-- and the other ones
 	for k, v in pairs (builder) do
 		local capture = k:match ('prepare_(.+)')
 		if capture then
-			builder[capture] = v (builder[capture], builder)
+			builder[capture] = v (builder[capture], builder.input[1])
 			builder[k] = nil
 		end
 	end
@@ -247,6 +249,8 @@ function BI.makeClean (builds)
 	-- build given by argument
 	local function removeBuild (b)
 		if type (b) ~= 'table' then return nil end
+
+		--print (b.input)
 
 		local target = b.output
 		-- not processed yet, let's go!

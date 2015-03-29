@@ -23,8 +23,8 @@ function int._addHellBuild (script, scope, level)
 	local file, err = loadfile (int.getPath () .. script)
 	if file then
 		-- pushes path to internals.path, for knowing where we are
-		local function takeDirectory (str)
-			return str:match ("(.+)/.+")
+		local function takeDirectory (path)
+			 return path:match ("(.+)/.+")
 		end
 		table.insert (int.path, takeDirectory (script))
 

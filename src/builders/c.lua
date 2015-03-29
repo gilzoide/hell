@@ -11,8 +11,8 @@ end
 gcc = Builder {
 	bin = 'gcc',
 	flags = '-Wall',
-	prepare_output = function (out, b)
-		return out or util.changeExtension (util.concat (b.input), hell.os.exe_ext)
+	prepare_output = function (out, input)
+		return out or util.changeExtension (input, hell.os.exe_ext)
 	end,
 	links = '',
 	prepare_links = pkgconfig,
@@ -27,8 +27,8 @@ function gcc.prepare_input (i, b)
 			input = ii,
 			deps = {},
 			prepare_input = util.id,
-			prepare_output = function (_, bb)
-				return util.changeExtension (bb.input, hell.os.obj_ext)
+			prepare_output = function (_, input)
+				return util.changeExtension (input, hell.os.obj_ext)
 			end
 		})
 	end)
@@ -37,16 +37,16 @@ end
 gcc.fpic = Builder {
 	flags = '&-c -fPIC',
 	prepare_input = util.id,
-	prepare_output = function (_, b)
-		return util.changeExtension (b.input, 'os')
+	prepare_output = function (_, input)
+		return util.changeExtension (input, 'os')
 	end
 }
 
 -- Shared libraries!
 gcc.shared = Builder {
 	flags = '&-shared',
-	prepare_output = function (o, b)
-		return util.changeExtension (util.concat (b.input), hell.os.shared_ext)
+	prepare_output = function (o, input)
+		return util.changeExtension (input, hell.os.shared_ext)
 	end
 }
 

@@ -6,8 +6,8 @@ hs = Builder {
 		return f .. outdir
 	end,
 	prepare_input = hell.utils.concat,
-	prepare_output = function (out, b)
-		return out or util.changeExtension (util.concat (b.input), hell.os.exe_ext)
+	prepare_output = function (out, input)
+		return out or util.changeExtension (input, hell.os.exe_ext)
 	end,
 	cmd = '$bin $flags $input -o $output'
 }

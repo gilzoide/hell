@@ -1,6 +1,8 @@
 module HS_Utils (registerHSUtils) where
 
 import qualified Lua_Utils as Lua
+import Builds_Map
+
 import Foreign.C.Types (CInt)
 -- What we will register
 import qualified System.Directory as Dir
@@ -15,8 +17,10 @@ import Data.List (isPrefixOf)
 registerHSUtils :: Lua.LuaState -> IO ()
 registerHSUtils l = do
 	Lua.newtable l
+	-- IO String
 	Lua.pushFunctions l [("getOS", return Info.os :: IO String),
 		("getArch", return Info.arch :: IO String)]
+	-- String -> String -> IO String
 	Lua.pushFunToTable l ("lazyPrefix", lazyPrefix)
 	Lua.pushRawFunctions l [("processBI", processBI),
 		("glob", glob')]
@@ -65,24 +69,30 @@ glob' l = do
 --  @param builds A table with all the builders
 processBI :: Lua.LuaCFunction
 processBI l = do
+	putStrLn "\nagora com os Map"
 	-- first key
 	Lua.pushnil l
-	printCmdRec
-	where
-		printCmdRec = do
-			theresMore <- Lua.next l (-2)
-			if theresMore then do
-				-- process dependencies first
-				Lua.getfield l (-1) "deps"
-				Lua.pushnil l
-				printCmdRec
-				-- and now back to our build
-				Lua.getfield l (-1) "cmd"
-				cmd <- Lua.tostring l (-1)
-				putStrLn cmd
-				-- pop `cmd' and the current build, leaves the key for `next'
-				Lua.pop l 2
-				printCmdRec
-			else do
-				Lua.pop l 1
-				return 0
+	{-printCmdRec-}
+	mapa <- makeMap l
+	return 0
+	{-
+	 -where
+	 -    printCmdRec = do
+	 -        theresMore <- Lua.next l (-2)
+	 -        putStrLn "oi"
+	 -        if theresMore then do
+	 -            -- process dependencies first
+	 -            Lua.getfield l (-1) "deps"
+	 -            Lua.pushnil l
+	 -            printCmdRec
+	 -            -- and now back to our build
+	 -            Lua.getfield l (-1) "cmd"
+	 -            cmd <- Lua.tostring l (-1)
+	 -            putStrLn cmd
+	 -            -- pop `cmd' and the current build, leaves the key for `next'
+	 -            Lua.pop l 2
+	 -            printCmdRec
+	 -        else do
+	 -            Lua.pop l 1
+	 -            return 0
+	 -}

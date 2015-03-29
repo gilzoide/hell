@@ -28,7 +28,11 @@ end
 --
 -- @return Table with all filename matches
 function t.glob (pattern)
-	return int.hs.glob (pattern, int.getPath ())
+	local dir = int.getPath ()
+	if dir == '' then
+		dir = '.'
+	end
+	return int.hs.glob (pattern, dir)
 end
 
 
@@ -208,7 +212,7 @@ function t.getBuildPath (builder)
 	end
 
 	if hell.keepDirStructure or builder.keepDirStructure then
-		str = str .. int.getPath (3)
+		str = str .. int.getPath (2)
 	end
 
 	return str
