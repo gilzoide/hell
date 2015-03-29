@@ -23,6 +23,9 @@ function int._addHellBuild (script, scope, level)
 	local file, err = loadfile (int.getPath () .. script)
 	if file then
 		-- pushes path to internals.path, for knowing where we are
+		--
+		-- don't use the Haskell version because it assumes the OS's directory
+		-- separator, and we don't want that
 		local function takeDirectory (path)
 			 return path:match ("(.+)/.+")
 		end

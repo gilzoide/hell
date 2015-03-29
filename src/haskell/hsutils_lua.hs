@@ -20,10 +20,17 @@ registerHSUtils l = do
 	-- IO String
 	Lua.pushFunctions l [("getOS", return Info.os :: IO String),
 		("getArch", return Info.arch :: IO String)]
+	-- String -> IO String
+	Lua.pushFunToTable l ("takeFileName", takeFileName')
 	-- String -> String -> IO String
 	Lua.pushFunToTable l ("lazyPrefix", lazyPrefix)
 	Lua.pushRawFunctions l [("processBI", processBI),
 		("glob", glob')]
+
+
+-- | Takes the filepath and drop directory
+takeFileName' :: FilePath -> IO FilePath
+takeFileName' = return . Path.takeFileName
 
 
 -- | Utility that prefixes a string into another one, if target string
@@ -79,7 +86,6 @@ processBI l = do
 	 -where
 	 -    printCmdRec = do
 	 -        theresMore <- Lua.next l (-2)
-	 -        putStrLn "oi"
 	 -        if theresMore then do
 	 -            -- process dependencies first
 	 -            Lua.getfield l (-1) "deps"

@@ -120,15 +120,18 @@ local function _build (builder)
 	-- call all the "prepare_" functions, starting with "output"
 	-- (output is special, cuz we need to prepare the output first,
 	-- as it often is based on the input field, that's why it's called first)
+	--
+	-- @note prepare_input is the only "prepare_" function called with the 
+	-- builder as parameter, as it might do some pipeBuilds
 	builder.input = new_prepare_input (builder.input, builder)
 	builder.prepare_input = nil
-	builder.output = new_prepare_output (builder.output, builder.input[1])
+	builder.output = new_prepare_output (builder.output, int.hs.takeFileName (builder.input[1]))
 	builder.prepare_output = nil
 	-- and the other ones
 	for k, v in pairs (builder) do
 		local capture = k:match ('prepare_(.+)')
 		if capture then
-			builder[capture] = v (builder[capture], builder.input[1])
+			builder[capture] = v (builder[capture], int.hs.takeFileName (builder.input[1]))
 			builder[k] = nil
 		end
 	end
