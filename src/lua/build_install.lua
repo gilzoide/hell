@@ -187,12 +187,14 @@ function build (builder)
 			"Can't build something without a command.\
 Needed a string, got a " .. type (builder.cmd) .. '.', 2)
 
+	local all_builds
 	-- support for multinput: 
-	local all_builds = { builder }
 	if builder.multinput then
 		all_builds = util.fmap (builder.input, function (i) 
 			return builder:extend { input = i }
 		end, true)
+	else
+		all_builds = { builder }
 	end
 
 	-- return all builds unpacked (if not multinput, return the only
@@ -243,7 +245,11 @@ function BI.makeClean (builds)
 	local cleans = {}
 
 	local remove = Builder {
-		bin = hell.os.name == 'windows' and 'del' or 'rm -rf',
+		bin = hell.os.name == 'windows' and 'del' or 'rm -f',
+		prepare_output = function (_, input) return input end,
+		-- force pipe build, so that it doesn't mess with our input (which
+		-- is already the full name for the output we want to clean)
+		pipe = true,
 		cmd = '$bin $input'
 	}
 	--- Function for removing a build, and it's dependencies recursively
