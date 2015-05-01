@@ -79,6 +79,7 @@ end
 local function getDefaultBuilder (builder)
 	local auto_builder
 	if not builder.builder then
+        local input_example
 		if type (builder.input) == 'table' then
 			input_example = builder.input[1]
 		else
@@ -86,7 +87,7 @@ local function getDefaultBuilder (builder)
 		end
 
 		local ext = input_example:match ('.-%.(%S+)')
-		auto_builder = getfenv(2)[ext] or copy
+		auto_builder = _ENV[ext] or copy
 	else
 		int.assert_quit (getmetatable (builder.builder) == 'hellbuilder',
 				"Trying to use an invalid Builder", 2)
@@ -125,13 +126,13 @@ local function _build (builder)
 	-- builder as parameter, as it might do some pipeBuilds
 	builder.input = new_prepare_input (builder.input, builder)
 	builder.prepare_input = nil
-	builder.output = new_prepare_output (builder.output, int.hs.takeFileName (builder.input[1]))
+	builder.output = new_prepare_output (builder.output, util.takeFileName (builder.input[1]))
 	builder.prepare_output = nil
 	-- and the other ones
 	for k, v in pairs (builder) do
 		local capture = k:match ('prepare_(.+)')
 		if capture then
-			builder[capture] = v (builder[capture], int.hs.takeFileName (builder.input[1]))
+			builder[capture] = v (builder[capture], util.takeFileName (builder.input[1]))
 			builder[k] = nil
 		end
 	end
@@ -169,7 +170,7 @@ function pipeBuild (target, source)
 	local new = _build (target:extend (source))
 
 	target.pipe = true
-	table.insert (target.deps, new)
+    --[[table.insert (target.deps, new)]]
 	-- flag that shows `target' is formed by pipe builds
 	return new.output
 end

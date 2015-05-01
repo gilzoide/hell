@@ -24,6 +24,7 @@ As build dependencies, we need some Haskell stuff (which can be found and
 installed with cabal):
 - hslua
 - glob
+- io-memoize
 
 Installing
 ----------

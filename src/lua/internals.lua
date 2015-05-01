@@ -3,6 +3,8 @@
 
 local t = {}
 
+t.cpp = require 'cppUtils'
+
 --- Prints a message from hell execution
 function t.hellMsg (msg)
 	if t.verbose ~= false then

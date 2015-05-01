@@ -1,6 +1,11 @@
 Como vai funcionar o hell internamente?
 
-A ideia é o Haskell mandar, e o script servir só pra dafinir as builds.
+Nota: a partir de 30/04/15 foi decidido que Haskell não era uma ideia tão boa,
+então bora usar C++, já que o problema demanda mta IO, e não faz tanto
+processamento que poderia ser 'Lazy'ado (além de ser melhor descrito
+proceduralmente, com estados) ;]
+
+A ideia é o ~Haskell~ C++ mandar, e o script servir só pra dafinir as builds.
 Inclusive, script provavelmente só será rodado quando precisar refazer o db
 (quando o script de construção tiver sido atualizado).
 	Pensando bem, é útil podermos settar variáveis direto no script pela cli,
@@ -8,15 +13,15 @@ Inclusive, script provavelmente só será rodado quando precisar refazer o db
 	Assim sendo, contando que cada chamada ao hell essas coisa podem mudar,
 	não tem muito como só rodar o script hora que o tal muda... Assim sendo,
 	acho melhor o lua mandar, ler opções de linha de comando, ler os scripts,
-	e daí sim chamar o haskell pra verificar dependências, quem mudou e quem
-	não, e soltar os comandos. 
+	e daí sim chamar o ~Haskell~ C++ pra verificar dependências, quem mudou e 
+    quem não, e soltar os comandos. 
 
 	Além disso, parsear opções é mais sussa no Lua, então ele começa e chama
-	os paranauê em Haskell depois.
+	os paranauê em ~Haskell~ C++ depois.
 		Problema é que não acho de jeito maneira um jeito de fazer a
-		biblioteca em Haskell num .so e linkar no Lua direto (que nem faz em C),
-		sem contar que linkar do C, que linka o Haskell dá muito trampo.
-		Solução: roda pelo Haskell, chama o script, e depois faz suas treta.
+		biblioteca em ~Haskell~ C++ num .so e linkar no Lua direto (que nem faz em C),
+		sem contar que linkar do C, que linka o ~Haskell~ C++ dá muito trampo.
+		Solução: roda pelo ~Haskell~ C++, chama o script, e depois faz suas treta.
 
 No Lua, quem manda é a table 'hell', que tem uns campos interessantes, bem
 explicadinhos no 'src/lua/hell.lua', dá uma olhadinha lá =]

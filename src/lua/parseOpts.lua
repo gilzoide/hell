@@ -25,7 +25,7 @@ end
 -- All the arguments. Options will be extracted to the opts table,
 -- while the others will be add in a var=val fashion (globally)
 -- Note that 'opts' keep track of the options only in their short form
-local args = ...
+local args = {...}
 local opts = {}
 local skip
 

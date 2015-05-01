@@ -2,8 +2,6 @@
 -- The hell script executable
 
 local int = require 'internals'
-local args
-int.hs, args = ...
 local util = require 'hellutils'
 
 -- get OS. As linux/freebsd/solaris are all alike, we gather them as unix.
@@ -29,8 +27,8 @@ local OSes = {
 	}
 }
 
-local os = OSes[int.hs.getOS ()] or OSes.unix
-os.name = int.hs.getOS ()
+local os = OSes[int.cpp.getOS ()] or OSes.unix
+os.name = int.cpp.getOS ()
 os.dir_sep = package.config:sub (1, 1)
 
 --[[		hell: the table that controls everything that's going on		]]--
@@ -51,7 +49,7 @@ hell = {
 	utils = util
 }
 
-local opts = (assert (loadfile ('parseOpts.lua'))) (args)
+local opts = (assert (loadfile ('parseOpts.lua'))) (...)
 
 --[[		And now, source our first hellbuild script.
 	It looks respectively into 'opts.file', './hellfire', './hellbuild'		]]--
@@ -88,7 +86,7 @@ end
 int.assert_quit (script, "Can't find any build scripts. Tried \"" .. table.concat (build_scripts, '", "') .. '"')
 script ()
 
-int.hellMsg ("all set, let's see what we got")
+int.hellMsg ("all set, let's see what we got\n")
 
 -- Called for help?
 if opts.h then
@@ -120,7 +118,7 @@ if opts.command == 'build' or opts.command == 'clean' then
 	end
 
 	-- Process the builds in Haskell
-	int.hs.processBI (BI.builds)
+	int.cpp.processBI (BI.builds)
 else -- opts.command == 'install' or opts.command == 'uninstall'
 	if opts.target ~= '' then
 		BI.installs = BI.getBI (target, 'install')
@@ -128,5 +126,5 @@ else -- opts.command == 'install' or opts.command == 'uninstall'
 	int.assert_quit (#BI.installs ~= 0, "Can't find any installs" .. (opts.target and ' in target "' .. opts.target .. '"' or ''))
 
 	-- Process the installs in Haskell
-	int.hs.processBI (BI.installs)
+	int.cpp.processBI (BI.installs)
 end

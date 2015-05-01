@@ -11,27 +11,22 @@ local int = require 'internals'
 --
 -- @param script The script name, for loading
 -- @param scope Should we scope _ENV? bool
--- @param level Level of fenv. Used as a "gambiarra", only for it to work.
---  Lua 5.2 would be really better for this, but hslua...
 --
 -- @return The script loaded, and it's env (which may be canged) if file loaded
 -- @return Nil and error message, if didn't load well
-function int._addHellBuild (script, scope, level)
+function int._addHellBuild (script, scope)
 	level = level or 3
-	local env = scope and setmetatable ({}, { __index = getfenv (level) }) or getfenv (level)
+	local env = scope and setmetatable ({}, { __index = _ENV }) or _ENV
 
-	local file, err = loadfile (int.getPath () .. script)
+	local file, err = loadfile (int.getPath () .. script, nil, env)
 	if file then
 		-- pushes path to internals.path, for knowing where we are
-		--
-		-- don't use the Haskell version because it assumes the OS's directory
-		-- separator, and we don't want that
 		local function takeDirectory (path)
 			 return path:match ("(.+)/.+")
 		end
 		table.insert (int.path, takeDirectory (script))
 
-		return setfenv (file, env), env
+		return file, env
 	else
 		return nil, err
 	end

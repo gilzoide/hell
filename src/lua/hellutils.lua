@@ -32,7 +32,7 @@ function t.glob (pattern)
 	if dir == '' then
 		dir = '.'
 	end
-	return int.hs.glob (pattern, dir)
+	return int.cpp.glob (pattern, dir)
 end
 
 
@@ -91,7 +91,11 @@ end
 --
 -- @return The final string
 function t.lazyPrefix (str, prefix)
-	return int.hs.lazyPrefix (str, prefix)
+    if str:match (prefix) then
+        return str
+    else
+        return prefix .. str
+    end
 end
 
 
@@ -216,6 +220,11 @@ function t.getBuildPath (builder)
 	end
 
 	return str
+end
+
+--- Take filename from filepath (until the last os.separator)
+function t.takeFileName (filename)
+    return filename:match ('.*' .. hell.os.separator .. '(.+)') or filename
 end
 
 

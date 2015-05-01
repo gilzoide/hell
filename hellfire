@@ -1,13 +1,15 @@
+local util = hell.utils
+
 hell.outdir = 'build'
 
 copy {
-	input = 'src/lua/*.lua'
+	input = util.glob 'src/lua/*.lua'
 }
 copy {
 	input = 'src/builders'
 }
 build {
-	input = 'src/haskell/*.hs',
+	input = util.glob 'src/haskell/*.hs',
 	flags = '&-dynamic',
 	output = 'hell'
 }

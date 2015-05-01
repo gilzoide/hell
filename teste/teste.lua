@@ -1,15 +1,16 @@
 hell.help = "e então, minha gente..."
-hell.outdir = "build"
+hell.outdir = "../teste"
 
 oi = build {
 	input = 'outro.c',
+	includes = 'include',
 	output = 'oUtRo',
 	deps = {cara}
 }
 
 cara = build {
 	input = 's.c',
-	deps = {oi}
+    deps = {oi}
 }
 
 a = {

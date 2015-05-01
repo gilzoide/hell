@@ -14,7 +14,6 @@ c = Builder {
 	bin = 'gcc',	-- * binário usado pra construção da saída desejada (bacana deixar separado pra poder ser sobreposto)
 	flags = 'Wall g O2',	-- * flags pro `bin'
 	ext = 'o',	-- * extensão de saída, maioria das vezes é padrão
-	out = input,	-- nome da saída, em geral só troca extensão a partir do input
 	links,	-- no caso do C, podemos usar um campo de linkagem, que pega info a partir do pkg-config
 	opts,	-- * opções do builder, teremos alguns predefinidos, como `Recursivo', `PreservaEstruturaDoDiretório' (é, n pensei mto mais q isso...)
 	cmd = '$bin $flags $input -o $out $links'	-- *** NECESSÁRIO: comando a ser executado, com substituição de variável por valores de campos da table (qualquer `nil' vira "", não se preocupe)
