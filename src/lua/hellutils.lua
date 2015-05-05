@@ -32,7 +32,7 @@ function t.glob (pattern)
 	if dir == '' then
 		dir = '.'
 	end
-	return int.cpp.glob (pattern, dir)
+	return int.cpp.glob (dir .. hell.os.dir_sep .. pattern)
 end
 
 
@@ -224,7 +224,7 @@ end
 
 --- Take filename from filepath (until the last os.separator)
 function t.takeFileName (filename)
-    return filename:match ('.*' .. hell.os.separator .. '(.+)') or filename
+    return filename:match ('.*' .. hell.os.dir_sep .. '(.+)') or filename
 end
 
 

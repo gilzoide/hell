@@ -5,6 +5,14 @@ local t = {}
 
 t.cpp = require 'cppUtils'
 
+function t.cpp.glob (pattern)
+	local ret = {}
+	for line in io.popen ('ls ' .. pattern):lines () do
+		table.insert (ret, line)
+	end
+	return ret
+end
+
 --- Prints a message from hell execution
 function t.hellMsg (msg)
 	if t.verbose ~= false then

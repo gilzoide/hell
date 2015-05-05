@@ -1,6 +1,6 @@
 ## Hell C++ stuff Makefile ##
 
-objs = cppUtils.o processBI.o build.o
+objs = cppUtils.o processBI.o Build.o BuildGraph.o
 lib_obj = cppUtils.so
 
 # Lua include, as seen on different Linux distros
@@ -14,8 +14,7 @@ CXXFLAGS = -Wall -g -O2 -std=c++11 -fPIC $(LINKS)
 all : $(objs)
 	$(CXX) -o $(BUILD)/$(lib_obj) $^ -shared $(CXXFLAGS) -lc
 
-#PIC : $(lib_src)
-%.o : %.cpp
+%.o : %.cpp %.hpp
 	$(CXX) -o $@ -c $< $(CXXFLAGS)
 
 .PHONY : clean

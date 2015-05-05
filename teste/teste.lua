@@ -5,7 +5,7 @@ oi = build {
 	input = 'outro.c',
 	includes = 'include',
 	output = 'oUtRo',
-	deps = {cara}
+	deps = {'opa'}
 }
 
 cara = build {

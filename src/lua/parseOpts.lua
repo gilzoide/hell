@@ -77,7 +77,7 @@ Check `hell -H` for help.", true)
 		end
 	-- variable attribution
 	elseif val then
-		getfenv ()[var] = val
+		_ENV[var] = val
 	-- or the command (must be one the valid ones)
 	elseif (' build clean install uninstall '):match ('%s+' .. arg .. '%s+') then
 		opts.command = arg

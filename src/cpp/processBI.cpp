@@ -1,9 +1,7 @@
 #include "processBI.hpp"
-#include "buildGraph.hpp"
-#include <iostream>
+#include "BuildGraph.hpp"
 
 int processBI (lua_State *L) {
-    //BuildGraph G {L};
-	std::cout << "processando" << std::endl;
+	BuildGraph G {L};
     return 0;
 }
