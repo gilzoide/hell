@@ -20,16 +20,19 @@ void Build::getInputList (lua_State *L) {
 }
 
 
-Build::Build (lua_State *L, Map & AllBuilds) : input (0) {
+Build::Build (lua_State *L, Map& AllBuilds) : input (0) {
 	auto buildTable = lua_gettop (L);
-	getInputList (L);
+	// Add this Build to the Map, avoiding cyclic dependency infinite loops
+	AllBuilds.emplace (lua_topointer (L, buildTable), this);
 
+	// inputs
+	getInputList (L);
+	// output
 	lua_getfield (L, buildTable, "output");
 	output = luaL_checkstring (L, -1);
-
+	// cmd
 	lua_getfield (L, buildTable, "cmd");
 	cmd = luaL_checkstring (L, -1);
-
 	// echo is optional
 	lua_getfield (L, buildTable, "echo");
 	if (!lua_isnil (L, -1)) {
@@ -55,7 +58,7 @@ Build::Build (lua_State *L, Map & AllBuilds) : input (0) {
 }
 
 
-Build * Build::getDependency (lua_State *L, Map & AllBuilds) {
+Build *Build::getDependency (lua_State *L, Map& AllBuilds) {
 	// get lua's table reference, as it's our key in the map
 	auto tableRef = lua_topointer (L, -1);
 
@@ -64,7 +67,6 @@ Build * Build::getDependency (lua_State *L, Map & AllBuilds) {
 	Build *newBuild;
 	if (it == AllBuilds.end ()) {
 		newBuild = new Build {L, AllBuilds};
-		AllBuilds.emplace (tableRef, newBuild);
 	}
 	else {
 		newBuild = it->second;
@@ -75,7 +77,7 @@ Build * Build::getDependency (lua_State *L, Map & AllBuilds) {
 
 
 void Build::print () {
-	cout << "out: " << output << "\ncmd: " << cmd;
+	cout << "out: " << output << endl << "cmd: " << cmd;
 	cout << endl << "deps: ";
 	for (const auto & dep : deps) {
 		cout << dep->output << "; ";

@@ -47,17 +47,18 @@ public:
 	 * @note The "build" metatable is also not checked
 	 *
 	 * @param[in] L The using lua_State
+	 * @param[in|out] AllBuilds The Map containing the Builds
 	 */
-	Build (lua_State *L, Map & AllBuilds);
+	Build (lua_State *L, Map& AllBuilds);
 
 	/**
 	 * A simple printing function
 	 */
 	void print ();
 
-private:
+
 	/// Echo field, line to be echoed when running command; optional
-	string echo;
+	string echo {""};
 	/// Cmd field, the command to be run
 	string cmd;
 	/// Output field, the build's output name
@@ -72,6 +73,14 @@ private:
 	/// Dependency list, built on the fly when checking the 'deps' field
 	forward_list<Build *> deps;
 
+	/// Has Build been processed yet (for the BFS)?
+	enum class State {
+		NotYet,
+		Working,
+		Done
+	} processed {State::NotYet};
+
+
 	/**
 	 * Gets the input list, reserving it's size inside @ref input
 	 *
@@ -85,10 +94,10 @@ private:
 	 * new Build from lua_State. This way, we avoid duplicates.
 	 *
 	 * @param[in] L The using lua_State
-	 * @param[in] AllBuilds The Map containing the Builds, which is
+	 * @param[in|out] AllBuilds The Map containing the Builds, which is
 	 *  updated whenever a new Build is created
 	 *
 	 * @return Existent or new Build's pointer
 	 */
-	Build * getDependency (lua_State *L, Map & AllBuilds);
+	Build *getDependency (lua_State *L, Map& AllBuilds);
 };

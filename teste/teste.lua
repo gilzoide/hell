@@ -5,13 +5,14 @@ oi = build {
 	input = 'outro.c',
 	includes = 'include',
 	output = 'oUtRo',
-	deps = {'opa'}
 }
 
 cara = build {
 	input = 's.c',
     deps = {oi}
 }
+
+oi:addDep (cara)
 
 a = {
 	build {

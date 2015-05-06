@@ -1,8 +1,8 @@
 #include "cppUtils.hpp"
-#include "processBI.hpp"
+#include "BuildGraph.hpp"
 
 int getOS (lua_State *L) {
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
     const char * osName = "windows";
 #elif __APPLE__
     const char * osName = "darwin";
@@ -20,10 +20,25 @@ int cppGlob (lua_State *L) {
 }
 
 
+int cppHellErrMsg (lua_State *L) {
+	const char *msg = luaL_checkstring (L, 1);
+	HellErrMsg (msg);
+	return 0;
+}
+
+
+int processBI (lua_State *L) {
+	BuildGraph G {L};
+	G.ProcessBuilds ();
+	return 0;
+}
+
+
 const struct luaL_Reg cppUtilsLib [] = {
 	{"processBI", processBI},
 	{"getOS", getOS},
 	{"glob", cppGlob},
+	{"HellErrMsg", cppHellErrMsg},
     {NULL, NULL}
 };
 

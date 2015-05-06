@@ -22,11 +22,22 @@
 #pragma once
 
 #include "Build.hpp"
+#include "processBI.hpp"
+#include "CycleLogger.hpp"
 
 class BuildGraph {
 public:
 	BuildGraph (lua_State *L);
 	~BuildGraph ();
+
+	/**
+	 * Process all the Builds, calling the private @ref BFS algorithm
+	 *
+	 * @note As we use a Map for storing the Builds, the sequence may not be
+	 *  the one you expected, but it'll still work, for the dependencies are
+	 *  processed first.
+	 */
+	void ProcessBuilds ();
 
 private:
 	/**
@@ -36,4 +47,11 @@ private:
 	 * from cyclic dependency (which will be warned to the user, if found)
 	 */
 	Map AllBuilds;
+	/**
+	 * Process Build, calling it's dependencies first
+	 *
+	 * If building ain't needed (as output exists and inputs haven't been
+	 * modified), it just skips it.
+	 */
+	void BFS (Build *current, CycleLogger& log);
 };

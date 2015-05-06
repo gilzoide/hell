@@ -1,7 +1,5 @@
 #include "processBI.hpp"
-#include "BuildGraph.hpp"
 
-int processBI (lua_State *L) {
-	BuildGraph G {L};
-    return 0;
+void HellErrMsg (const char *msg) {
+	cerr << "hell: !!! " << msg << endl;
 }

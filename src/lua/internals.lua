@@ -41,7 +41,7 @@ end
 
 --- Quits the program with a message, and sign possible error
 function t.quit (msg, was_error)
-	io.stderr:write ('hell: ' .. msg .. '\n')
+	t.cpp.HellErrMsg (msg)
 	os.exit (was_error and 0 or 1, true)
 end
 

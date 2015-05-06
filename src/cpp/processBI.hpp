@@ -22,6 +22,9 @@
 #pragma once
 
 #include <lua.hpp>
+#include <iostream>
+
+using namespace std;
 
 /**
  * Process Hell's builds
@@ -29,3 +32,7 @@
  * In Lua, it's arguments are a table with the wanted builds.
  */
 int processBI (lua_State *L);
+/**
+ * Writes a Hell message at stderr
+ */
+void HellErrMsg (const char *msg);

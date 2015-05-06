@@ -163,7 +163,8 @@ local function _build (builder)
 		deps = builder.deps,
 		input = builder.input,
 		output = builder.output,
-		cmd = new_cmd
+		cmd = new_cmd,
+		addDep = function (self, dep) table.insert (self.deps, dep) end
 	}
 	setmetatable (new, new)
 
@@ -188,7 +189,7 @@ function pipeBuild (target, source)
 	local new = _build (target:extend (source))
 
 	target.pipe = true
-    --[[table.insert (target.deps, new)]]
+	table.insert (target.deps, new)
 	-- flag that shows `target' is formed by pipe builds
 	return new.output
 end
