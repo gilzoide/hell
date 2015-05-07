@@ -21,8 +21,11 @@
 
 #pragma once
 
+#include "commonLib.hpp"
+
 #include <lua.hpp>
 #include <iostream>
+#include <sstream>
 
 #include <forward_list>
 #include <vector>
@@ -54,8 +57,14 @@ public:
 	/**
 	 * A simple printing function
 	 */
-	void print ();
+	string to_str ();
 
+	/**
+	 * Runs the command, echoing Build::echo or Build::command, if not silent
+	 *
+	 * @throws Int regarding exit failure
+	 */
+	void process () throw (int);
 
 	/// Echo field, line to be echoed when running command; optional
 	string echo {""};
@@ -74,7 +83,7 @@ public:
 	forward_list<Build *> deps;
 
 	/// Has Build been processed yet (for the BFS)?
-	enum class State {
+	enum class State : char {
 		NotYet,
 		Working,
 		Done

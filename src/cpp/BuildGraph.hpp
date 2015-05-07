@@ -22,7 +22,6 @@
 #pragma once
 
 #include "Build.hpp"
-#include "processBI.hpp"
 #include "CycleLogger.hpp"
 
 class BuildGraph {
@@ -53,5 +52,5 @@ private:
 	 * If building ain't needed (as output exists and inputs haven't been
 	 * modified), it just skips it.
 	 */
-	void BFS (Build *current, CycleLogger& log);
+	void BFS (Build *current, CycleLogger& log) throw (int);
 };

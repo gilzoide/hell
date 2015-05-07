@@ -1,4 +1,6 @@
-/** @file processBI.hpp
+/** @file commonLib.hpp
+ *
+ * Hell's common functions for C++ and Lua
  */
 
 /*
@@ -26,13 +28,29 @@
 
 using namespace std;
 
+/// Verbosity level
+enum class Verbosity : char {
+	Verbose,
+	Default,
+	Silent
+};
+
 /**
- * Process Hell's builds
- *
- * In Lua, it's arguments are a table with the wanted builds.
+ * Sets the verbosity level 
  */
-int processBI (lua_State *L);
+void setVerbose (Verbosity V);
 /**
- * Writes a Hell message at stderr
+ * Gets the verbosity level
  */
-void HellErrMsg (const char *msg);
+Verbosity getVerbose ();
+
+/**
+ * Writes a Hell message at stdout
+ */
+void hellMsg (string msg);
+void hellMsg (const char *msg);
+/**
+ * Writes a Hell message at stderr (with a warning "!!!" mark)
+ */
+void hellErrMsg (string msg);
+void hellErrMsg (const char *msg);

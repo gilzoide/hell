@@ -112,7 +112,7 @@ end
 --[[		Now that we parsed the options, make them active!		]]--
 opts.command = opts.command or 'build'
 -- Verbose (if -v, true; if -s, false; else, nil)
-int.verbose = opts.v or opts.s and false
+int.cpp.setVerbose (opts.v or opts.s and false)
 
 -- Version
 if opts.V then
@@ -128,7 +128,7 @@ function hellp ()
 	end
 	if opts.H then
 		optionsString = {
-			"Usage: hell [OPTIONS...] [TARGET] { build | clean | install | uninstall }\
+			"Usage: hell [OPTIONS...] [TARGET] { build | clean | install | uninstall } [var=value]\
 \
 Hell options:"
 		}
@@ -144,7 +144,7 @@ Report bugs to <gilzoide@gmail.com>]])
 
 		optionsString = table.concat (optionsString, '\n')
 
-		help = (help and help .. '\n\nUse `hell -H` for more help.')or optionsString
+		help = (help and help .. '\n\nUse `hell -H` for more help.') or optionsString
 		int.quit ('help:\n' .. help)
 	end
 end

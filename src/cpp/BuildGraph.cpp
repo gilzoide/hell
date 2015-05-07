@@ -19,16 +19,19 @@ BuildGraph::BuildGraph (lua_State *L) {
 
 
 void BuildGraph::ProcessBuilds () {
-	cout << endl << endl << endl;
-
-	for (auto & build : AllBuilds) {
-		CycleLogger log;
-		BFS (build.second, log);
+	try {
+		for (auto & build : AllBuilds) {
+			CycleLogger log;
+			BFS (build.second, log);
+		}
+	}
+	catch (int ret) {
+		hellErrMsg ("error trying to run command. Exited [" + to_string (ret) + "]");
 	}
 }
 
 
-void BuildGraph::BFS (Build *current, CycleLogger& log) {
+void BuildGraph::BFS (Build *current, CycleLogger& log) throw (int) {
 	if (current->processed != Build::State::Done) {
 		if (current->processed == Build::State::Working) {
 			log.setNode (current);
@@ -46,13 +49,18 @@ void BuildGraph::BFS (Build *current, CycleLogger& log) {
 
 				// maybe cycle ended, so write it, and clear logger
 				if (log.getNode () == current) {
-					HellErrMsg (log.getCycle ().data ());
+					hellErrMsg (log.getCycle ());
 					log.setNode (nullptr);
 				}
 			}
 		}
 
-		cout << "processing " << current->output << endl;
+		try {
+			current->process ();
+		}
+		catch (...) {
+			throw;
+		}
 		current->processed = Build::State::Done;
 	}
 }

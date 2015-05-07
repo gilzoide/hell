@@ -33,15 +33,13 @@ end
 
 --- Prints a message from hell execution
 function t.hellMsg (msg)
-	if t.verbose ~= false then
-		print ('hell: ' .. msg)
-	end
+	t.cpp.hellMsg (msg)
 end
 
 
 --- Quits the program with a message, and sign possible error
 function t.quit (msg, was_error)
-	t.cpp.HellErrMsg (msg)
+	t.cpp.hellErrMsg (msg)
 	os.exit (was_error and 0 or 1, true)
 end
 

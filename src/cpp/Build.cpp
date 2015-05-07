@@ -54,7 +54,7 @@ Build::Build (lua_State *L, Map& AllBuilds) : input (0) {
 
 	// clean stack
 	lua_pop (L, 4);
-	print ();
+	hellMsg (to_str ());
 }
 
 
@@ -76,15 +76,36 @@ Build *Build::getDependency (lua_State *L, Map& AllBuilds) {
 }
 
 
-void Build::print () {
-	cout << "out: " << output << endl << "cmd: " << cmd;
-	cout << endl << "deps: ";
+string Build::to_str () {
+	ostringstream os;
+	os << "out: " << output << endl << "cmd: " << cmd;
+	os << endl << "deps: ";
 	for (const auto & dep : deps) {
-		cout << dep->output << "; ";
+		os << dep->output << "; ";
 	}
-	cout << endl << "inputs: ";
+	os << endl << "inputs: ";
 	for (const auto & in : input) {
-		cout << in << "; ";
+		os << in << "; ";
 	}
-	cout << endl << endl;
+	os << endl << endl;
+
+	return os.str ();
+}
+
+
+void Build::process () throw (int) {
+	// echo cmd
+	if (getVerbose () == Verbosity::Default) {
+		cout << (echo.empty () ? cmd : echo) << endl;
+	}
+	else if (getVerbose () == Verbosity::Verbose) {
+		cout << cmd << endl;
+	}
+
+	// run command effectively
+	int ret = system (cmd.data ());
+	// if something went wrong, throw it's result
+	if (ret) {
+		throw WEXITSTATUS (ret);
+	}
 }
