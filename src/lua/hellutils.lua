@@ -39,18 +39,15 @@ end
 
 --- Glob function, returns all matches in a table
 --
--- @note Currently it uses only `ls`, so don't really use it in windows
--- (I'll use `dir` someday, and make it more crossplatform)
---
 -- @param pattern The search pattern
 --
 -- @return Table with all filename matches
 function t.glob (pattern)
 	local dir = int.getPath ()
 	if dir == '' then
-		dir = '.'
+		dir = './'
 	end
-	return int.cpp.glob (dir .. hell.os.dir_sep .. pattern)
+	return int.cpp.glob (dir .. pattern)
 end
 
 
@@ -91,17 +88,6 @@ function t.curryPrefix (prefix)
 end
 
 
---- Prefix each string in `str' with prefix
---
--- @param str The string
--- @param prefix The prefix to be used
---
--- @return The string str with prefix before every word
-function t.prefixEach (str, prefix)
-	return t.fmap (str, t.curryPrefix (prefix))
-end
-
-
 --- Prefix `str' with `prefix', if it ain't already prefixed by it.
 --
 -- @param str The string
@@ -109,29 +95,12 @@ end
 --
 -- @return The final string
 function t.lazyPrefix (str, prefix)
-    if str:match (prefix) then
-        return str
-    else
-        return prefix .. str
-    end
+	return int.cpp.lazyPrefix (str, prefix)
 end
 
-
---- Curry the prefixEach function with the prefix
---
--- For preparing a field, it's often useful to just prefix it. Rewriting the 
--- function for calling it everytime is boring, so here it is!
---
--- __Example__:
--- 		prepare_flags = curryPrefixEach ('-')
--- 		prepare_includes = curryPrefixEach ('-I')
--- 		prepare_defines = curryPrefixEach ('-D')
---
--- @param prefix The prefix to be curried in prefixEach
---
--- @return prefixEach's result
-function t.curryPrefixEach (prefix)
-	return function (str) return t.prefixEach (str, prefix) end
+--- Curry the `lazyPrefix' function, just as @ref curryPrefix does
+function t.curryLazyPrefix (prefix)
+	return function (str) return t.lazyPrefix (str, prefix) end
 end
 
 
@@ -202,12 +171,7 @@ function t.substField (builder, field)
 end
 
 
---- Auxiliary function: gets the nested field inside table t.
---
--- It works by recursing over tables until there's no more '.' in field name.
---
--- @param t The table which will be searched
--- @param field 
+--- Auxiliary recursion function for t.getNestedField
 local function getNestedField (t, field)
 	if not field or not t then
 		return t
@@ -217,6 +181,14 @@ local function getNestedField (t, field)
 		return getNestedField (t[current], rest)
 	end
 end
+--- Gets the nested field inside table t.
+--
+-- It works by recursing over tables until there's no more '.' in field name.
+--
+-- @param t The table which will be searched
+-- @param field 
+--
+-- @return Field asked for, whole table if empty field name
 function t.getNestedField (t, field)
 	if field == '' then
 		return t
@@ -226,23 +198,28 @@ function t.getNestedField (t, field)
 end
 
 
---- Get the build path, it's important for the commands to be executed 
-function t.getBuildPath (builder)
-	local str = ''
-	if hell.outdir then
-		str = hell.outdir .. hell.os.dir_sep
-	end
-
-	if hell.keepDirStructure or builder.keepDirStructure then
-		str = str .. int.getPath (2)
-	end
-
-	return str
-end
-
 --- Take filename from filepath (until the last os.separator)
 function t.takeFileName (filename)
     return filename:match ('.*' .. hell.os.dir_sep .. '(.+)') or filename
+end
+
+
+function t.makeRelative (path, base)
+	-- first of all, lazyPrefix base path
+	local prefixed = t.lazyPrefix (path, base)
+	local ret = {}
+	-- now, remove any combination "dir/../", in any level
+	for dir in prefixed:gmatch '([^/]+)/?' do
+		if dir ~= '.' then
+			if dir == '..' and ret[#ret] and ret[#ret] ~= '..' then
+				table.remove (ret)
+			else
+				table.insert (ret, dir)
+			end
+		end
+	end
+
+	return table.concat (ret, hell.os.dir_sep)
 end
 
 

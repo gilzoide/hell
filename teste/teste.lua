@@ -1,5 +1,5 @@
 hell.help = "e então, minha gente..."
-hell.outdir = "../teste"
+hell.outdir = "../build"
 
 oi = build {
 	input = 'outro.c',

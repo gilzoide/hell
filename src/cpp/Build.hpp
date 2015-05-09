@@ -64,7 +64,7 @@ public:
 	 *
 	 * @throws Int regarding exit failure
 	 */
-	void process () throw (int);
+	void process (bool dryRun) throw (int);
 
 	/// Echo field, line to be echoed when running command; optional
 	string echo {""};

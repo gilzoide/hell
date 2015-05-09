@@ -127,13 +127,15 @@ local function _build (builder)
 		local parcial_result = original_prepare_input (i, b)
 		-- only prefix input path if it's not a pipeBuild
 		if not builder.pipe then
-			parcial_result = util.fmap (parcial_result, util.curryPrefixEach (int.getPath ()))
+			parcial_result = util.fmap (parcial_result, function (i) 
+						return util.makeRelative (i, int.getPath ())
+					end)
 		end
 		return util.fmap (parcial_result, util.id, true)
 	end
 	local new_prepare_output = function (o, input)
 		local parcial_result = original_prepare_output (o, input)
-		return util.lazyPrefix (parcial_result or "", util.getBuildPath (builder))
+		return util.makeRelative (parcial_result or '', int.getBuildPath (builder))
 	end
 	
 	-- call all the "prepare_" functions, starting with "output"
@@ -144,13 +146,14 @@ local function _build (builder)
 	-- builder as parameter, as it might do some pipeBuilds
 	builder.input = new_prepare_input (builder.input, builder)
 	builder.prepare_input = nil
-	builder.output = new_prepare_output (builder.output, util.takeFileName (builder.input[1]))
+	local input_filename = util.takeFileName (builder.input[1])
+	builder.output = new_prepare_output (builder.output, input_filename)
 	builder.prepare_output = nil
 	-- and the other ones
 	for k, v in pairs (builder) do
 		local capture = k:match ('prepare_(.+)')
 		if capture then
-			builder[capture] = v (builder[capture], util.takeFileName (builder.input[1]))
+			builder[capture] = v (builder[capture], input_filename)
 			builder[k] = nil
 		end
 	end

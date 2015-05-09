@@ -31,6 +31,7 @@ local hell_options = {
 	{'t', 'tree', nil, "Show the target's dependency tree"},
 	{'h', 'help', nil, "Show script's custom help, or this one"},
 	{'H', 'help-options', nil, "Give this help list"},
+	{'n', 'no-exec', nil, "Don't execute commands, just print them"},
 	{'V', 'version', nil, "Print program version"}
 }
 

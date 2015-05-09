@@ -54,7 +54,7 @@ Build::Build (lua_State *L, Map& AllBuilds) : input (0) {
 
 	// clean stack
 	lua_pop (L, 4);
-	hellMsg (to_str ());
+	//hellMsg (to_str ());
 }
 
 
@@ -93,7 +93,7 @@ string Build::to_str () {
 }
 
 
-void Build::process () throw (int) {
+void Build::process (bool dryRun) throw (int) {
 	// echo cmd
 	if (getVerbose () == Verbosity::Default) {
 		cout << (echo.empty () ? cmd : echo) << endl;
@@ -102,10 +102,12 @@ void Build::process () throw (int) {
 		cout << cmd << endl;
 	}
 
-	// run command effectively
-	int ret = system (cmd.data ());
-	// if something went wrong, throw it's result
-	if (ret) {
-		throw WEXITSTATUS (ret);
+	if (!dryRun) {
+		// run command effectively
+		int ret = system (cmd.data ());
+		// if something went wrong, throw it's result
+		if (ret) {
+			throw WEXITSTATUS (ret);
+		}
 	}
 }

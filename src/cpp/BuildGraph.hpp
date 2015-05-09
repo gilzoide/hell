@@ -39,6 +39,8 @@ public:
 	void ProcessBuilds ();
 
 private:
+	/// Is it a "dry run" (just echo the commands, not actually process them)?
+	bool dryRun {false};
 	/**
 	 * A map with all the builds, 'tablePointer' X 'buildPointer'.
 	 *

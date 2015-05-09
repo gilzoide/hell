@@ -15,9 +15,8 @@ end
 
 gcc = Builder {
 	bin = 'gcc',
-	flags = '-Wall',
-	prepare_output = function (out, input)
-		return out or util.changeExtension (input, hell.os.exe_ext)
+	prepare_output = function (o, input)
+		return o or util.changeExtension (input, hell.os.exe_ext)
 	end,
 	links = '',
 	includes = '',
@@ -49,26 +48,23 @@ function gcc.prepare_input (i, b)
 	end)
 end
 
-gcc.fpic = Builder {
-	flags = '&-c -fPIC',
-	prepare_input = false,
-	prepare_output = function (_, input)
-		return util.changeExtension (input, 'os')
-	end
-}
-
 -- Shared libraries!
 gcc.shared = Builder {
-	flags = '&-shared',
+	flags = '-shared',
 	prepare_output = function (o, input)
-		return util.changeExtension (input, hell.os.shared_ext)
+		return o or util.changeExtension (input, hell.os.shared_ext)
 	end
 }
 
 function gcc.shared.prepare_input (i, b)
 	return util.fmap (i, function (ii)
-		return pipeBuild (b, gcc.fpic:extend {
-			input = ii
+		return pipeBuild (b, {
+			flags = '&-c -fPIC',
+			input = ii,
+			prepare_input = false,
+			prepare_output = function (_, input)
+				return util.changeExtension (input, hell.os.obj_ext)
+			end
 		})
 	end)
 end

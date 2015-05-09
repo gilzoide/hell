@@ -1,8 +1,10 @@
 #include "BuildGraph.hpp"
 
 BuildGraph::BuildGraph (lua_State *L) {
+	dryRun = lua_toboolean (L, 1);
+
 	lua_pushnil (L);
-	while (lua_next (L, 1)) {
+	while (lua_next (L, 2)) {
 		// get lua's table reference, as it's our key in the map
 		auto tableRef = lua_topointer (L, -1);
 
@@ -56,7 +58,7 @@ void BuildGraph::BFS (Build *current, CycleLogger& log) throw (int) {
 		}
 
 		try {
-			current->process ();
+			current->process (dryRun);
 		}
 		catch (...) {
 			throw;

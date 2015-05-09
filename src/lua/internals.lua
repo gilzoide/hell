@@ -23,13 +23,6 @@ local t = {}
 
 t.cpp = require 'cppUtils'
 
-function t.cpp.glob (pattern)
-	local ret = {}
-	for line in io.popen ('ls ' .. pattern):lines () do
-		table.insert (ret, line)
-	end
-	return ret
-end
 
 --- Prints a message from hell execution
 function t.hellMsg (msg)
@@ -115,6 +108,21 @@ function t.getPath (from)
 	end
 
 	return dir
+end
+
+
+--- Get the build path, it's important for the commands to be executed 
+function t.getBuildPath (builder)
+	local str = ''
+	if hell.outdir then
+		str = hell.outdir .. hell.os.dir_sep
+	end
+
+	if hell.keepDirStructure or builder.keepDirStructure then
+		str = str .. t.getPath (2)
+	end
+
+	return t.cpp.lazyPrefix (str, t.path[1] .. hell.os.dir_sep)
 end
 
 return t

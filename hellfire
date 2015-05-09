@@ -8,8 +8,9 @@ copy {
 copy {
 	input = 'src/builders'
 }
-build {
-	input = util.glob 'src/haskell/*.hs',
-	flags = '&-dynamic',
-	output = 'hell'
+cpp.shared {
+	input = util.glob 'src/cpp/*.cpp',
+	flags = '&-Wall -g -std=c++11',
+	links = 'lua',
+	output = 'cppUtils.so'
 }
