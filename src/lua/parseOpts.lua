@@ -141,7 +141,7 @@ Hell options:"
 		table.insert (optionsString, [[ 
 All arguments to short options and their long counterpart are mandatory.
 
-Report bugs to <gilzoide@gmail.com>]])
+Any bugs should be reported to <gilzoide@gmail.com>]])
 
 		optionsString = table.concat (optionsString, '\n')
 

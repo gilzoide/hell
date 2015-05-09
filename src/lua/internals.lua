@@ -113,9 +113,12 @@ end
 
 --- Get the build path, it's important for the commands to be executed 
 function t.getBuildPath (builder)
-	local str = ''
-	if hell.outdir then
-		str = hell.outdir .. hell.os.dir_sep
+	-- initial buildPath == outdir, from builder or from the hell table
+	local str = builder.outdir or hell.outdir
+	if str then
+		str =  str .. hell.os.dir_sep
+	else
+		str = ''
 	end
 
 	if hell.keepDirStructure or builder.keepDirStructure then

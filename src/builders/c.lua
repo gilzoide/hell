@@ -50,7 +50,7 @@ end
 
 -- Shared libraries!
 gcc.shared = Builder {
-	flags = '-shared',
+	prepare_flags = function (f) return '-shared ' .. f end,
 	prepare_output = function (o, input)
 		return o or util.changeExtension (input, hell.os.shared_ext)
 	end
@@ -62,6 +62,7 @@ function gcc.shared.prepare_input (i, b)
 			flags = '&-c -fPIC',
 			input = ii,
 			prepare_input = false,
+			prepare_flags = util.id,
 			prepare_output = function (_, input)
 				return util.changeExtension (input, hell.os.obj_ext)
 			end
