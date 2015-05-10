@@ -1,0 +1,6 @@
+-- lua
+feedHellFire 'lua/hellfire'
+-- builders
+feedHellFire 'builders/hellfire'
+-- cpp
+feedHellFire 'cpp/hellfire'

@@ -1,0 +1,6 @@
+local util = hell.utils
+
+copy {
+	input = util.glob '*.lua'
+}
+

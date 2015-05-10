@@ -62,7 +62,7 @@ function addHellBuild (script, scope)
 	local file, env = int._addHellBuild (script, scope)
 
 	int.assert_quit (file, "Can't load hellbuild \"" .. script .. '"', 2)
-	int.hellMsg ('sourcing hellfire: ' .. script)
+	int.hellMsg (string.rep ('  ', #int.path - 1) .. 'sourcing hellfire: ' .. script)
 	
 	local ret = file ()
 

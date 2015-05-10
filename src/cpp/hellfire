@@ -1,0 +1,9 @@
+local util = hell.utils
+
+cpp.shared {
+	input = util.glob '*.cpp',
+	flags = '-Wall -g -O2 -std=c++11',
+	links = 'lua',
+	output = 'cppUtils.so'
+}
+

@@ -222,7 +222,7 @@ Needed a string, got a " .. type (builder.cmd) .. '.', 2)
 
 	-- return all builds unpacked (if not multinput, return the only
 	-- build as it would normally do
-	return unpack (util.fmap (all_builds, _build))
+	return table.unpack (util.fmap (all_builds, _build))
 end
 
 --- The install function
