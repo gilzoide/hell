@@ -34,7 +34,7 @@
 // Forward declaration, for Map to work
 class Build;
 
-using namespace std;
+/// Our build Map
 using Map = map<const void *, Build *>;
 
 /**
@@ -64,10 +64,10 @@ public:
 	 *
 	 * @throws Int regarding exit failure
 	 */
-	void process (bool dryRun) throw (int);
+	void process () throw (int);
 
 	/// Echo field, line to be echoed when running command; optional
-	string echo {""};
+	string echo;
 	/// Cmd field, the command to be run
 	string cmd;
 	/// Output field, the build's output name

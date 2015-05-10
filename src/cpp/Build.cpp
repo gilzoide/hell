@@ -93,16 +93,17 @@ string Build::to_str () {
 }
 
 
-void Build::process (bool dryRun) throw (int) {
+void Build::process () throw (int) {
+    auto opts = Opts::getInstance ();
 	// echo cmd
-	if (getVerbose () == Verbosity::Default) {
+	if (opts.get_verbose () == Verbosity::Default) {
 		cout << (echo.empty () ? cmd : echo) << endl;
 	}
-	else if (getVerbose () == Verbosity::Verbose) {
+	else if (opts.get_verbose () == Verbosity::Verbose) {
 		cout << cmd << endl;
 	}
 
-	if (!dryRun) {
+	if (!opts.get_dryRun ()) {
 		// run command effectively
 		int ret = system (cmd.data ());
 		// if something went wrong, throw it's result

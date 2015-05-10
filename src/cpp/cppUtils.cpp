@@ -50,27 +50,6 @@ int processBI (lua_State *L) {
 }
 
 
-/// Sets the verbosity Level, expected to be executed only once
-// Lua params:
-//     verbose: - true -> Verbose;
-//              - nil -> Default;
-//              - false -> Silent
-int cppSetVerbose (lua_State *L) {
-	if (lua_isnil (L, 1)) {
-		setVerbose (Verbosity::Default);
-	}
-	else if (lua_toboolean (L, 1)) {
-		setVerbose (Verbosity::Verbose);
-	}
-	else {
-		setVerbose (Verbosity::Silent);
-	}
-
-	return 0;
-}
-
-
-
 /// Makes a POSIX glob pattern matching
 // Lua params:
 //     pattern: String with the pattern to be matched
@@ -121,6 +100,50 @@ int cppLazyPrefix (lua_State *L) {
 }
 
 
+/// Set the opts important to C++, instancing the singleton Opts class
+// Lua params:
+//     opts: Table with the options
+int cppSetOpts (lua_State *L) {
+    lua_getfield (L, 1, "j");
+    shorty j = 1;
+    if (!lua_isnil (L, -1)) {
+        j = lua_tointeger (L, -1);
+    }
+
+    Verbosity verbose;
+    lua_getfield (L, 1, "v");
+    // opts.v -> verbose
+    if (!lua_isnil (L, -1)) {
+        verbose = Verbosity::Verbose;
+    }
+    else {
+        lua_getfield (L, 1, "s");
+        // opts.s -> silent
+        if (!lua_isnil (L, -1)) {
+            verbose = Verbosity::Silent;
+        }
+        // none -> default
+        else {
+            verbose = Verbosity::Default;
+        }
+
+        // pops 's', as 'v' will always be popped anyway
+        lua_pop (L, 1);
+    }
+
+    lua_getfield (L, 1, "n");
+    bool dryRun = !lua_isnil (L, -1);
+
+    lua_getfield (L, 1, "t");
+    bool timer = !lua_isnil (L, -1);
+    
+    Opts::getInstance ().setOpts (j, verbose, dryRun, timer);
+    lua_pop (L, 4);
+
+    return 0;
+}
+
+
 const struct luaL_Reg cppUtilsLib [] = {
 	{"processBI", processBI},
 	{"getOS", getOS},
@@ -128,7 +151,7 @@ const struct luaL_Reg cppUtilsLib [] = {
 	{"lazyPrefix", cppLazyPrefix},
 	{"hellErrMsg", cppHellErrMsg},
 	{"hellMsg", cppHellMsg},
-	{"setVerbose", cppSetVerbose},
+	{"setOpts", cppSetOpts},
     {NULL, NULL}
 };
 

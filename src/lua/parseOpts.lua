@@ -28,7 +28,7 @@ local hell_options = {
 	{'s', 'silent', nil, "Suppress stdout output"},
 	{'v', 'verbose', nil, "Print all the commands executed, surpassing the build's 'echo' field"},
 	{'l', 'list-targets', nil, "List all possible targets"},
-	{'t', 'tree', nil, "Show the target's dependency tree"},
+	{'t', 'timer', nil, "Show builds/installs process time"},
 	{'h', 'help', nil, "Show script's custom help, or this one"},
 	{'H', 'help-options', nil, "Give this help list"},
 	{'n', 'no-exec', nil, "Don't execute commands, just print them"},
@@ -112,8 +112,9 @@ end
 
 --[[		Now that we parsed the options, make them active!		]]--
 opts.command = opts.command or 'build'
--- Verbose (if -v, true; if -s, false; else, nil)
-int.cpp.setVerbose (opts.v or opts.s and false)
+
+-- set the opts important to C++ in the singleton `Opts' class
+int.cpp.setOpts (opts)
 
 -- Version
 if opts.V then

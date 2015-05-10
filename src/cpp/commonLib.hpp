@@ -23,10 +23,11 @@
 
 #pragma once
 
-#include <lua.hpp>
 #include <iostream>
 
 using namespace std;
+/// A value we know will/should be little (for the number of jobs)
+using shorty = unsigned char;
 
 /// Verbosity level
 enum class Verbosity : char {
@@ -36,13 +37,44 @@ enum class Verbosity : char {
 };
 
 /**
- * Sets the verbosity level 
+ * Singleton with the important options taken from "parseOpts.lua"
+ *
+ * The values can only be set once, with the `setOpts` function
  */
-void setVerbose (Verbosity V);
-/**
- * Gets the verbosity level
- */
-Verbosity getVerbose ();
+class Opts {
+public:
+    /**
+     * Set options, please
+     */
+    void setOpts (shorty j, Verbosity verbose, bool dryRun, bool timer);
+    /**
+     * Gets the only instance by reference
+     */
+    static Opts &getInstance ();
+private:
+    /// Singleton instance
+    static Opts instance;
+    /// Private Ctor, because singleton
+    Opts ();
+
+    /* Important opts */
+// Define attributes with respective getters.
+#define withGetter(type, name) \
+private: \
+    type name; \
+public: \
+    type get_ ## name () { \
+        return name; \
+    }
+    /// Number of jobs/threads that will run concurrently
+    withGetter (shorty, j);
+    /// Verbosity state of the program
+    withGetter (Verbosity, verbose);
+    /// Is it a dryRun?
+    withGetter (bool, dryRun);
+    /// Should we count the processing time?
+    withGetter (bool, timer);
+};
 
 /**
  * Writes a Hell message at stdout

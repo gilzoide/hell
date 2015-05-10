@@ -1,24 +1,29 @@
 #include "commonLib.hpp"
 
-/// Stores the verbosity state of program
-static Verbosity verbose;
 
+// Opts!
+Opts::Opts () {}
 
-void setVerbose (Verbosity V) {
-	verbose = V;
+Opts &Opts::getInstance () {
+    return Opts::instance;
 }
 
-
-Verbosity getVerbose () {
-	return verbose;
+void Opts::setOpts (shorty j, Verbosity verbose, bool dryRun, bool timer) {
+    this->j = j;
+    this->verbose = verbose;
+    this->dryRun = dryRun;
+    this->timer = timer;
 }
 
+Opts Opts::instance;
 
+
+// Hell Messaging API
 void hellMsg (string msg) {
 	hellMsg (msg.data ());
 }
 void hellMsg (const char *msg) {
-	if (verbose != Verbosity::Silent) {
+	if (Opts::getInstance ().get_verbose () != Verbosity::Silent) {
 		cout << "hell: " << msg << endl;
 	}
 }

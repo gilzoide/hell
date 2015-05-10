@@ -135,14 +135,14 @@ if opts.command == 'build' or opts.command == 'clean' then
 		BI.builds = BI.makeClean (BI.builds)
 	end
 
-	-- Process the builds in Haskell
-	int.cpp.processBI (opts.n, BI.builds)
+	-- Process the builds in C++
+	int.cpp.processBI (BI.builds)
 else -- opts.command == 'install' or opts.command == 'uninstall'
 	if opts.target ~= '' then
 		BI.installs = BI.getBI (target, 'install')
 	end
 	int.assert_quit (#BI.installs ~= 0, "Can't find any installs" .. (opts.target and ' in target "' .. opts.target .. '"' or ''))
 
-	-- Process the installs in Haskell
-	int.cpp.processBI (opts.n, BI.installs)
+	-- Process the installs in C++
+	int.cpp.processBI (BI.installs)
 end
