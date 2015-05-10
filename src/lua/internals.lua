@@ -115,17 +115,25 @@ end
 function t.getBuildPath (builder)
 	-- initial buildPath == outdir, from builder or from the hell table
 	local str = builder.outdir or hell.outdir
+
 	if str then
 		str =  str .. hell.os.dir_sep
 	else
 		str = ''
 	end
 
+	-- should we keep the build structure?
 	if hell.keepDirStructure or builder.keepDirStructure then
 		str = str .. t.getPath (2)
 	end
 
-	return t.cpp.lazyPrefix (str, t.path[1] .. hell.os.dir_sep)
+	-- update build path with script path
+	str = t.cpp.lazyPrefix (str, t.path[1] .. hell.os.dir_sep)
+
+	-- assert that the build directory exists, before we can use it
+	t.cpp.createDirIfNeeded (str)
+
+	return str
 end
 
 return t

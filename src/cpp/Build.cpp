@@ -1,4 +1,6 @@
 #include "Build.hpp"
+#include <sys/stat.h>
+#include <ctime>
 
 void Build::getInputList (lua_State *L) {
 	lua_getfield (L, -1, "input");
@@ -20,7 +22,7 @@ void Build::getInputList (lua_State *L) {
 }
 
 
-Build::Build (lua_State *L, Map& AllBuilds) : input (0) {
+Build::Build (lua_State *L, BuildMap& AllBuilds) : input (0) {
 	auto buildTable = lua_gettop (L);
 	// Add this Build to the Map, avoiding cyclic dependency infinite loops
 	AllBuilds.emplace (lua_topointer (L, buildTable), this);
@@ -58,7 +60,7 @@ Build::Build (lua_State *L, Map& AllBuilds) : input (0) {
 }
 
 
-Build *Build::getDependency (lua_State *L, Map& AllBuilds) {
+Build *Build::getDependency (lua_State *L, BuildMap& AllBuilds) {
 	// get lua's table reference, as it's our key in the map
 	auto tableRef = lua_topointer (L, -1);
 
@@ -94,21 +96,74 @@ string Build::to_str () {
 
 
 void Build::process () throw (int) {
-    auto opts = Opts::getInstance ();
-	// echo cmd
-	if (opts.get_verbose () == Verbosity::Default) {
-		cout << (echo.empty () ? cmd : echo) << endl;
-	}
-	else if (opts.get_verbose () == Verbosity::Verbose) {
-		cout << cmd << endl;
-	}
+	// verify if really need to rebuild, checking in the input list
+	if (needRebuild ()) {
+		auto opts = Opts::getInstance ();
+		// echo cmd
+		if (opts.get_verbose () == Verbosity::Default) {
+			cout << (echo.empty () ? cmd : echo) << endl;
+		}
+		else if (opts.get_verbose () == Verbosity::Verbose) {
+			cout << cmd << endl;
+		}
 
-	if (!opts.get_dryRun ()) {
-		// run command effectively
-		int ret = system (cmd.data ());
-		// if something went wrong, throw it's result
-		if (ret) {
-			throw WEXITSTATUS (ret);
+		if (!opts.get_dryRun ()) {
+			// run command effectively
+			int ret = system (cmd.data ());
+			// if something went wrong, throw it's result
+			if (ret) {
+				throw WEXITSTATUS (ret);
+			}
 		}
 	}
 }
+
+time_t getModTime (const char *filename) {
+	// File status buffer struct, static as it will be used inumerous times.
+	static struct stat statbuf;
+
+	if (stat (filename, &statbuf) < 0) {
+		return -1;
+	}
+	else {
+		return statbuf.st_mtime;
+	}
+}
+
+
+bool Build::needRebuild () {
+	// first, let's check for the output modification time
+	time_t outTime = getModTime (output.data ());
+
+	// output doesn't exist: build!
+	if (outTime < 0) {
+		// we'll build it, so store that we did it
+		modTimes[output.data ()] = time (nullptr);
+		return true;
+	}
+
+	time_t inTime;
+	for (const auto & in : input) {
+		auto in_data = in.data ();
+		auto it = modTimes.find (in_data);
+		// do we know the modTime already? If so, don't need to `stat` again
+		if (it == modTimes.end ()) {
+			inTime = getModTime (in_data);
+			modTimes.emplace (in_data, inTime);
+		}
+		else {
+			inTime = it->second;
+		}
+
+		// maybe some error; let's rebuild then
+		if (inTime < 0 || inTime > outTime) {
+			// we'll build it, so store that we did it
+			modTimes[output.data ()] = time (nullptr);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+ModTimeMap Build::modTimes;

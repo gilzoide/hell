@@ -45,7 +45,7 @@ private:
 	 * We use this to avoid having doubled builds, as well as infinite loop
 	 * from cyclic dependency (which will be warned to the user, if found)
 	 */
-	Map AllBuilds;
+	BuildMap AllBuilds;
 	/**
 	 * Process Build, calling it's dependencies first
 	 *

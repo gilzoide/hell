@@ -19,6 +19,7 @@ gcc = Builder {
 		return o or util.changeExtension (input, hell.os.exe_ext)
 	end,
 	links = '',
+	flags = '-Wall',
 	includes = '',
 	prepare_links = pkgconfig_link,
 	prepare_includes = pkgconfig_include_dirs,
@@ -50,7 +51,7 @@ end
 
 -- Shared libraries!
 gcc.shared = Builder {
-	prepare_flags = function (f) return '-shared ' .. f end,
+	prepare_flags = function (f) return '-shared ' .. (f or '') end,
 	prepare_output = function (o, input)
 		return o or util.changeExtension (input, hell.os.shared_ext)
 	end

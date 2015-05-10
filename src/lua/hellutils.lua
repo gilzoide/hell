@@ -204,6 +204,12 @@ function t.takeFileName (filename)
 end
 
 
+--- Finds a relative path between `path' and `base' paths
+--
+-- @param path The file path to be processed
+-- @param base Base file path, used as reference
+--
+-- @returns Relative path
 function t.makeRelative (path, base)
 	-- first of all, lazyPrefix base path
 	local prefixed = t.lazyPrefix (path, base)

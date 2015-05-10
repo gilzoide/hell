@@ -3,9 +3,11 @@
 #include "commonLib.hpp"
 
 #include <cstring>
+#include <sys/stat.h>
 #include <glob.h>
 
 /// Get the OS name
+// Lua return: OS name
 int getOS (lua_State *L) {
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
     const char *osName = "windows";
@@ -144,6 +146,23 @@ int cppSetOpts (lua_State *L) {
 }
 
 
+/// Creates directory, if it doesn't already exists
+// Lua params:
+//     dirName: String with the directory name
+// TODO discover if "755" is the right way to pass the mask to `mkdir`
+int cppCreateDirIfNeeded (lua_State *L) {
+	const char *dirName = luaL_checkstring (L, 1);
+
+	struct stat statbuf;
+	// check if dir exists. If not, creates it
+	if (stat (dirName, &statbuf) < 0) {
+		mkdir (dirName, 755);
+	}
+
+	return 0;
+}
+
+
 const struct luaL_Reg cppUtilsLib [] = {
 	{"processBI", processBI},
 	{"getOS", getOS},
@@ -151,6 +170,7 @@ const struct luaL_Reg cppUtilsLib [] = {
 	{"lazyPrefix", cppLazyPrefix},
 	{"hellErrMsg", cppHellErrMsg},
 	{"hellMsg", cppHellMsg},
+	{"createDirIfNeeded", cppCreateDirIfNeeded},
 	{"setOpts", cppSetOpts},
     {NULL, NULL}
 };

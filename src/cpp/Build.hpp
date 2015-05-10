@@ -35,7 +35,9 @@
 class Build;
 
 /// Our build Map
-using Map = map<const void *, Build *>;
+using BuildMap = map<const void *, Build *>;
+/// Our file modification times map
+using ModTimeMap = map<const char *, time_t>;
 
 /**
  * Hell's builds, mapped exactly as Lua's
@@ -52,7 +54,7 @@ public:
 	 * @param[in] L The using lua_State
 	 * @param[in|out] AllBuilds The Map containing the Builds
 	 */
-	Build (lua_State *L, Map& AllBuilds);
+	Build (lua_State *L, BuildMap& AllBuilds);
 
 	/**
 	 * A simple printing function
@@ -67,7 +69,7 @@ public:
 	void process () throw (int);
 
 	/// Echo field, line to be echoed when running command; optional
-	string echo;
+	string echo {""};
 	/// Cmd field, the command to be run
 	string cmd;
 	/// Output field, the build's output name
@@ -89,6 +91,18 @@ public:
 		Done
 	} processed {State::NotYet};
 
+    /// The file modification times map
+    static ModTimeMap modTimes;
+
+	/**
+	 * Check if need to rebuild Build
+	 *
+	 * Checks if output exists. If not, rebuild. Else, checks all entries 
+	 * in input list if they modified, memoizing the modification times.
+	 * The first input newer than output immediately returns true.
+	 */
+	bool needRebuild ();
+
 
 	/**
 	 * Gets the input list, reserving it's size inside @ref input
@@ -108,5 +122,5 @@ public:
 	 *
 	 * @return Existent or new Build's pointer
 	 */
-	Build *getDependency (lua_State *L, Map& AllBuilds);
+	Build *getDependency (lua_State *L, BuildMap& AllBuilds);
 };
