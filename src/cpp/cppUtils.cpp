@@ -139,10 +139,11 @@ int cppSetOpts (lua_State *L) {
     lua_getfield (L, 1, "t");
     bool timer = !lua_isnil (L, -1);
     
-    Opts::getInstance ().setOpts (j, verbose, dryRun, timer);
+    bool valid_j = Opts::getInstance ().setOpts (j, verbose, dryRun, timer);
     lua_pop (L, 4);
 
-    return 0;
+	lua_pushboolean (L, valid_j);
+    return 1;
 }
 
 

@@ -46,7 +46,7 @@ public:
     /**
      * Set options, please
      */
-    void setOpts (shorty j, Verbosity verbose, bool dryRun, bool timer);
+    bool setOpts (shorty j, Verbosity verbose, bool dryRun, bool timer);
     /**
      * Gets the only instance by reference
      */

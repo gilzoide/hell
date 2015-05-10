@@ -114,7 +114,8 @@ end
 opts.command = opts.command or 'build'
 
 -- set the opts important to C++ in the singleton `Opts' class
-int.cpp.setOpts (opts)
+int.assert_quit (int.cpp.setOpts (opts),
+		'Invalid number of jobs: must be between 1 and 100')
 
 -- Version
 if opts.V then

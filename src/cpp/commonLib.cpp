@@ -8,11 +8,18 @@ Opts &Opts::getInstance () {
     return Opts::instance;
 }
 
-void Opts::setOpts (shorty j, Verbosity verbose, bool dryRun, bool timer) {
+bool Opts::setOpts (shorty j, Verbosity verbose, bool dryRun, bool timer) {
+	if (j < 1 || j > 100) {
+		// wrong number of jobs: tell hell that it's wrong (must
+		// be caught in a `assert_quit`)
+		return false;
+	}
     this->j = j;
     this->verbose = verbose;
     this->dryRun = dryRun;
     this->timer = timer;
+
+	return true;
 }
 
 Opts Opts::instance;

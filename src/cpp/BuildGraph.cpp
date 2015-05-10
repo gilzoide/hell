@@ -25,9 +25,9 @@ using namespace std::chrono;
 using clk = steady_clock;
 
 void BuildGraph::ProcessBuilds () {
-    clk::time_point start;
+	// starting clock, so we can measure the elapsed time
+    clk::time_point start = clk::now ();
 	try {
-        start = clk::now ();
 		for (auto & build : AllBuilds) {
 			CycleLogger log;
 			BFS (build.second, log);
@@ -38,12 +38,12 @@ void BuildGraph::ProcessBuilds () {
 				to_string (ret) + "]");
 	}
 	// if asked to show the time elapsed, let'sa do it!
-	// It is in ms, 3 decimal places
+	// It is in seconds, 3 decimal places
     if (Opts::getInstance ().get_timer ()) {
-		const auto dt = duration_cast<microseconds> (clk::now () - start).count ();
-		const auto ms = dt / 1000.0;
+		const auto dt = duration_cast<milliseconds> (clk::now () - start)
+				.count () / 1000.0;
 		ostringstream str;
-		str << "Processing time: " << fixed << setprecision (3) << ms << "ms";
+		str << "Processing time: " << fixed << setprecision (3) << dt << "s";
 		hellMsg (str.str ());
 	}
 }
