@@ -97,7 +97,8 @@ string Build::to_str () {
 
 void Build::process () throw (int) {
 	// verify if really need to rebuild, checking in the input list
-	if (needRebuild ()) {
+	checkNeedRebuild ();
+	if (needRebuild) {
 		auto opts = Opts::getInstance ();
 		// echo cmd
 		if (opts.get_verbose () == Verbosity::Default) {
@@ -131,7 +132,7 @@ time_t getModTime (const char *filename) {
 }
 
 
-bool Build::needRebuild () {
+void Build::checkNeedRebuild () {
 	// first, let's check for the output modification time
 	time_t outTime = getModTime (output.data ());
 
@@ -139,31 +140,33 @@ bool Build::needRebuild () {
 	if (outTime < 0) {
 		// we'll build it, so store that we did it
 		modTimes[output.data ()] = time (nullptr);
-		return true;
 	}
+	else {
+		time_t inTime;
+		for (const auto & in : input) {
+			auto in_data = in.data ();
+			auto it = modTimes.find (in_data);
+			// do we know the modTime already? If so, don't need to `stat` again
+			if (it == modTimes.end ()) {
+				inTime = getModTime (in_data);
+				modTimes.emplace (in_data, inTime);
+			}
+			else {
+				inTime = it->second;
+			}
 
-	time_t inTime;
-	for (const auto & in : input) {
-		auto in_data = in.data ();
-		auto it = modTimes.find (in_data);
-		// do we know the modTime already? If so, don't need to `stat` again
-		if (it == modTimes.end ()) {
-			inTime = getModTime (in_data);
-			modTimes.emplace (in_data, inTime);
-		}
-		else {
-			inTime = it->second;
-		}
-
-		// maybe some error; let's rebuild then
-		if (inTime < 0 || inTime > outTime) {
-			// we'll build it, so store that we did it
-			modTimes[output.data ()] = time (nullptr);
-			return true;
+			// maybe some error; let's rebuild then
+			if (inTime < 0 || inTime > outTime) {
+				// we'll build it, so store that we did it
+				modTimes[output.data ()] = time (nullptr);
+				return;
+			}
+			// Nothing to be done: don't rebuild, please
+			else {
+				needRebuild = false;
+			}
 		}
 	}
-
-	return false;
 }
 
 ModTimeMap Build::modTimes;

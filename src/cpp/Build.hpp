@@ -99,9 +99,11 @@ public:
 	 *
 	 * Checks if output exists. If not, rebuild. Else, checks all entries 
 	 * in input list if they modified, memoizing the modification times.
-	 * The first input newer than output immediately returns true.
+	 * The first input newer than output immediately marks as need to rebuild.
 	 */
-	bool needRebuild ();
+	void checkNeedRebuild ();
+	/// Stores if need to rebuild or not
+	bool needRebuild {true};
 
 
 	/**

@@ -30,7 +30,7 @@ void BuildGraph::ProcessBuilds () {
 	try {
 		for (auto & build : AllBuilds) {
 			CycleLogger log;
-			BFS (build.second, log);
+			DFS (build.second, log);
 		}
 	}
 	catch (int ret) {
@@ -49,7 +49,7 @@ void BuildGraph::ProcessBuilds () {
 }
 
 
-void BuildGraph::BFS (Build *current, CycleLogger& log) throw (int) {
+void BuildGraph::DFS (Build *current, CycleLogger& log) throw (int) {
 	if (current->processed != Build::State::Done) {
 		if (current->processed == Build::State::Working) {
 			log.setNode (current);
@@ -59,7 +59,7 @@ void BuildGraph::BFS (Build *current, CycleLogger& log) throw (int) {
 		current->processed = Build::State::Working;
 
 		for (auto & dep : current->deps) {
-			BFS (dep, log);
+			DFS (dep, log);
 
 			// check if it's in a cycle
 			if (log.hasLog ()) {

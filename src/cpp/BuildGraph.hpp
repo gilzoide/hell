@@ -30,7 +30,7 @@ public:
 	~BuildGraph ();
 
 	/**
-	 * Process all the Builds, calling the private @ref BFS algorithm
+	 * Process all the Builds, calling the private @ref DFS algorithm
 	 *
 	 * @note As we use a Map for storing the Builds, the sequence may not be
 	 *  the one you expected, but it'll still work, for the dependencies are
@@ -52,5 +52,5 @@ private:
 	 * If building ain't needed (as output exists and inputs haven't been
 	 * modified), it just skips it.
 	 */
-	void BFS (Build *current, CycleLogger& log) throw (int);
+	void DFS (Build *current, CycleLogger& log) throw (int);
 };
