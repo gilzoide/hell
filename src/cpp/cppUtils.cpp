@@ -5,6 +5,8 @@
 #include <cstring>
 #include <sys/stat.h>
 #include <glob.h>
+#include <chrono>
+#include <iomanip>
 
 /// Get the OS name
 // Lua return: OS name
@@ -34,7 +36,6 @@ int cppHellErrMsg (lua_State *L) {
 /// Call hellMsg
 // Lua params:
 //     msg: String with the message
-//     verbose: Bool, should we write msg or not? (Skips only if false, not nil)
 int cppHellMsg (lua_State *L) {
 	const char *msg = luaL_checkstring (L, 1);
 	hellMsg (msg);
@@ -42,12 +43,29 @@ int cppHellMsg (lua_State *L) {
 }
 
 
+// some definitions so we can track down the time spent
+using namespace std::chrono;
+using clk = steady_clock;
+
 /// Process the Builds/Installs
 // Lua params:
 //     BI: Table with the Builds
 int processBI (lua_State *L) {
+	// starting clock, so we can measure the elapsed time
+    clk::time_point start = clk::now ();
+
 	BuildGraph G {L};
 	G.ProcessBuilds ();
+
+	// if asked to show the time elapsed, let'sa do it!
+	// It is in seconds, 3 decimal places
+    if (Opts::getInstance ().get_timer ()) {
+		const auto dt = duration_cast<milliseconds> (clk::now () - start)
+				.count () / 1000.0;
+		ostringstream str;
+		str << "Processing time: " << fixed << setprecision (3) << dt << "s";
+		hellMsg (str.str ());
+	}
 	return 0;
 }
 
@@ -66,6 +84,7 @@ int cppGlob (lua_State *L) {
 	// creates the table and puts the matches inside it
 	lua_newtable (L);
 	for (unsigned int i = 0; i < globbuf.gl_pathc; i++) {
+		// i + 1, because Lua
 		lua_pushinteger (L, i + 1);
 		lua_pushstring (L, globbuf.gl_pathv[i]);
 		lua_settable (L, -3);
@@ -138,9 +157,12 @@ int cppSetOpts (lua_State *L) {
 
     lua_getfield (L, 1, "t");
     bool timer = !lua_isnil (L, -1);
+
+    lua_getfield (L, 1, "c");
+    bool c = !lua_isnil (L, -1);
     
-    bool valid_j = Opts::getInstance ().setOpts (j, verbose, dryRun, timer);
-    lua_pop (L, 4);
+    bool valid_j = Opts::getInstance ().setOpts (j, verbose, dryRun, timer, c);
+    lua_pop (L, 5);
 
 	lua_pushboolean (L, valid_j);
     return 1;
@@ -157,7 +179,8 @@ int cppCreateDirIfNeeded (lua_State *L) {
 	struct stat statbuf;
 	// check if dir exists. If not, creates it
 	if (stat (dirName, &statbuf) < 0) {
-		mkdir (dirName, 755);
+		// permissions: 755 - rwxr-xr-x
+		mkdir (dirName, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
 	}
 
 	return 0;

@@ -1,6 +1,4 @@
 #include "BuildGraph.hpp"
-#include <chrono>
-#include <iomanip>
 
 BuildGraph::BuildGraph (lua_State *L) {
 	lua_pushnil (L);
@@ -20,13 +18,7 @@ BuildGraph::BuildGraph (lua_State *L) {
 }
 
 
-// some definitions so we can track down the time spent
-using namespace std::chrono;
-using clk = steady_clock;
-
 void BuildGraph::ProcessBuilds () {
-	// starting clock, so we can measure the elapsed time
-    clk::time_point start = clk::now ();
 	try {
 		for (auto & build : AllBuilds) {
 			CycleLogger log;
@@ -37,19 +29,13 @@ void BuildGraph::ProcessBuilds () {
 		hellErrMsg ("error trying to run command. Exited [" +
 				to_string (ret) + "]");
 	}
-	// if asked to show the time elapsed, let'sa do it!
-	// It is in seconds, 3 decimal places
-    if (Opts::getInstance ().get_timer ()) {
-		const auto dt = duration_cast<milliseconds> (clk::now () - start)
-				.count () / 1000.0;
-		ostringstream str;
-		str << "Processing time: " << fixed << setprecision (3) << dt << "s";
-		hellMsg (str.str ());
+	catch (string cycle) {
+		hellErrMsg (cycle);
 	}
 }
 
 
-void BuildGraph::DFS (Build *current, CycleLogger& log) throw (int) {
+void BuildGraph::DFS (Build *current, CycleLogger& log) throw (int, string) {
 	if (current->processed != Build::State::Done) {
 		if (current->processed == Build::State::Working) {
 			log.setNode (current);
@@ -62,14 +48,14 @@ void BuildGraph::DFS (Build *current, CycleLogger& log) throw (int) {
 			DFS (dep, log);
 
 			// check if it's in a cycle
-			if (log.hasLog ()) {
+			if (!Opts::getInstance ().get_c () && log.hasLog ()) {
 				log.addNode (current);
 
-				// maybe cycle ended, so write it, and clear logger
+				// cycle ended: throw cycle error message
 				if (log.getNode () == current) {
-					hellErrMsg (log.getCycle ());
-					log.setNode (nullptr);
+					throw log.getCycle ();
 				}
+				return;
 			}
 		}
 

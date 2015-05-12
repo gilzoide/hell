@@ -3,15 +3,15 @@ Como vai chamar o comando hell?
 USO:
 ====
 	hell [OPTIONS...] [TARGET] { build | clean | install | uninstall }
+[var=value]
 	
 flags:
 	-f file|--file=file	-> especifica o arquivo a ser usado como script
 	-j N|--jobs=N	-> especifica o número de 'jobs' a serem executados em
 paralelo
 	-s|--silent		-> não escreve na stdout
-	-v|--verbose	-> mais informações: nível 1 => mostra todos os comandos
-rodados, ignorando o campo 'echo'; nível 2 => debug do próprio hell, não é pra
-usuário
+	-v|--verbose	-> mais informações: mostra todos os comandos rodados,
+ignorando o campo 'echo'
 	-l|--list-targets	-> lista quais as targets que existem no script
 	-V|--version	-> mostra versão do software. Deve ficar em '0.1.0' por
 bastante tempo xP
@@ -19,7 +19,12 @@ bastante tempo xP
 pode sobrescrever mensagem de ajuda)
 	-H|--help-options	-> mostra ajuda padrão de opções do hell
 	-n|--no-exec	-> não executa os comandos especificados, só os mostra
-	-t|--tree		-> mostra árvore de dependências pra target especificada
+	-t|--timer		-> mostra tempo de execução da build
+	-d|--dependency-tree	-> mostra árvore de dependências pra target 
+especificada
+	-c|--ignore-cyclic-dependencies	-> assina um contrato que diz "estou
+ciente de que existem dependências cíclicas e não responsabilizo o criador do
+hell se meu pc pegar fogo"
 
 
 

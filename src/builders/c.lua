@@ -23,7 +23,7 @@ gcc = Builder {
 	includes = '',
 	prepare_links = pkgconfig_link,
 	prepare_includes = pkgconfig_include_dirs,
-	cmd = '$bin $flags $input -o $output $includes $links'
+	cmd = '$bin -o $output $input $flags $includes $links'
 }
 
 -- In C, we must first build the object files, then the executable, so do it!

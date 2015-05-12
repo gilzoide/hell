@@ -97,9 +97,14 @@ string Build::to_str () {
 
 void Build::process () throw (int) {
 	// verify if really need to rebuild, checking in the input list
-	checkNeedRebuild ();
+	// do it if not in a dryRun
+	auto opts = Opts::getInstance ();
+	bool dryRun = opts.get_dryRun ();
+	if (!dryRun) {
+		checkNeedRebuild ();
+	}
+
 	if (needRebuild) {
-		auto opts = Opts::getInstance ();
 		// echo cmd
 		if (opts.get_verbose () == Verbosity::Default) {
 			cout << (echo.empty () ? cmd : echo) << endl;
@@ -108,7 +113,7 @@ void Build::process () throw (int) {
 			cout << cmd << endl;
 		}
 
-		if (!opts.get_dryRun ()) {
+		if (!dryRun) {
 			// run command effectively
 			int ret = system (cmd.data ());
 			// if something went wrong, throw it's result
@@ -155,17 +160,15 @@ void Build::checkNeedRebuild () {
 				inTime = it->second;
 			}
 
-			// maybe some error; let's rebuild then
+			// some error, or input is newer: let's rebuild then
 			if (inTime < 0 || inTime > outTime) {
 				// we'll build it, so store that we did it
 				modTimes[output.data ()] = time (nullptr);
 				return;
 			}
-			// Nothing to be done: don't rebuild, please
-			else {
-				needRebuild = false;
-			}
 		}
+		// Nothing to be done: don't rebuild, please
+		needRebuild = false;
 	}
 }
 

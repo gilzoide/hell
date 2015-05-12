@@ -33,7 +33,7 @@ end
 --- Quits the program with a message, and sign possible error
 function t.quit (msg, was_error)
 	t.cpp.hellErrMsg (msg)
-	os.exit (was_error and 0 or 1, true)
+	os.exit (was_error and 1 or 0, true)
 end
 
 

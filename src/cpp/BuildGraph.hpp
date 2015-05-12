@@ -52,5 +52,5 @@ private:
 	 * If building ain't needed (as output exists and inputs haven't been
 	 * modified), it just skips it.
 	 */
-	void DFS (Build *current, CycleLogger& log) throw (int);
+	void DFS (Build *current, CycleLogger& log) throw (int, string);
 };

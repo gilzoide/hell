@@ -24,15 +24,17 @@ local int = require 'internals'
 -- all the hell options
 local hell_options = {
 	{'f', 'file', 'FILE', "Specify build script name. Defaults: hellbuild or hellfire"},
-	{'j', 'jobs', 'N', "Allow N jobs at once"},
+	{'j', 'jobs', 'N', "Allow N jobs at once. Must be between 1~100"},
 	{'s', 'silent', nil, "Suppress stdout output"},
 	{'v', 'verbose', nil, "Print all the commands executed, surpassing the build's 'echo' field"},
 	{'l', 'list-targets', nil, "List all possible targets"},
-	{'t', 'timer', nil, "Show builds/installs process time"},
+	{'t', 'timer', nil, "Show builds/installs' process time"},
 	{'h', 'help', nil, "Show script's custom help, or this one"},
 	{'H', 'help-options', nil, "Give this help list"},
 	{'n', 'no-exec', nil, "Don't execute commands, just print them"},
-	{'V', 'version', nil, "Print program version"}
+	{'V', 'version', nil, "Print program version"},
+	{'c', 'ignore-cyclic-dependency', nil, [[Ignores cyclic dependencies, signing the following contract:
+"I am aware that my build may have cyclic dependencies, and declare hell's developer innocent if my PC burns"]]},
 }
 
 -- associate each short and long flags with their table
@@ -138,7 +140,7 @@ Hell options:"
 		for _, v in ipairs (hell_options) do
 			local short = v[1] .. (v[3] and ' ' .. v[3] or '')
 			local long = v[2] .. (v[3] and '=' .. v[3] or '') 
-			table.insert (optionsString, string.format ('%-30s %s', '  -' .. short .. ', --' .. long, v[4]))
+			table.insert (optionsString, string.format ('%-35s %s', '    -' .. short .. ', --' .. long, v[4]))
 		end
 		table.insert (optionsString, [[ 
 All arguments to short options and their long counterpart are mandatory.
