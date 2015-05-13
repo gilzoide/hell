@@ -229,4 +229,26 @@ function t.makeRelative (path, base)
 end
 
 
+--- Runs a command on the shell, and returns its output
+--
+-- @param command Command to be run
+--
+-- @return Command's output, or nil if no output is read
+function t.shell (command)
+	-- open the command file handler, suppressing its stderr
+	local handler = io.popen (command .. ' 2> /dev/null')
+	-- read everything from command run
+	local ret = handler:read ('*a')
+	-- and close the command file handler
+	handler:close ()
+
+	-- if command failed, reads nothing, so return nil
+	if ret ~= '' then
+		return ret:sub (1, -2)
+	else
+		return nil
+	end
+end
+
+
 return t

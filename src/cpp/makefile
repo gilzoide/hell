@@ -4,7 +4,7 @@ objs = cppUtils.o commonLib.o Build.o BuildGraph.o CycleLogger.o
 lib_obj = cppUtils.so
 
 # Lua include, as seen on different Linux distros
-lualib = $(shell if pkg-config --list-all | grep lua5.2; then echo "lua5.2"; else echo "lua"; fi)
+lualib = $(shell if pkg-config --list-all | grep lua5.2 > /dev/null; then echo "lua5.2"; else echo "lua"; fi)
 LINKS = $(shell pkg-config --cflags --libs $(lualib)) -pthread
 
 CXX = g++

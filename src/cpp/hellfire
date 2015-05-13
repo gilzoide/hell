@@ -1,9 +1,13 @@
 local util = hell.utils
 
+lualib = util.checkPkgConfig ('lua5.2') or 'lua'
+-- the threads libraries for windows are different from *nix
+threadlib = hell.os.name == 'windows' and '-mthreads' or '-pthread'
+
 cpp.shared {
 	input = util.glob '*.cpp',
-	flags = '-Wall -g -O2 -std=c++11',
-	links = 'lua pthread',
+	flags = '-Wall -g -O2 -std=c++11 ' .. threadlib,
+	links = {lualib},
 	output = 'cppUtils.so'
 }
 

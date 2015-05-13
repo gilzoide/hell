@@ -3,14 +3,14 @@ local util = hell.utils
 -- Get the linking options for C compiling
 -- If there ain't a pkg-config for it, just add the '-l' preffix
 local function pkgconfig_link (links)
-	return links:gsub ('%S+', function (pkg)
-		return io.popen ('pkg-config --silence-errors --libs ' .. pkg):read () or '-l' .. pkg
-	end)
+	return util.fmap (links, function (pkg)
+			return pkg and (util.shell ('pkg-config --silence-errors --libs ' .. pkg) or '-l' .. pkg)
+		end)
 end
 local function pkgconfig_include_dirs (includes)
-	return includes:gsub ('%S+', function (pkg)
-		return io.popen ('pkg-config --silence-errors --cflags-only-I ' .. pkg):read () or '-I' .. pkg
-	end)
+	return util.fmap (includes, function (pkg)
+			return pkg and (util.shell ('pkg-config --silence-errors --cflags-only-I ' .. pkg) or '-I' .. pkg)
+		end)
 end
 
 gcc = Builder {
@@ -18,9 +18,9 @@ gcc = Builder {
 	prepare_output = function (o, input)
 		return o or util.changeExtension (input, hell.os.exe_ext)
 	end,
-	links = '',
+	links = nil,
 	flags = '-Wall',
-	includes = '',
+	includes = nil,
 	prepare_links = pkgconfig_link,
 	prepare_includes = pkgconfig_include_dirs,
 	cmd = '$bin -o $output $input $flags $includes $links'
@@ -74,3 +74,8 @@ end
 -- default C builder (cuz it's the only one we have), so that the build function
 -- can find it easily from the file's extension
 c = gcc
+
+-- Auxiliary function: checks package in `pkg-config`
+function util.checkPkgConfig (pkg)
+	return util.shell ('pkg-config --list-all | grep ' .. pkg) and pkg
+end
