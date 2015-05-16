@@ -46,7 +46,8 @@ end
 -- All the arguments. Options will be extracted to the opts table,
 -- while the others will be add in a var=val fashion (globally)
 -- Note that 'opts' keep track of the options only in their short form
-local args = {...}
+local args = hell.args
+hell.args = nil
 local opts = {}
 local skip
 
@@ -158,4 +159,4 @@ if opts.H then
 	hellp ()
 end
 
-return opts
+hell.opts = opts

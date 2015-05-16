@@ -19,20 +19,20 @@
 -- along with Hell.  If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-local t = {}
+local int = {}
 
-t.cpp = require 'cppUtils'
+int.cpp = require 'cppUtils'
 
 
 --- Prints a message from hell execution
-function t.hellMsg (msg)
-	t.cpp.hellMsg (msg)
+function int.hellMsg (msg)
+	int.cpp.hellMsg (msg)
 end
 
 
 --- Quits the program with a message, and sign possible error
-function t.quit (msg, was_error)
-	t.cpp.hellErrMsg (msg)
+function int.quit (msg, was_error)
+	int.cpp.hellErrMsg (msg)
 	os.exit (was_error and 1 or 0, true)
 end
 
@@ -48,7 +48,7 @@ end
 --  increments itself in the level.
 --
 -- @return If condition is true, it's returned (just like assert does)
-function t.assert_quit (cond, msg, level)
+function int.assert_quit (cond, msg, level)
 	if not cond then
 		-- maybe we want to trace where the problem happened, so...
 		if level then
@@ -56,7 +56,7 @@ function t.assert_quit (cond, msg, level)
 			local script = debug.getinfo (level + 1)
 			msg = script.short_src .. ':' .. script.currentline .. ': ' .. msg
 		end
-		t.quit (msg, true)
+		int.quit (msg, true)
 	end
 
 	return cond
@@ -68,7 +68,7 @@ end
 -- @param t The table
 --
 -- @return The iterator
-function t.rawpairs (t)
+function int.rawpairs (t)
 	local key = nil
 	local value
 
@@ -90,19 +90,20 @@ end
 --- A stack for the paths, which will be used when sourcing a hellfire,
 -- for `build' and `install' to know where to look for inputs.
 -- First path is where we are now
-t.path = {}
+int.path = { int.cpp.getcwd () }
 
 --- Get the path for the current hellbuild, from `from' to the end
 --
 -- @param from Trace path from which level?
+-- 		0 : hell command initial working directory
 -- 		Default = 1 : root hellbuild
 -- 		2 : script's relative path to root build
 --
 -- @return The path trace, from `from' until the end
-function t.getPath (from)
+function int.getPath (from)
 	from = from or 1
 
-	local dir = table.concat (t.path, hell.os.dir_sep, from)
+	local dir = table.concat (int.path, hell.os.dir_sep, from + 1)
 	if dir ~= '' then
 		dir = dir .. hell.os.dir_sep
 	end
@@ -112,7 +113,7 @@ end
 
 
 --- Get the build path, it's important for the commands to be executed 
-function t.getBuildPath (builder)
+function int.getBuildPath (builder)
 	-- initial buildPath == outdir, from builder or from the hell table
 	local str = builder.outdir or hell.outdir
 
@@ -124,16 +125,16 @@ function t.getBuildPath (builder)
 
 	-- should we keep the build structure?
 	if hell.keepDirStructure or builder.keepDirStructure then
-		str = str .. t.getPath (2)
+		str = str .. int.getPath (2)
 	end
 
 	-- update build path with script path
-	str = t.cpp.lazyPrefix (str, t.path[1] .. hell.os.dir_sep)
+	str = int.cpp.lazyPrefix (str, int.path[2] .. hell.os.dir_sep)
 
 	-- assert that the build directory exists, before we can use it
-	t.cpp.createDirIfNeeded (str)
+	int.cpp.createDirIfNeeded (str)
 
 	return str
 end
 
-return t
+return int

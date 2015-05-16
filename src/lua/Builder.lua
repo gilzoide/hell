@@ -21,6 +21,7 @@
 
 
 require 'build_install'
+local int = require 'internals'
 local util = hell.utils
 
 --- Auxiliary function for merging two fields
@@ -117,6 +118,6 @@ function Builder (initializer)
 end
 
 --[[		Load all builders from the builders directory		]]--
-for _, f in ipairs (util.glob ('builders/*.lua')) do
+for _, f in ipairs (util.glob (int.hellInstallPath .. '/builders/*.lua')) do
 	dofile (f)
 end

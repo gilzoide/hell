@@ -36,13 +36,14 @@ function int._addHellBuild (script, scope)
 	level = level or 3
 	local env = scope and setmetatable ({}, { __index = _ENV }) or _ENV
 
-	local file, err = loadfile (int.getPath () .. script, nil, env)
+	local file, err = loadfile (script, nil, env)
 	if file then
 		-- pushes path to internals.path, for knowing where we are
 		local function takeDirectory (path)
 			 return path:match ("(.+)/.+")
 		end
 		table.insert (int.path, takeDirectory (script))
+		int.cpp.chdir (int.getPath (0))
 
 		return file, env
 	else
@@ -62,12 +63,13 @@ function addHellBuild (script, scope)
 	local file, env = int._addHellBuild (script, scope)
 
 	int.assert_quit (file, "Can't load hellbuild \"" .. script .. '"', 2)
-	int.hellMsg (string.rep ('  ', #int.path - 1) .. 'sourcing hellfire: ' .. script)
+	int.hellMsg (string.rep ('  ', #int.path - 2) .. 'sourcing hellfire: ' .. script)
 	
 	local ret = file ()
 
 	-- and pop the path, as we will go back now
 	table.remove (int.path)
+	int.cpp.chdir (int.getPath (0))
 
 	return ret, env
 end

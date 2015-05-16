@@ -1,3 +1,5 @@
+#!/usr/bin/env lua
+
 --- @file hell.lua
 -- The hell script executable
 
@@ -19,7 +21,20 @@
 -- along with Hell.  If not, see <http://www.gnu.org/licenses/>.
 --]]
 
+--- Hell's install path, for our LUAPATH and CPATH to be defined right, and
+-- builders be loaded fine. It may be easily modified from this sed script:
+-- '/^local hellInstallPath/ c local hellInstallPath = $whateverYouWant'
+local hellInstallPath = '/usr/lib/hell'
+
+-- let `hell` require it's components from hell's lib directory
+local oldpath = package.path
+local oldcpath = package.cpath
+package.path = oldpath .. ';' .. hellInstallPath .. '/?.lua'
+package.cpath = oldcpath .. ';' .. hellInstallPath .. '/?.so'
+
+
 local int = require 'internals'
+int.hellInstallPath = hellInstallPath
 local util = require 'hellutils'
 
 -- get OS. As linux/freebsd/solaris are all alike, we gather them as unix.
@@ -67,19 +82,22 @@ hell = {
 	utils = util
 }
 
-local opts = (assert (loadfile ('parseOpts.lua'))) (...)
-
---[[		And now, source our first hellbuild script.
-	It looks respectively into 'opts.file', './hellfire', './hellbuild'		]]--
+-- parse our opts, from args
+hell.args = {...}
+require 'parseOpts'
+-- extract hell opts
+local opts = hell.opts
+hell.opts = nil
+-- require builder stuff
 local BI = require 'build_install'
 require 'Builder'
 require 'fireHandler'
 
+--[[		And now, source our first hellbuild script.
+	It looks respectively into 'opts.file', './hellfire', './hellbuild'		]]--
 -- first script to load
 local script, err, env
-local build_scripts = { opts.f }
-table.insert (build_scripts, './hellfire')
-table.insert (build_scripts, './hellbuild')
+local build_scripts = { './hellbuild', './hellfire', opts.f }
 
 int.hellMsg ('reading build script(s)')
 for i = #build_scripts, 1, -1 do
@@ -100,9 +118,17 @@ if not script and opts.h then
 	hellp ()
 end
 
+-- don't let script use require with hell's internals
+package.path = oldpath
+package.cpath = oldcpath
+
 -- process root build script
 int.assert_quit (script, "Can't find any build scripts. Tried \"" .. table.concat (build_scripts, '", "') .. '"')
 script ()
+
+-- remove root hellbuild from path, so commands are rightly executed
+table.remove (int.path)
+int.cpp.chdir (int.getPath (0))
 
 int.hellMsg ("all set, let's see what we got\n")
 

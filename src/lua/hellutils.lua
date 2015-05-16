@@ -23,12 +23,10 @@
 
 local int = require 'internals'
 
--- `hs' is the forward declaration of the haskell library that `hell.lua'
--- will give us
-local t = {}
+local utils = {}
 
 
-function t.cloneTable (src)
+function utils.cloneTable (src)
 	local new = {}
 	for k, v in pairs (src) do
 		new[k] = v
@@ -42,12 +40,8 @@ end
 -- @param pattern The search pattern
 --
 -- @return Table with all filename matches
-function t.glob (pattern)
-	local dir = int.getPath ()
-	if dir == '' then
-		dir = './'
-	end
-	return int.cpp.glob (dir .. pattern)
+function utils.glob (pattern)
+	return int.cpp.glob (pattern)
 end
 
 
@@ -59,7 +53,7 @@ end
 --  `target' ain't a table?
 --
 -- @return table with the results
-function t.fmap (field, f, force_table)
+function utils.fmap (field, f, force_table)
 	int.assert_quit (type (f) == 'function', "[fmap] Can't map a function if it ain't a function!", 2)
 
 	if type (field) ~= 'table' then
@@ -77,14 +71,14 @@ end
 
 
 --- Prefix a string `str' with `prefix'
-function t.prefix (str, prefix)
+function utils.prefix (str, prefix)
 	return prefix .. str
 end
 
 
 --- Curried version of `prefix' function
-function t.curryPrefix (prefix)
-	return function (str) return t.prefix (str, prefix) end
+function utils.curryPrefix (prefix)
+	return function (str) return utils.prefix (str, prefix) end
 end
 
 
@@ -94,20 +88,20 @@ end
 -- @param prefix The prefix to be used if needed
 --
 -- @return The final string
-function t.lazyPrefix (str, prefix)
+function utils.lazyPrefix (str, prefix)
 	return int.cpp.lazyPrefix (str, prefix)
 end
 
 --- Curry the `lazyPrefix' function, just as @ref curryPrefix does
-function t.curryLazyPrefix (prefix)
-	return function (str) return t.lazyPrefix (str, prefix) end
+function utils.curryLazyPrefix (prefix)
+	return function (str) return utils.lazyPrefix (str, prefix) end
 end
 
 
 --- Function for doing nothing
 --
 -- It's useful for passing it into fmap, when you don't want to mess with things
-function t.id (a)
+function utils.id (a)
 	return a
 end
 
@@ -117,13 +111,13 @@ end
 -- @param field The field
 --
 -- @return The field unpacked and concatenated, or unaltered
-function t.concat (field)
-	return table.concat (t.fmap (field, t.id, true), ' ')
+function utils.concat (field)
+	return table.concat (utils.fmap (field, utils.id, true), ' ')
 end
 
 
 --- Changes a file name's extension to the `new' one
-function t.changeExtension (file_name, new)
+function utils.changeExtension (file_name, new)
 	-- drop the dot from filename, if there should be no extension
 	if new ~= '' then
 		new = '.' .. new
@@ -143,7 +137,7 @@ end
 -- @param str The string to be substituted
 --
 -- @return A string with the substituted stuff
-function t.subst (builder, str)
+function utils.subst (builder, str)
 	int.assert_quit (type (str) == 'string', "[subst] Can't substitute parameter: it isn't a string", 3)
 
 	-- build the command substituting anything that starts with a '$'
@@ -152,7 +146,7 @@ function t.subst (builder, str)
 		if capture:sub (1, 1) == '$' then
 			return capture
 		else
-			return t.concat (builder[capture]) or ''
+			return utils.concat (builder[capture]) or ''
 		end
 	end
 
@@ -166,8 +160,8 @@ end
 -- @param field Builder's field to be substituted
 --
 -- @return A string with the substituted stuff
-function t.substField (builder, field)
-	return t.subst (builder, builder[field])
+function utils.substField (builder, field)
+	return utils.subst (builder, builder[field])
 end
 
 
@@ -189,7 +183,7 @@ end
 -- @param field 
 --
 -- @return Field asked for, whole table if empty field name
-function t.getNestedField (t, field)
+function utils.getNestedField (t, field)
 	if field == '' then
 		return t
 	else
@@ -199,7 +193,7 @@ end
 
 
 --- Take filename from filepath (until the last os.separator)
-function t.takeFileName (filename)
+function utils.takeFileName (filename)
     return filename:match ('.*' .. hell.os.dir_sep .. '(.+)') or filename
 end
 
@@ -210,9 +204,9 @@ end
 -- @param base Base file path, used as reference
 --
 -- @returns Relative path
-function t.makeRelative (path, base)
+function utils.makeRelative (path, base)
 	-- first of all, lazyPrefix base path
-	local prefixed = t.lazyPrefix (path, base)
+	local prefixed = utils.lazyPrefix (path, base)
 	local ret = {}
 	-- now, remove any combination "dir/../", in any level
 	for dir in prefixed:gmatch '([^/]+)/?' do
@@ -234,7 +228,7 @@ end
 -- @param command Command to be run
 --
 -- @return Command's output, or nil if no output is read
-function t.shell (command)
+function utils.shell (command)
 	-- open the command file handler, suppressing its stderr
 	local handler = io.popen (command .. ' 2> /dev/null')
 	-- read everything from command run
@@ -251,4 +245,4 @@ function t.shell (command)
 end
 
 
-return t
+return utils

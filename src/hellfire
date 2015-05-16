@@ -1,3 +1,10 @@
+local util = hell.utils
+
+-- if prefix is to be changed, do it first, please
+if prefix then
+	print (prefix, util.shell ('sh changeInstallPath.sh ' .. prefix))
+end
+
 -- lua
 feedHellFire 'lua/hellfire'
 -- builders

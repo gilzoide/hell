@@ -4,6 +4,7 @@
 
 #include <cstring>
 #include <sys/stat.h>
+#include <unistd.h>
 #include <glob.h>
 #include <chrono>
 #include <iomanip>
@@ -172,7 +173,6 @@ int cppSetOpts (lua_State *L) {
 /// Creates directory, if it doesn't already exists
 // Lua params:
 //     dirName: String with the directory name
-// TODO discover if "755" is the right way to pass the mask to `mkdir`
 int cppCreateDirIfNeeded (lua_State *L) {
 	const char *dirName = luaL_checkstring (L, 1);
 
@@ -187,6 +187,41 @@ int cppCreateDirIfNeeded (lua_State *L) {
 }
 
 
+/// Shell's `cd`
+// Lua params:
+//     dirName: String with the directory name
+// Lua return:
+//     true if everything all right, nil + msg otherwise
+int cppChDir (lua_State *L) {
+	const char *dirName = luaL_checkstring (L, 1);
+	int ret = chdir (dirName);
+
+	if (ret) {
+		lua_pushnil (L);
+		lua_pushstring (L, "CD failed!");
+		return 2;
+	}
+	else {
+		lua_pushboolean (L, 1);
+		return 1;
+	}
+}
+
+
+/// Get current working directory
+// Lua return:
+//     String with current working directory's absolute path
+int cppGetCwd (lua_State *L) {
+#define BUFSIZE 100
+	char dirName[BUFSIZE];
+	getcwd (dirName, BUFSIZE);
+
+	lua_pushstring (L, dirName);
+	return 1;
+#undef BUFSIZE
+}
+
+
 const struct luaL_Reg cppUtilsLib [] = {
 	{"processBI", processBI},
 	{"getOS", getOS},
@@ -196,6 +231,8 @@ const struct luaL_Reg cppUtilsLib [] = {
 	{"hellMsg", cppHellMsg},
 	{"createDirIfNeeded", cppCreateDirIfNeeded},
 	{"setOpts", cppSetOpts},
+	{"chdir", cppChDir},
+	{"getcwd", cppGetCwd},
     {NULL, NULL}
 };
 
