@@ -100,10 +100,11 @@ int.path = { int.cpp.getcwd () }
 -- 		2 : script's relative path to root build
 --
 -- @return The path trace, from `from' until the end
-function int.getPath (from)
+function int.getPath (from, to)
 	from = from or 1
+	to = to or #int.path
 
-	local dir = table.concat (int.path, hell.os.dir_sep, from + 1)
+	local dir = table.concat (int.path, hell.os.dir_sep, from + 1, to)
 	if dir ~= '' then
 		dir = dir .. hell.os.dir_sep
 	end
@@ -128,11 +129,11 @@ function int.getBuildPath (builder)
 		str = str .. int.getPath (2)
 	end
 
+	-- assert that the build directory exists, before we can use it
+	int.cpp.createDirIfNeeded (int.getPath (0, 1) .. str)
+
 	-- update build path with script path
 	str = int.cpp.lazyPrefix (str, int.path[2] .. hell.os.dir_sep)
-
-	-- assert that the build directory exists, before we can use it
-	int.cpp.createDirIfNeeded (str)
 
 	return str
 end

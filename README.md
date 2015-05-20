@@ -13,7 +13,7 @@ For building hell, you can use make
 
     $ make
 
-Or, you can use hell itself! (for now, you have to `lua hell.lua -f ../hellfire`)
+Or, you can use hell itself!
 
     $ hell
 

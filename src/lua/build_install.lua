@@ -135,7 +135,7 @@ local function _build (builder)
 	end
 	local new_prepare_output = function (o, input)
 		local parcial_result = original_prepare_output (o, input)
-		return util.makeRelative (parcial_result or '', int.getBuildPath (builder))
+		return util.makeRelative (parcial_result or input, int.getBuildPath (builder))
 	end
 	
 	-- call all the "prepare_" functions, starting with "output"
@@ -152,7 +152,7 @@ local function _build (builder)
 	-- and the other ones
 	for k, v in pairs (builder) do
 		local capture = k:match ('prepare_(.+)')
-		if capture then
+		if capture and v then
 			builder[capture] = v (builder[capture], input_filename)
 			builder[k] = nil
 		end

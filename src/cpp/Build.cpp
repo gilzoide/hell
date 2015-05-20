@@ -8,7 +8,7 @@ void Build::getInputList (lua_State *L) {
 	// get input's length, and reserve vector's capacity so that we
 	// save memory reallocation operations
 	lua_len (L, -1);
-	size_t size = luaL_checkint (L, -1);
+	size_t size = luaL_checkinteger (L, -1);
 	input.reserve (size);
 
 	// traverse the inputs table and get values
@@ -161,7 +161,7 @@ void Build::checkNeedRebuild () {
 			}
 
 			// some error, or input is newer: let's rebuild then
-			if (inTime < 0 || inTime > outTime) {
+			if (inTime < 0 || inTime >= outTime) {
 				// we'll build it, so store that we did it
 				modTimes[output.data ()] = time (nullptr);
 				return;

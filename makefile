@@ -15,7 +15,7 @@ permissions = 755
 export BUILD := $(CURDIR)/build
 
 # default target: make all
-all : lua cpp
+all : builddir lua cpp
 
 # build lua stuff (just copy =P)
 lua : $(lua_src)
@@ -25,6 +25,9 @@ lua : $(lua_src)
 # call make for cpp stuff
 cpp :
 	$(MAKE) -C $(cpp_dir)
+
+builddir :
+	@mkdir -p $(BUILD)
 
 
 # INSTALL #

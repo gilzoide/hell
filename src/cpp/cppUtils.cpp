@@ -176,11 +176,13 @@ int cppSetOpts (lua_State *L) {
 int cppCreateDirIfNeeded (lua_State *L) {
 	const char *dirName = luaL_checkstring (L, 1);
 
-	struct stat statbuf;
-	// check if dir exists. If not, creates it
-	if (stat (dirName, &statbuf) < 0) {
-		// permissions: 755 - rwxr-xr-x
-		mkdir (dirName, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
+	// run mkdir, giving an error if error different from EEXIST
+	if (mkdir (dirName, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) < 0 &&
+			errno != EEXIST) {
+		ostringstream os;
+		os << "can't create directory " << dirName << ": " 
+				<< strerror (errno);
+		hellErrMsg (os.str ());
 	}
 
 	return 0;

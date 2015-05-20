@@ -3,14 +3,14 @@ local util = hell.utils
 -- Get the linking options for C compiling
 -- If there ain't a pkg-config for it, just add the '-l' preffix
 local function pkgconfig_link (links)
-	return util.fmap (links, function (pkg)
+	return links and util.fmap (links, function (pkg)
 			return pkg and (util.shell ('pkg-config --silence-errors --libs ' .. pkg) or '-l' .. pkg)
 		end)
 end
 local function pkgconfig_include_dirs (includes)
-	return util.fmap (includes, function (pkg)
-			return pkg and (util.shell ('pkg-config --silence-errors --cflags-only-I ' .. pkg) or '-I' .. pkg)
-		end)
+	return includes and util.fmap (includes, function (pkg)
+			return util.shell ('pkg-config --silence-errors --cflags-only-I ' .. pkg) or '-I' .. pkg
+		end) or ''
 end
 
 gcc = Builder {
@@ -30,17 +30,20 @@ gcc = Builder {
 function gcc.prepare_input (i, b)
 	return util.fmap (i, function (ii)
 		-- insert dependencies from `gcc -MM' on pipeBuild
-		local deps = {}
-		local gccMM = io.popen ('gcc -MM ' .. ii .. pkgconfig_include_dirs (b.includes or '') .. ' 2> /dev/null'):read () or ''
-		for dependency in gccMM:gmatch ('%S%.%S') do
-			table.insert (deps, dependency)
-		end
+		--local deps = {}
+		--local gccMM = util.shell ('gcc -MM ' .. ii .. util.concat (pkgconfig_include_dirs (b.includes or ''))) or ''
+		--for dependency in gccMM:gmatch ('%S%.%S') do
+			--print (dependency)
+			--table.insert (deps, dependency)
+		--end
 
 		-- and now build the object file!
 		return pipeBuild (b, {
 			flags = '&-c',
 			input = ii,
 			deps = deps,
+			links = '',
+			prepare_links = false,
 			prepare_input = false,
 			prepare_output = function (_, input)
 				return util.changeExtension (input, hell.os.obj_ext)

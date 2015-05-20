@@ -122,7 +122,7 @@ int.assert_quit (int.cpp.setOpts (opts),
 
 -- Version
 if opts.V then
-	int.quit ('hell 0.1.0')
+	int.quit ('version 0.1.0')
 end
 
 -- Help! Should be called after sourcing the scripts, as it may override hell.help
