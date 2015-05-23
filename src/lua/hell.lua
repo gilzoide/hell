@@ -72,10 +72,6 @@ hell = {
 	-- if nil/false, do the builds in the build scripts' own path
 	-- note that if `outdir = '.'`, hell uses the root script's path
 	outdir = nil,
-	-- keep the directory structure when building?
-	-- doesn't make sense when not shadow building (when outdir not especified)
-	-- Ex: if input is at './src', output goes to the '$outdir/src' dir
-	keepDirStructure = nil,
 	-- table with some SO especific stuff
 	os = os,
 	-- let users use the utils!
@@ -92,6 +88,12 @@ hell.opts = nil
 local BI = require 'build_install'
 require 'Builder'
 require 'fireHandler'
+
+-- Asked for Builder's hellp, so let's do it!
+local hellp = require 'hellp'
+if opts.hb then
+	hellp (hellp.getBuilderHellp (opts.hb))
+end
 
 --[[		And now, source our first hellbuild script.
 	It looks respectively into 'opts.file', './hellfire', './hellbuild'		]]--
@@ -134,7 +136,7 @@ int.hellMsg ("all set, let's see what we got\n")
 
 -- Called for help?
 if opts.h then
-	hellp ()
+	hellp (hell.help)
 end
 
 opts.target = opts.target or ''

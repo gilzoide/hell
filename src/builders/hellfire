@@ -2,6 +2,6 @@ local util = hell.utils
 
 copy {
 	input = util.glob '*.lua',
-	outdir = 'build/builders'
+	outdir = hell.outdir .. hell.os.dir_sep .. 'builders'
 }
 

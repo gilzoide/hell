@@ -23,7 +23,8 @@ gcc = Builder {
 	includes = nil,
 	prepare_links = pkgconfig_link,
 	prepare_includes = pkgconfig_include_dirs,
-	cmd = '$bin -o $output $input $flags $includes $links'
+	cmd = '$bin -o $output $input $flags $includes $links',
+	help = "Compiles a C program, pipeBuilding all of the files as objects first"
 }
 
 -- In C, we must first build the object files, then the executable, so do it!

@@ -1,4 +1,4 @@
-Como vai chamar o comando hell?
+Como usar o comando `hell`
 
 USO:
 ====
@@ -34,10 +34,10 @@ ao chamar o hell sem -VhH, ele espera um comando a ser executado. Os comandos
 esperados são um desses: build, clean, install, uninstall. Se nenhum comando
 for especificado, o padrão usado é 'build'.
 
-build: executa os comandos de 'build'
-clean: limpa todas as saídas de comandos 'build'
-install: executa os comandos de 'install'
-uninstall: limpa todas as saídas de comandos 'install'
+- build: executa os comandos de 'build'
+- clean: limpa todas as saídas de comandos 'build'
+- install: executa os comandos de 'install'
+- uninstall: limpa todas as saídas de comandos 'install'
 
 
 
@@ -45,11 +45,11 @@ TARGETS:
 ========
 ao chamar o hell sem -VhH, ele espera uma Target a ser construída.
 A target nada mais é que uma table que contém as builds. Por padrão, a table
-chamada é a própria _G, a table global do Lua, ou seja, as builds que estão
+chamada é a própria \_G, a table global do Lua, ou seja, as builds que estão
 "de fora".
 	Nah, padrão pra quê? Não especificou, constrói tudo!
 Pode-se chamar tables dentro de tables usando a própria notação do
-Lua, 'table.outra_table'.
+Lua, 'table.outra\_table'.
 	Chamar tables dentro de tables é um tanto quanto inútil, e mais difícil de
 	implementar. Ideia abandonada!
 		Ou não, já implementei, enóis xP

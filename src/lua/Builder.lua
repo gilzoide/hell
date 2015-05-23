@@ -35,13 +35,12 @@ local util = hell.utils
 -- @param sep The separator to be used when concatting. Default = ' '
 --
 -- @return The merged fields
-local function mergeFields (target, src, sep)
-	sep = sep or ' '
+local function mergeFields (target, src)
 	-- if src is a string, we may want to concatenate
 	if type (src) == 'string' then
 		local prefix, sufix = src:sub (1, 1), src:sub (2)
-		if prefix == '&' then
-			return target .. sep .. sufix
+		if prefix == '&' and type (target) == 'string' then
+			return target .. ' ' .. sufix
 		elseif prefix == '!' then
 			return sufix
 		else
