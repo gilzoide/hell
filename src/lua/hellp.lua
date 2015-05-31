@@ -47,11 +47,11 @@ function hellp.getBuilderHellp (builderName)
 	local msg
 
 	if builder then
-		msg = builderName .. " builder" .. 
-				(builder.help and '\n' .. builder.help or '') .. 
+		msg = '"' .. builderName .. "\" builder\n" .. 
+				(builder.help or '') .. 
 				"\ncmd: " .. builder.cmd
 	else
-		msg = builderName .. " builder doesn't exist"
+		msg = '"' .. builderName .. "\" builder doesn't exist"
 	end
 	return msg
 end

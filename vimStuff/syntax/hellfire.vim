@@ -23,7 +23,7 @@ endif
 
 " hellfire extensions
 syn keyword hellFireHandler	feedHellFire addHellBuild
-syn keyword hellBuilder		gcc cpp copy hs
+syn keyword hellBuilder		gcc cpp copy hs java
 syn keyword hellBuild		build
 syn keyword hellMetatables	Builder
 syn keyword hell		hell

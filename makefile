@@ -36,7 +36,7 @@ install :
 	install -m $(permissions) build/*.lua $(install_path)
 	install -m $(permissions) build/*.so $(install_path)
 	install -m $(permissions) build/builders/*.lua $(install_path)/builders
-	install -m $(permissions) -T build/hell.lua $(prefix)/bin/hell
+	install -m $(permissions) build/hell.lua $(prefix)/bin/hell
 
 
 .PHONY : clean

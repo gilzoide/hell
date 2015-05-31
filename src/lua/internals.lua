@@ -23,6 +23,9 @@ local int = {}
 
 int.cpp = require 'cppUtils'
 
+--- Hell's current version
+int.version = '0.1.0'
+
 
 --- Prints a message from hell execution
 function int.hellMsg (msg)

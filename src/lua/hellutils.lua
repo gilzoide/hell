@@ -25,7 +25,24 @@ local int = require 'internals'
 
 local utils = {}
 
+--- Gets hell's version
+function utils.getVersion ()
+	return int.version
+end
 
+
+--- Gets current working directory's absolute path
+function utils.getcwd ()
+	return int.cpp.getcwd ()
+end
+
+
+--- Clones a table (copying each field)
+--
+-- @note This is a shallow clone, so any tables inside 
+--  will be copied by reference
+--
+-- @return The clone table
 function utils.cloneTable (src)
 	local new = {}
 	for k, v in pairs (src) do
@@ -42,6 +59,40 @@ end
 -- @return Table with all filename matches
 function utils.glob (pattern)
 	return int.cpp.glob (pattern)
+end
+
+
+--- Recursive glob function, ran over every directory inside first
+--
+-- @warning This may be dangerous if there's any circular link!
+--
+-- @param pattern The pattern to be matched
+-- @param base Base path, where it all starts. Default = '.'
+--
+-- @return All matches, from within all directories
+function utils.recursiveGlob (pattern, base)
+	local function recGlob (pattern, base)
+		-- first, get every dir there is
+		local allDirs = utils.glob (base .. '*/')
+
+		local allMatches = {}
+		for _, dir in ipairs (allDirs) do
+			-- keep matches until now, adding the ones from the next directory
+			for _, file in ipairs (recGlob (pattern, dir)) do
+				table.insert (allMatches, file)
+			end
+		end
+
+		-- add now matches from current directory
+		for _, file in ipairs (utils.glob (base .. pattern)) do
+			table.insert (allMatches, file)
+		end
+
+		return allMatches
+	end
+
+	base = base or '.'
+	return recGlob (pattern, utils.lazyPrefix (hell.os.dir_sep, base))
 end
 
 
@@ -192,9 +243,14 @@ function utils.getNestedField (t, field)
 end
 
 
---- Take filename from filepath (until the last os.separator)
+--- Take filename from filepath (until the last os.dir_sep)
 function utils.takeFileName (filename)
     return filename:match ('.*' .. hell.os.dir_sep .. '(.+)') or filename
+end
+
+--- Take directory name (until last os.dir_sep)
+function utils.takeDirectory (path)
+	return path:match ("(.+)" .. hell.os.dir_sep .. ".+")
 end
 
 
@@ -207,7 +263,8 @@ end
 function utils.makeRelative (path, base)
 	-- first of all, lazyPrefix base path
 	local prefixed = utils.lazyPrefix (path, base)
-	local ret = {}
+	-- return value. If prefixed starts with a '/', don't discard it
+	local ret = { prefixed:sub (1, 1) == '/' and '' or nil }
 	-- now, remove any combination "dir/../", in any level
 	for dir in prefixed:gmatch '([^/]+)/?' do
 		if dir ~= '.' then

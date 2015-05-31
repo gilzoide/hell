@@ -4,12 +4,12 @@ local util = hell.utils
 -- If there ain't a pkg-config for it, just add the '-l' preffix
 local function pkgconfig_link (links)
 	return links and util.fmap (links, function (pkg)
-			return pkg and (util.shell ('pkg-config --silence-errors --libs ' .. pkg) or '-l' .. pkg)
+			return pkg and (util.shell ('pkg-config --silence-errors --libs ' .. pkg) or '-l' .. util.makeRelative (pkg, util.getcwd () .. hell.os.dir_sep))
 		end)
 end
 local function pkgconfig_include_dirs (includes)
 	return includes and util.fmap (includes, function (pkg)
-			return util.shell ('pkg-config --silence-errors --cflags-only-I ' .. pkg) or '-I' .. pkg
+			return util.shell ('pkg-config --silence-errors --cflags-only-I ' .. pkg) or '-I' .. util.makeRelative (pkg, util.getcwd () .. hell.os.dir_sep)
 		end) or ''
 end
 
@@ -24,7 +24,7 @@ gcc = Builder {
 	prepare_links = pkgconfig_link,
 	prepare_includes = pkgconfig_include_dirs,
 	cmd = '$bin -o $output $input $flags $includes $links',
-	help = "Compiles a C program, pipeBuilding all of the files as objects first"
+	help = "Compiles a C program, pipeBuilding all of the input files as objects first"
 }
 
 -- In C, we must first build the object files, then the executable, so do it!
@@ -58,7 +58,8 @@ gcc.shared = Builder {
 	prepare_flags = function (f) return '-shared ' .. (f or '') end,
 	prepare_output = function (o, input)
 		return o or util.changeExtension (input, hell.os.shared_ext)
-	end
+	end,
+	help = "Compiles a C shared library, pipeBuilding all of the input files as PIC objects first"
 }
 
 function gcc.shared.prepare_input (i, b)

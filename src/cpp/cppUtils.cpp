@@ -80,7 +80,15 @@ int cppGlob (lua_State *L) {
 
 	// glob buffer
 	glob_t globbuf;
-	glob (pattern, 0, nullptr, &globbuf);
+	int flags;
+#ifdef __GNUC__
+	// GNU extensions: ~ and {} patterns
+	flags = GLOB_TILDE | GLOB_BRACE;
+#else
+	flags = 0;
+#endif
+
+	glob (pattern, flags, nullptr, &globbuf);
 
 	// creates the table and puts the matches inside it
 	lua_newtable (L);

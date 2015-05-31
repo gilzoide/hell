@@ -146,7 +146,9 @@ local function _build (builder)
 	-- builder as parameter, as it might do some pipeBuilds
 	builder.input = new_prepare_input (builder.input, builder)
 	builder.prepare_input = nil
-	local input_filename = util.takeFileName (builder.input[1])
+	-- input_filename == fileName only, if not keepDirStructure
+	local input_filename = builder.keepDirStructure and builder.input[1] or
+			util.takeFileName (builder.input[1])
 	builder.output = new_prepare_output (builder.output, input_filename)
 	builder.prepare_output = nil
 	-- and the other ones

@@ -12,8 +12,7 @@ local win_copy = {
 }
 
 copy = Builder ((hell.os.name == 'windows' and win_copy) or unix_copy)
-copy.multinput = true
-copy.prepare_output = function (out, input)
-	local str = (hell.outdir and '' or 'copy_of_') .. input
-	return out or str
-end
+copy.help = "Just copies inputs (one by one)\
+When using `util.glob` in inputs, better set `multinput = true'\
+If no outDir specified, uses \"copy_of_<your file name>\" as output name\
+Default flag: -r (for copying folders)"

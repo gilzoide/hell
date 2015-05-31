@@ -82,8 +82,7 @@ hell = {
 hell.args = {...}
 require 'parseOpts'
 -- extract hell opts
-local opts = hell.opts
-hell.opts = nil
+local opts = int.opts
 -- require builder stuff
 local BI = require 'build_install'
 require 'Builder'

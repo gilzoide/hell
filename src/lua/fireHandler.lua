@@ -20,6 +20,7 @@
 --]]
 
 local int = require 'internals'
+local util = hell.utils
 
 
 --- Function for sourcing a hell build script.
@@ -39,10 +40,7 @@ function int._addHellBuild (script, scope)
 	local file, err = loadfile (script, nil, env)
 	if file then
 		-- pushes path to internals.path, for knowing where we are
-		local function takeDirectory (path)
-			 return path:match ("(.+)/.+")
-		end
-		table.insert (int.path, takeDirectory (script))
+		table.insert (int.path, util.takeDirectory (script))
 		int.cpp.chdir (int.getPath (0))
 
 		return file, env

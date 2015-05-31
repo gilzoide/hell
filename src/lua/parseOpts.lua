@@ -100,18 +100,23 @@ end
 
 if opts.H then
 	hellp ()
+-- Version
+elseif opts.V then
+	int.quit ('version ' .. int.version)
 end
 
---[[		Now that we parsed the options, make them active!		]]--
-opts.command = opts.command or 'build'
+
+
+-- if not interested in any help nor target list, use a valid command
+if not (opts.h or opts.hb or opts.l) then
+	opts.command = opts.command or 'build'
+else
+	opts.command = nil
+end
 
 -- set the opts important to C++ in the singleton `Opts' class
 int.assert_quit (int.cpp.setOpts (opts),
 		'Invalid number of jobs: must be between 1 and 100')
 
--- Version
-if opts.V then
-	int.quit ('version 0.1.0')
-end
-
-hell.opts = opts
+-- set internals' opts, so all across hell we have access to it =]
+int.opts = opts

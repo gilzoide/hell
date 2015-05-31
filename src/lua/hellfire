@@ -1,6 +1,7 @@
 local util = hell.utils
 
 copy {
-	input = util.glob '*.lua'
+	input = util.glob '*.lua',
+	multinput = true
 }
 
