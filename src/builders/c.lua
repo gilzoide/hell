@@ -4,8 +4,8 @@ local util = hell.utils
 -- If there ain't a pkg-config for it, just add the '-l' preffix
 local function pkgconfig_link (links)
 	return links and util.fmap (links, function (pkg)
-			return pkg and (util.shell ('pkg-config --silence-errors --libs ' .. pkg) or '-l' .. util.makeRelative (pkg, util.getcwd () .. hell.os.dir_sep))
-		end)
+			return util.shell ('pkg-config --silence-errors --libs ' .. pkg) or '-l' .. util.makeRelative (pkg, util.getcwd () .. hell.os.dir_sep)
+		end) or ''
 end
 local function pkgconfig_include_dirs (includes)
 	return includes and util.fmap (includes, function (pkg)

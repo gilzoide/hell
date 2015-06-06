@@ -169,6 +169,9 @@ local function _build (builder)
 		input = builder.input,
 		output = builder.output,
 		cmd = new_cmd,
+		--- Adds a dependency into build
+		--
+		-- @param dep Dependency to add, either a string or another build
 		addDep = function (self, dep) table.insert (self.deps, dep) end
 	}
 	setmetatable (new, new)
@@ -283,8 +286,6 @@ function BI.makeClean (builds)
 	-- build given by argument
 	local function removeBuild (b)
 		if type (b) ~= 'table' then return nil end
-
-		--print (b.input)
 
 		local target = b.output
 		-- not processed yet, let's go!
