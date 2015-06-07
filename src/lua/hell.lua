@@ -29,8 +29,8 @@ local hellInstallPath = '/usr/lib/hell'
 -- let `hell` require it's components from hell's lib directory
 local oldpath = package.path
 local oldcpath = package.cpath
-package.path = oldpath .. ';' .. hellInstallPath .. '/?.lua'
-package.cpath = oldcpath .. ';' .. hellInstallPath .. '/?.so'
+package.path = hellInstallPath .. '/?.lua'
+package.cpath = hellInstallPath .. '/?.so'
 
 
 local int = require 'internals'

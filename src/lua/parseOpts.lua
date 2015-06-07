@@ -97,8 +97,9 @@ Check `hell -H` for help.', true)
 	end
 end
 
-
-if opts.H then
+if opts.u then
+	int.quit (hellp.usage)
+elseif opts.H then
 	hellp ()
 -- Version
 elseif opts.V then

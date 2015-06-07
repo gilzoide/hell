@@ -34,6 +34,7 @@ hellp.hell_options = {
 	{'t', 'timer', nil, "Show builds/installs' process time"},
 	{'h', 'help', nil, "Show script's custom help, or this one"},
 	{'H', 'help-options', nil, "Give this help list"},
+	{'u', 'usage', nil, "Show usage"},
 	{'hb', 'help-builder', 'BUILDER', "Show Builder's hellp"},
 	{'n', 'no-exec', nil, "Don't execute commands, just print them"},
 	{'V', 'version', nil, "Print program version"},
@@ -56,6 +57,7 @@ function hellp.getBuilderHellp (builderName)
 	return msg
 end
 
+hellp.usage = "Usage: hell [OPTIONS...] [TARGET] { build | clean | install | uninstall } [var=value]"
 
 -- Make hellp table callable
 setmetatable (hellp, {__call = 
@@ -64,9 +66,9 @@ setmetatable (hellp, {__call =
 
 		if not msg then
 			optionsString = {
-				"Usage: hell [OPTIONS...] [TARGET] { build | clean | install | uninstall } [var=value]\
-\
-Hell options:"
+				"Welcome to Hellp (Hell's help)\n",
+				self.usage,
+				"\nOptions:"
 			}
 			for _, v in ipairs (self.hell_options) do
 				local short = v[1] .. (v[3] and ' ' .. v[3] or '')
