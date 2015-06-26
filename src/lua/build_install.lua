@@ -273,38 +273,44 @@ function BI.makeClean (builds)
 	local cleans = {}
 
 	local remove = Builder {
-		bin = hell.os.name == 'windows' and 'del' or 'rm -f',
+		bin = hell.os.name == 'windows' and 'del' or 'rm -rf',
 		prepare_output = function (_, input) return input end,
 		-- force pipe build, so that it doesn't mess with our input (which
 		-- is already the full name for the output we want to clean)
 		pipe = true,
 		cmd = '$bin $input'
 	}
-	--- Function for removing a build, and it's dependencies recursively
-	--
-	-- @note By removing, we mean creating a "build" that will remove the 
-	-- build given by argument
-	local function removeBuild (b)
-		if type (b) ~= 'table' then return nil end
 
-		local target = b.output
-		-- not processed yet, let's go!
-		if not processed[target] then
-			processed[target] = true
+	-- if called hell with the -c option, just clean the outdir
+	if int.opts.c and hell.outdir then
+		table.insert (cleans, remove { input = hell.outdir })
+	else
+		--- Function for removing a build, and it's dependencies recursively
+		--
+		-- @note By removing, we mean creating a "build" that will remove the 
+		-- build given by argument
+		local function removeBuild (b)
+			if type (b) ~= 'table' then return nil end
 
-			-- dependencies first
-			for _, bb in ipairs (b.deps) do
-				table.insert (cleans, removeBuild (bb))
+			local target = b.output
+			-- not processed yet, let's go!
+			if not processed[target] then
+				processed[target] = true
+
+				-- dependencies first
+				for _, bb in ipairs (b.deps) do
+					table.insert (cleans, removeBuild (bb))
+				end
+
+				return remove { input = target }
+			else
+				return nil
 			end
-
-			return remove { input = target }
-		else
-			return nil
 		end
-	end
 
-	for _, b in ipairs (builds) do
-		table.insert (cleans, removeBuild (b))
+		for _, b in ipairs (builds) do
+			table.insert (cleans, removeBuild (b))
+		end
 	end
 
 	return cleans

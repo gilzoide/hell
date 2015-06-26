@@ -31,18 +31,23 @@ gcc = Builder {
 function gcc.prepare_input (i, b)
 	return util.fmap (i, function (ii)
 		-- insert dependencies from `gcc -MM' on pipeBuild
-		--local deps = {}
-		--local gccMM = util.shell ('gcc -MM ' .. ii .. util.concat (pkgconfig_include_dirs (b.includes or ''))) or ''
-		--for dependency in gccMM:gmatch ('%S%.%S') do
-			--print (dependency)
-			--table.insert (deps, dependency)
-		--end
+		local gccDeps = {}
+		local gccMM = util.shell ('gcc -MM ' .. ii .. ' ' .. util.concat (pkgconfig_include_dirs (b.includes or ''))) or ''
+		-- ignore "target:"
+		gccMM = gccMM:match ('.*: (.*)') or ''
+		for dependency in gccMM:gmatch ('%S+[^\\%s]') do
+			-- if relative path, add root hellbuild path
+			if dependency:sub (1, 1) ~= '/' then
+				dependency = util.makeRelative (dependency, util.getPath ())
+			end
+			table.insert (gccDeps, dependency)
+		end
 
 		-- and now build the object file!
 		return pipeBuild (b, {
 			flags = '&-c',
 			input = ii,
-			deps = deps,
+			deps = gccDeps,
 			links = '',
 			prepare_links = false,
 			prepare_input = false,

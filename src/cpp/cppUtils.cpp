@@ -167,10 +167,10 @@ int cppSetOpts (lua_State *L) {
     lua_getfield (L, 1, "t");
     bool timer = !lua_isnil (L, -1);
 
-    lua_getfield (L, 1, "c");
-    bool c = !lua_isnil (L, -1);
+    lua_getfield (L, 1, "C");
+    bool C = !lua_isnil (L, -1);
     
-    bool valid_j = Opts::getInstance ().setOpts (j, verbose, dryRun, timer, c);
+    bool valid_j = Opts::getInstance ().setOpts (j, verbose, dryRun, timer, C);
     lua_pop (L, 5);
 
 	lua_pushboolean (L, valid_j);

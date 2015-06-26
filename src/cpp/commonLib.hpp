@@ -46,7 +46,7 @@ public:
     /**
      * Set options, please
      */
-    bool setOpts (shorty j, Verbosity verbose, bool dryRun, bool timer, bool c);
+    bool setOpts (shorty j, Verbosity verbose, bool dryRun, bool timer, bool C);
     /**
      * Gets the only instance by reference
      */
@@ -75,7 +75,7 @@ public: \
     /// Should we count the processing time?
     withGetter (bool, timer);
 	/// Ignore cyclic dependency?
-	withGetter (bool, c);
+	withGetter (bool, C);
 };
 
 /**

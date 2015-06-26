@@ -48,7 +48,7 @@ void BuildGraph::DFS (Build *current, CycleLogger& log) throw (int, string) {
 			DFS (dep, log);
 
 			// check if it's in a cycle
-			if (!Opts::getInstance ().get_c () && log.hasLog ()) {
+			if (!Opts::getInstance ().get_C () && log.hasLog ()) {
 				log.addNode (current);
 
 				// cycle ended: throw cycle error message

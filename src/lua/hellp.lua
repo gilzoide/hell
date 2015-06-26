@@ -37,8 +37,9 @@ hellp.hell_options = {
 	{'u', 'usage', nil, "Show usage"},
 	{'hb', 'help-builder', 'BUILDER', "Show Builder's hellp"},
 	{'n', 'no-exec', nil, "Don't execute commands, just print them"},
+	{'c', 'clean-outdir', nil, "Clean hell.outdir (if defined), instead of each output separately"},
 	{'V', 'version', nil, "Print program version"},
-	{'c', 'ignore-cyclic-dependency', nil, [[Ignores cyclic dependencies, signing the following contract:
+	{'C', 'ignore-cyclic-dependency', nil, [[Ignores cyclic dependencies, signing the following contract:
 "I am aware that my build may have cyclic dependencies, and declare hell's developer innocent if my PC burns"]]},
 }
 

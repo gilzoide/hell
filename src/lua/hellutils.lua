@@ -37,6 +37,12 @@ function utils.getcwd ()
 end
 
 
+--- Gets root hellbuild path
+function utils.getPath ()
+	return int.getPath ()
+end
+
+
 --- Clones a table (copying each field)
 --
 -- @note This is a shallow clone, so any tables inside 
