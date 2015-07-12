@@ -38,7 +38,7 @@ int.hellInstallPath = hellInstallPath
 local util = require 'hellutils'
 
 -- get OS. As linux/freebsd/solaris are all alike, we gather them as unix.
--- note that MacOSX is called "darwin" here (haskell puts it that way)
+-- note that MacOSX is called "darwin" here
 local OSes = {
 	windows = {
 		prefix = os.getenv ("APPDATA"),
@@ -157,7 +157,7 @@ if opts.command == 'build' or opts.command == 'clean' then
 	end
 	int.assert_quit (#BI.builds ~= 0, "Can't find any builds" .. (opts.target and ' in target "' .. opts.target .. '"' or ''))
 
-	-- let's clean stuff instead of building
+	-- if `clean`, then let's clean stuff instead of building
 	if opts.command == 'clean' then
 		BI.builds = BI.makeClean (BI.builds)
 	end
@@ -169,6 +169,11 @@ else -- opts.command == 'install' or opts.command == 'uninstall'
 		BI.installs = BI.getBI (target, 'install')
 	end
 	int.assert_quit (#BI.installs ~= 0, "Can't find any installs" .. (opts.target and ' in target "' .. opts.target .. '"' or ''))
+
+	-- if `uninstall`, then let's uninstall stuff instead of installing
+	if opts.command == 'uninstall' then
+		BI.installs = BI.makeClean (BI.installs)
+	end
 
 	-- Process the installs in C++
 	int.cpp.processBI (BI.installs)

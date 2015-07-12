@@ -1,8 +1,7 @@
 local util = hell.utils
 
-copy {
+return table.pack (copy {
 	input = util.glob '*.lua',
 	multinput = true,
 	outdir = hell.outdir .. hell.os.dir_sep .. 'builders'
-}
-
+})

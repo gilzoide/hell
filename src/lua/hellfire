@@ -1,7 +1,25 @@
 local util = hell.utils
 
-copy {
-	input = util.glob '*.lua',
-	multinput = true
+-- our main script name (the executable script)
+local mainScript = 'hell.lua'
+
+-- libLuas holds all the lua files, but mainScript
+local libLuas = util.glob '*.lua'
+for i = 0, #libLuas do
+	if libLuas[i] == mainScript then
+		table.remove (libLuas, i)
+		break
+	end
+end
+
+-- executable is one build
+executable = copy {
+	input = mainScript,
+	output = util.changeExtension (mainScript, '')
 }
 
+-- and libs are another
+return table.pack (copy {
+	input = libLuas,
+	multinput = true
+})

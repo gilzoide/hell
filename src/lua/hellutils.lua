@@ -250,13 +250,20 @@ end
 
 
 --- Take filename from filepath (until the last os.dir_sep)
-function utils.takeFileName (filename)
+function utils.takeFilename (filename)
     return filename:match ('.*' .. hell.os.dir_sep .. '(.+)') or filename
 end
+
 
 --- Take directory name (until last os.dir_sep)
 function utils.takeDirectory (path)
 	return path:match ("(.+)" .. hell.os.dir_sep .. ".+")
+end
+
+
+--- Makes a path by concatting the various paths with dir_sep
+function utils.makePath (...)
+	return table.concat ({...}, hell.os.dir_sep)
 end
 
 

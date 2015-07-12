@@ -116,6 +116,7 @@ local function getDefaultBuilder (builder)
 end
 
 
+--- The build function, for building anything!
 local function _build (builder)
 	-- both input and outputs will have, apart from the original "prepare_"
 	-- function, another one. Thus we need to apply the original within the new
@@ -148,7 +149,7 @@ local function _build (builder)
 	builder.prepare_input = nil
 	-- input_filename == fileName only, if not keepDirStructure
 	local input_filename = builder.keepDirStructure and builder.input[1] or
-			util.takeFileName (builder.input[1])
+			util.takeFilename (builder.input[1])
 	builder.output = new_prepare_output (builder.output, input_filename)
 	builder.prepare_output = nil
 	-- and the other ones
@@ -203,7 +204,9 @@ function pipeBuild (target, source)
 end
 
 
---- The build function, for building anything!
+--- @ref _build wrapper, for multibuilds
+--
+-- @return All processed builds, more than one if multinput
 function build (builder)
 	-- if called build function explicitly, search for the builder
 	-- defaults to it's extension, or fallback to copy
@@ -230,31 +233,41 @@ Needed a string, got a " .. type (builder.cmd) .. '.', 2)
 	return table.unpack (util.fmap (all_builds, _build))
 end
 
+
 --- The install function
 --
--- @note Build will be installed in "$(prefix)/$(dir)" directory.
--- prefix can come directly from command line options, or use the OS default.
-function install (builder, dir)
+-- @note Build will be installed in "$(prefix)/$(dir)" directory;
+--  prefix can come directly from command line options, or use the OS default.
+--
+-- @param in_build The input: a build
+-- @param dir Install in_build into which directory (relative to prefix)?
+-- @param permission Unix `install` permission. Windows ignores it. Default: 755
+local function _install (in_build, dir, permission)
+	int.assert_quit (getmetatable (in_build) == 'build',
+			"Can't install something that's not a build", 2)
 	int.assert_quit (type (dir) == 'string',
-		"Can't install without knowing where to (second parameter should be a string).", 2)
-	dir = (prefix or hell.os.prefix) .. hell.os.dir_sep .. dir
-	int.assert_quit (type (builder.output or builder.input) == 'string',
-			"Can't install without output or input fields.", 2)
+			"Can't install without knowing where to (second parameter should be a string).", 2)
+	dir = util.lazyPrefix (dir, (prefix or hell.os.prefix) .. (dir ~= '' and hell.os.dir_sep or ''))
 
-	if builder.cmd then
-		util.substField (builder, 'cmd')
-	end
+	local filename = util.takeFilename (in_build.output)
 
-	builder = copy:extend {
-		input = builder.output or builder.input,
+	--- Install Builder: the one that installs stuff (in Windows, it's just copy)
+	local installBuilder = hell.os.name == 'windows' and copy or Builder {
+		bin = 'install',
+		permission = permission or '755',
+		cmd = '$bin -m $permission $input $output'
 	}
-	builder.output = dir .. hell.os.dir_sep .. builder.input
+	-- install's input and output
+	builder = installBuilder:extend {
+		input =  { in_build.output },
+		output = util.makePath (dir, filename)
+	}
 
 	local new = {
 		__metatable = 'install',
 		input = builder.input,
 		output = builder.output,
-		deps = builder.deps,
+		deps = { in_build },
 		cmd = util.substField (builder, 'cmd')
 	}
 	setmetatable (new, new)
@@ -264,6 +277,25 @@ function install (builder, dir)
 end
 
 
+--- @ref _install wrapper, for multiinstalls
+--
+-- @return All processed installs, more than one if in_builds is a table
+function install (in_builds, dir, permission)
+	local all_installs
+	-- if in_builds isn't a build, we suppose it's a table containing builds
+	if getmetatable (in_builds) ~= 'build' then
+		all_installs = in_builds
+	else
+		all_installs = { in_builds }
+	end
+
+	local function curryInstall (in_build)
+		return _install (in_build, dir, permission)
+	end
+
+	return table.unpack (util.fmap (all_installs, curryInstall))
+end
+
 --- Function for transforming builds in cleans
 function BI.makeClean (builds)
 	-- table with the processed builds, so that we don't process any build 
@@ -272,6 +304,7 @@ function BI.makeClean (builds)
 	-- table with the cleaning builds, which will be returned
 	local cleans = {}
 
+	--- Remove Builder: the one used for cleaning
 	local remove = Builder {
 		bin = hell.os.name == 'windows' and 'del' or 'rm -rf',
 		prepare_output = function (_, input) return input end,
