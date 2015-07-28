@@ -3,5 +3,5 @@ local util = hell.utils
 return table.pack (copy {
 	input = util.glob '*.lua',
 	multinput = true,
-	outdir = hell.outdir .. hell.os.dir_sep .. 'builders'
+	outdir = util.makePath (hell.outdir, 'builders')
 })

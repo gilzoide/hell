@@ -56,7 +56,7 @@ int processBI (lua_State *L) {
     clk::time_point start = clk::now ();
 
 	BuildGraph G {L};
-	G.ProcessBuilds ();
+	G.processBuilds ();
 
 	// if asked to show the time elapsed, let'sa do it!
 	// It is in seconds, 3 decimal places

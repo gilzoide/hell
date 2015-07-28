@@ -63,7 +63,7 @@ private:
 private: \
     type name; \
 public: \
-    type get_ ## name () { \
+    type get_ ## name () const { \
         return name; \
     }
     /// Number of jobs/threads that will run concurrently

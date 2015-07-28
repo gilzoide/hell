@@ -18,24 +18,42 @@ BuildGraph::BuildGraph (lua_State *L) {
 }
 
 
-void BuildGraph::ProcessBuilds () {
+void BuildGraph::processBuilds () {
 	try {
-		for (auto & build : AllBuilds) {
-			CycleLogger log;
-			DFS (build.second, log);
-		}
+		auto processQueue = topoSort ();
+		JobManager jm;
+		jm.process (&processQueue);
 	}
+	// some command failed
 	catch (int ret) {
 		hellErrMsg ("error trying to run command. Exited [" +
 				to_string (ret) + "]");
 	}
+	// oops, cycle found!
 	catch (string cycle) {
 		hellErrMsg (cycle);
 	}
 }
 
 
-void BuildGraph::DFS (Build *current, CycleLogger& log) throw (int, string) {
+TopoSorted BuildGraph::topoSort () throw (string) {
+	try {
+		CycleLogger log;
+		TopoSorted sorted;
+		for (auto & build : AllBuilds) {
+			visit (sorted, build.second, log);
+		}
+
+		return move (sorted);
+	}
+	// oops, cycle found!
+	catch (...) {
+		throw;
+	}
+}
+
+
+void BuildGraph::visit (TopoSorted& sorted, Build *current, CycleLogger& log) throw (string) {
 	if (current->processed != Build::State::Done) {
 		if (current->processed == Build::State::Working) {
 			log.setNode (current);
@@ -45,7 +63,7 @@ void BuildGraph::DFS (Build *current, CycleLogger& log) throw (int, string) {
 		current->processed = Build::State::Working;
 
 		for (auto & dep : current->deps) {
-			DFS (dep, log);
+			visit (sorted, dep, log);
 
 			// check if it's in a cycle
 			if (!Opts::getInstance ().get_C () && log.hasLog ()) {
@@ -59,12 +77,7 @@ void BuildGraph::DFS (Build *current, CycleLogger& log) throw (int, string) {
 			}
 		}
 
-		try {
-			current->process ();
-		}
-		catch (...) {
-			throw;
-		}
+		sorted.push_back (current);
 		current->processed = Build::State::Done;
 	}
 }

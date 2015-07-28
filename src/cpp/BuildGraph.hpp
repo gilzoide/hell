@@ -22,8 +22,12 @@
 #pragma once
 
 #include "Build.hpp"
+#include "JobManager.hpp"
 #include "CycleLogger.hpp"
 
+/**
+ * Our Build Graph, with dependencies and stuff
+ */
 class BuildGraph {
 public:
 	BuildGraph (lua_State *L);
@@ -36,21 +40,35 @@ public:
 	 *  the one you expected, but it'll still work, for the dependencies are
 	 *  processed first.
 	 */
-	void ProcessBuilds ();
+	void processBuilds ();
 
 private:
 	/**
 	 * A map with all the builds, 'tablePointer' X 'buildPointer'.
 	 *
 	 * We use this to avoid having doubled builds, as well as infinite loop
-	 * from cyclic dependency (which will be warned to the user, if found)
+	 * from cyclic dependency (which will be warned to the user, if found
+	 * and not explicitly ignored)
 	 */
 	BuildMap AllBuilds;
+
+	/**
+	 * Topologically sort the BuildMap, using DFS
+	 *
+	 * @note Using DFS helps us detect cycles
+	 *
+	 * @throws Cycle description
+	 *
+	 * @return Topologically sorted vector
+	 */
+	TopoSorted topoSort () throw (string);
 	/**
 	 * Process Build, calling it's dependencies first
 	 *
 	 * If building ain't needed (as output exists and inputs haven't been
 	 * modified), it just skips it.
+	 *
+	 * @throws Cycle description
 	 */
-	void DFS (Build *current, CycleLogger& log) throw (int, string);
+	void visit (TopoSorted& sorted, Build *current, CycleLogger& log) throw (string);
 };

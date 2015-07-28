@@ -1,6 +1,10 @@
 # text backups
 *~
 *.swp
+
+# cscope
+*cscope*
+
 # build
 build/
 *.o

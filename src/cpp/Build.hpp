@@ -57,7 +57,7 @@ public:
 	Build (lua_State *L, BuildMap& AllBuilds);
 
 	/**
-	 * A simple printing function
+	 * A simple stringifying function
 	 */
 	string to_str ();
 

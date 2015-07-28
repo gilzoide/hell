@@ -91,7 +91,7 @@ string Build::to_str () {
 	}
 	os << endl << endl;
 
-	return os.str ();
+	return move (os.str ());
 }
 
 
