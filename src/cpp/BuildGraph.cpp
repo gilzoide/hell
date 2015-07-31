@@ -1,4 +1,5 @@
 #include "BuildGraph.hpp"
+#include <exception>
 
 BuildGraph::BuildGraph (lua_State *L) {
 	lua_pushnil (L);
@@ -15,14 +16,32 @@ BuildGraph::BuildGraph (lua_State *L) {
 
 		lua_pop (L, 1);
 	}
+/*    for (auto & build : AllBuilds) {
+ *        hellMsg (build.second->to_str ());
+ *    } */
 }
 
 
 void BuildGraph::processBuilds () {
 	try {
-		auto processQueue = topoSort ();
-		JobManager jm;
-		jm.process (&processQueue);
+		// toposort graph (so we build things accordingly to their dependency)
+		auto sorted = topoSort ();
+		//for (auto & build : sorted) {
+			//cout << build->depsLeft << ' ';
+		//}
+
+		auto numJobs = Opts::getInstance ().get_numJobs ();
+		// no parallelism here, so process every build in order;
+		// straightforward, to avoid multithread management overhead)
+		if (numJobs == 1) {
+			for (auto & build : sorted) {
+				build->process ();
+			}
+		}
+		else {
+			JobManager jm (&sorted);
+			jm.process ();
+		}
 	}
 	// some command failed
 	catch (int ret) {
@@ -32,6 +51,9 @@ void BuildGraph::processBuilds () {
 	// oops, cycle found!
 	catch (string cycle) {
 		hellErrMsg (cycle);
+	}
+	catch (exception e) {
+		hellErrMsg (e.what ());
 	}
 }
 
@@ -78,6 +100,7 @@ void BuildGraph::visit (TopoSorted& sorted, Build *current, CycleLogger& log) th
 		}
 
 		sorted.push_back (current);
+		current->checkNeedRebuild ();
 		current->processed = Build::State::Done;
 	}
 }

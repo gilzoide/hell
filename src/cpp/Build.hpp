@@ -66,7 +66,7 @@ public:
 	 *
 	 * @throws Int regarding exit failure
 	 */
-	void process () throw (int);
+	void process (string threadId = "") throw (int);
 
 	/// Echo field, line to be echoed when running command; optional
 	string echo {""};
@@ -83,6 +83,21 @@ public:
 	vector<string> input;
 	/// Dependency list, built on the fly when checking the 'deps' field
 	forward_list<Build *> deps;
+
+	/**
+	 * List of who depend on `this'
+	 *
+	 * This will be useful for multiple job control
+	 */
+	forward_list<Build *> dependOnThis;
+	/**
+	 * Notifies `you' that `this' depends on it
+	 *
+	 * Meaning: you->dependOnThis.push_front (this)
+	 *
+	 * @param[out] you Who I (`this') depend on
+	 */
+	void IDependOnYou (Build *you);
 
 	/// Has Build been processed yet (for the BFS)?
 	enum class State : char {
@@ -102,8 +117,9 @@ public:
 	 * The first input newer than output immediately marks as need to rebuild.
 	 */
 	void checkNeedRebuild ();
-	/// Stores if need to rebuild or not
 	bool needRebuild {true};
+	/// Stores how many dependencies are left so we can build `this'
+	int depsLeft {0};
 
 
 	/**

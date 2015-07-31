@@ -7,7 +7,8 @@ threadlib = hell.os.name == 'windows' and '-mthreads' or '-pthread'
 
 return cpp.shared {
 	input = util.glob '*.cpp',
-	flags = '-Wall -g -O2 -std=c++11 ' .. threadlib,
+	std = 'c++11',
+	flags = '-Wall -g -O2 ' .. threadlib,
 	links = lualib,
 	includes = lualib,
 	output = 'cppUtils.so'

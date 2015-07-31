@@ -1,6 +1,6 @@
 ## Hell C++ stuff Makefile ##
 
-objs = cppUtils.o commonLib.o Build.o BuildGraph.o CycleLogger.o
+objs = cppUtils.o commonLib.o Build.o BuildGraph.o CycleLogger.o JobManager.o
 lib_obj = cppUtils.so
 
 # Lua include, as seen on different Linux distros

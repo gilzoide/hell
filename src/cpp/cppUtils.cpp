@@ -133,11 +133,13 @@ int cppLazyPrefix (lua_State *L) {
 /// Set the opts important to C++, instancing the singleton Opts class
 // Lua params:
 //     opts: Table with the options
+// Lua return:
+//     bool: Is numJobs a valid value?
 int cppSetOpts (lua_State *L) {
     lua_getfield (L, 1, "j");
-    shorty j = 1;
+    int numJobs = 1;
     if (!lua_isnil (L, -1)) {
-        j = lua_tointeger (L, -1);
+        numJobs = lua_tointeger (L, -1);
     }
 
     Verbosity verbose;
@@ -170,10 +172,10 @@ int cppSetOpts (lua_State *L) {
     lua_getfield (L, 1, "C");
     bool C = !lua_isnil (L, -1);
     
-    bool valid_j = Opts::getInstance ().setOpts (j, verbose, dryRun, timer, C);
+    bool isNumJobsValid = Opts::getInstance ().setOpts (numJobs, verbose, dryRun, timer, C);
     lua_pop (L, 5);
 
-	lua_pushboolean (L, valid_j);
+	lua_pushboolean (L, isNumJobsValid);
     return 1;
 }
 

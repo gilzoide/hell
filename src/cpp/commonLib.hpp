@@ -26,8 +26,6 @@
 #include <iostream>
 
 using namespace std;
-/// A value we know will/should be little (for the number of jobs)
-using shorty = unsigned char;
 
 /// Verbosity level
 enum class Verbosity : char {
@@ -46,7 +44,7 @@ public:
     /**
      * Set options, please
      */
-    bool setOpts (shorty j, Verbosity verbose, bool dryRun, bool timer, bool C);
+    bool setOpts (int j, Verbosity verbose, bool dryRun, bool timer, bool C);
     /**
      * Gets the only instance by reference
      */
@@ -67,7 +65,7 @@ public: \
         return name; \
     }
     /// Number of jobs/threads that will run concurrently
-    withGetter (shorty, j);
+    withGetter (int, numJobs);
     /// Verbosity state of the program
     withGetter (Verbosity, verbose);
     /// Is it a dryRun?

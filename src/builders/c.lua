@@ -12,6 +12,9 @@ local function pkgconfig_include_dirs (includes)
 			return util.shell ('pkg-config --silence-errors --cflags-only-I ' .. pkg) or '-I' .. util.makeRelative (pkg, util.getcwd () .. hell.os.dir_sep)
 		end) or ''
 end
+local function prepare_std (std)
+	return std and '-std=' .. std or ''
+end
 
 gcc = Builder {
 	bin = 'gcc',
@@ -21,33 +24,42 @@ gcc = Builder {
 	links = nil,
 	flags = '-Wall',
 	includes = nil,
+	std = nil,
 	prepare_links = pkgconfig_link,
 	prepare_includes = pkgconfig_include_dirs,
-	cmd = '$bin -o $output $input $flags $includes $links',
+	prepare_std = prepare_std,
+	cmd = '$bin -o $output $input $std $flags $includes $links',
 	help = "Compiles a C program, pipeBuilding all of the input files as objects first"
 }
+
+
+local function getGccMMDeps (input, builder)
+	-- insert dependencies from `gcc -MM' on pipeBuild
+	local gccDeps = {}
+	local gccMM = util.shell ('gcc -MM ' .. input .. ' ' .. util.concat (pkgconfig_include_dirs (builder.includes or '')) .. ' ' .. prepare_std (builder.std)) or ''
+	-- ignore "target:"
+	gccMM = gccMM:match ('.*: (.*)') or ''
+	--print ('gccMM', gccMM)
+	for dependency in gccMM:gmatch ('%S+[^\\%s]') do
+		-- if relative path, add root hellbuild path
+		if dependency:sub (1, 1) ~= '/' then
+			dependency = util.makeRelative (dependency, util.getPath ())
+		end
+		table.insert (gccDeps, dependency)
+	end
+
+	return gccDeps
+end
+
 
 -- In C, we must first build the object files, then the executable, so do it!
 function gcc.prepare_input (i, b)
 	return util.fmap (i, function (ii)
-		-- insert dependencies from `gcc -MM' on pipeBuild
-		local gccDeps = {}
-		local gccMM = util.shell ('gcc -MM ' .. ii .. ' ' .. util.concat (pkgconfig_include_dirs (b.includes or ''))) or ''
-		-- ignore "target:"
-		gccMM = gccMM:match ('.*: (.*)') or ''
-		for dependency in gccMM:gmatch ('%S+[^\\%s]') do
-			-- if relative path, add root hellbuild path
-			if dependency:sub (1, 1) ~= '/' then
-				dependency = util.makeRelative (dependency, util.getPath ())
-			end
-			table.insert (gccDeps, dependency)
-		end
-
 		-- and now build the object file!
 		return pipeBuild (b, {
 			flags = '&-c',
 			input = ii,
-			deps = gccDeps,
+			deps = getGccMMDeps (ii, b),
 			links = '',
 			prepare_links = false,
 			prepare_input = false,
@@ -72,6 +84,7 @@ function gcc.shared.prepare_input (i, b)
 		return pipeBuild (b, {
 			flags = '&-c -fPIC',
 			input = ii,
+			deps = getGccMMDeps (ii, b),
 			prepare_input = false,
 			prepare_flags = util.id,
 			prepare_output = function (_, input)

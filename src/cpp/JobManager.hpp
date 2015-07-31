@@ -22,8 +22,10 @@
 #pragma once
 
 #include "Build.hpp"
+#include "commonLib.hpp"
 
 #include <vector>
+#include <condition_variable>
 
 using namespace std;
 /// Topologically sorted BuildGraph representation
@@ -34,13 +36,40 @@ using TopoSorted = vector<Build *>;
  */
 class JobManager {
 public:
+	JobManager (TopoSorted *sorted);
 	/**
 	 * Process the TopoSorted graph, `opts.j' jobs in parallel
 	 *
 	 * @throws Command execution error status
 	 */
-	void process (TopoSorted *sorted) throw (int);
+	void process () throw (int);
+
 private:
-	/// Reference to our TopoSorted BuildGraph
+	/// Our topologically sorted Graph (reference to it)
 	TopoSorted *sorted;
+	/// Condition variable, for syncing the threads
+	condition_variable cv_waitDeps;
+	/// Mutex for protecting stuff
+	mutex mtx;
+	mutex waitDeps;
+	/// How many jobs were asked
+	int numJobs;
+
+	int currentBuild {0};
+	bool moreWork {true};
+
+	/**
+	 * Task performed by a thread: find next Build, and process it
+	 */
+	void task ();
+
+	/**
+	 * Finds the next available Build in `sorted', starting from `index'
+	 *
+	 * @return Next Build, if available
+	 * @return nullptr if none found
+	 */
+	Build *findNextBuild ();
 };
+
+

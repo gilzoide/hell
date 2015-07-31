@@ -298,9 +298,9 @@ end
 -- @param command Command to be run
 --
 -- @return Command's output, or nil if no output is read
-function utils.shell (command)
-	-- open the command file handler, suppressing its stderr
-	local handler = io.popen (command .. ' 2> /dev/null')
+function utils.shell (command, showErr)
+	-- open the command file handler, suppressing its stderr if needed
+	local handler = io.popen (command .. (showErr and '' or ' 2> /dev/null'))
 	-- read everything from command run
 	local ret = handler:read ('*a')
 	-- and close the command file handler

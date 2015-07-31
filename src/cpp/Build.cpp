@@ -49,14 +49,17 @@ Build::Build (lua_State *L, BuildMap& AllBuilds) : input (0) {
 			input.emplace_back (luaL_checkstring (L, -1));
 		}
 		else {	// table containing a build
-			deps.push_front (getDependency (L, AllBuilds));
+			auto dep = getDependency (L, AllBuilds);
+			IDependOnYou (dep);
+			deps.push_front (dep);
+			// well, one more dependency before we can build `this'
+			depsLeft++;
 		}
 		lua_pop (L, 1);
 	}
 
 	// clean stack
 	lua_pop (L, 4);
-	//hellMsg (to_str ());
 }
 
 
@@ -78,10 +81,15 @@ Build *Build::getDependency (lua_State *L, BuildMap& AllBuilds) {
 }
 
 
+void Build::IDependOnYou (Build *you) {
+	you->dependOnThis.push_front (this);
+}
+
+
 string Build::to_str () {
 	ostringstream os;
 	os << "out: " << output << endl << "cmd: " << cmd;
-	os << endl << "deps: ";
+	os << endl << "I depend on: ";
 	for (const auto & dep : deps) {
 		os << dep->output << "; ";
 	}
@@ -89,28 +97,28 @@ string Build::to_str () {
 	for (const auto & in : input) {
 		os << in << "; ";
 	}
+	os << endl << "depend on me: ";
+	for (const auto & depOnMe : dependOnThis) {
+		os << depOnMe->output << "; ";
+	}
 	os << endl << endl;
 
 	return move (os.str ());
 }
 
 
-void Build::process () throw (int) {
+void Build::process (string threadId) throw (int) {
 	// verify if really need to rebuild, checking in the input list
 	// do it if not in a dryRun
 	auto opts = Opts::getInstance ();
 	bool dryRun = opts.get_dryRun ();
-	if (!dryRun) {
-		checkNeedRebuild ();
-	}
 
-	if (needRebuild) {
-		// echo cmd
+	if (dryRun || needRebuild) {
 		if (opts.get_verbose () == Verbosity::Default) {
-			cout << (echo.empty () ? cmd : echo) << endl;
+			cout << threadId << (echo.empty () ? cmd : echo) << endl;
 		}
 		else if (opts.get_verbose () == Verbosity::Verbose) {
-			cout << cmd << endl;
+			cout << threadId << cmd << endl;
 		}
 
 		if (!dryRun) {
