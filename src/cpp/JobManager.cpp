@@ -10,23 +10,20 @@ JobManager::JobManager (TopoSorted *sorted) : sorted (sorted) {}
 
 void JobManager::process () throw (int) {
 	try {
-		numJobs = Opts::getInstance ().get_numJobs ();
+		auto numJobs = Opts::getInstance ().get_numJobs ();
 
-		// first of all, no Build has been processed
-		for (auto & build : *sorted) {
-			build->processed = Build::State::NotYet;
-		}
 		// launch `numJobs' threads
 		auto j = numJobs;
-		thread allThreads[numJobs];
-		auto mem_task = mem_fn (&JobManager::task);
+		thread workers[numJobs];
+		// our worker's task (which is a JobManager member function)
+		auto mem_task = mem_fn (&JobManager::workerTask);
 		while (j--) {
-			allThreads[j] = move (thread (mem_task, this));
+			workers[j] = move (thread (mem_task, this));
 		}
-		// join on all threads
+		// join on all workers
 		j = numJobs;
 		while (j--) {
-			allThreads[j].join ();
+			workers[j].join ();
 		}
 	}
 	catch (...) {
@@ -35,46 +32,55 @@ void JobManager::process () throw (int) {
 }
 
 
-void JobManager::task () {
-	while (moreWork) {
+void JobManager::workerTask () {
+	while (theresMoreWork) {
+		// lock, for `currentBuild' is shared
 		mtx.lock ();
 		auto build = findNextBuild ();
+		// no more builds: let's get outta here, and sinalize work's over
 		if (!build) {
-			moreWork = false;
+			theresMoreWork = false;
 			mtx.unlock ();
 			return;
 		}
 		mtx.unlock ();
 
+		// process the build, afterall, this is the whole point of this SW xD
 		build->process ();
-		build->processed = Build::State::Done;
 
+		// if someone depends on this build, let it know we are done here
 		if (!build->dependOnThis.empty ()) {
-			unique_lock<mutex> lk (waitDeps);
+			// lock, for `b->depsLeft' is shared
+			waitDeps.lock ();
 			for (auto & b : build->dependOnThis) {
 				b->depsLeft--;
+				// hey, `b' ain't got dependencies no more, so unblock it
 				if (!b->depsLeft) {
 					cv_waitDeps.notify_all ();
 				}
 			}
+			waitDeps.unlock ();
 		}
 	}
 }
 
 
 Build *JobManager::findNextBuild () {
-	for (unsigned int i = currentBuild; i < sorted->size (); i++) {
-		auto build = (*sorted)[i];
-		if (build->processed == Build::State::NotYet) {
-			if (build->depsLeft) {
-				unique_lock<mutex> lk (waitDeps);
-				int * depsLeft = &build->depsLeft;
-				cv_waitDeps.wait (lk, [depsLeft] { return *depsLeft <= 0; });
-			}
-			currentBuild = i + 1;
-			return build;
+	// only get a Build if there's any to build
+	if (currentBuild < sorted->size ()) {
+		auto build = (*sorted)[currentBuild];
+		// if there are still dependencies, wait until it's all done
+		if (build->depsLeft) {
+			unique_lock<mutex> lk (waitDeps);
+			auto depsLeft = &build->depsLeft;
+			cv_waitDeps.wait (lk, [depsLeft] { return *depsLeft <= 0; });
 		}
-	}
+		// well, let's go to the next one now
+		currentBuild++;
 
-	return nullptr;
+		return build;
+	}
+	else {
+		return nullptr;
+	}
 }

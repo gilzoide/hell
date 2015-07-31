@@ -61,7 +61,11 @@ local builder = {}
 --- Extending a builder is easy, just call this method!
 --
 -- @note This method doesn't change the original builder,
--- but rather returns a new one with the extended fields
+--  but rather returns a new one shallow copied with the extended fields
+--
+-- @note If one wants to get rid of a "prepare_" function from `builder',
+--  set the `appendix' field to 'false' rather than 'nil', so `mergeFields`
+--  does update the field, yet `build` doesn't try to call it
 function builder:extend (appendix)
 	appendix = appendix or {}
 	local new = setmetatable ({}, builder)

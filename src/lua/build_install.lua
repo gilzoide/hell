@@ -144,21 +144,31 @@ local function _build (builder)
 	-- as it often is based on the input field, that's why it's called first)
 	--
 	-- @note prepare_input is the only "prepare_" function called with the 
-	-- builder as parameter, as it might do some pipeBuilds
+	--  builder as parameter, as it might do some pipeBuilds
 	builder.input = new_prepare_input (builder.input, builder)
 	builder.prepare_input = nil
-	-- input_filename == fileName only, if not keepDirStructure
+	-- @note that input_filename == fileName only if not keepDirStructure
 	local input_filename = builder.keepDirStructure and builder.input[1] or
 			util.takeFilename (builder.input[1])
 	builder.output = new_prepare_output (builder.output, input_filename)
 	builder.prepare_output = nil
-	-- and the other ones
+	-- find "prepare_" functions...
+	local prepare_funcs = {}
 	for k, v in pairs (builder) do
-		local capture = k:match ('prepare_(.+)')
-		if capture and v then
-			builder[capture] = v (builder[capture], input_filename)
-			builder[k] = nil
+		local field_name = k:match ('prepare_(.+)')
+		-- there's a match, and `v' is not false (see the second
+		-- @note in `builder:extend` function)
+		if field_name and v then
+			prepare_funcs[field_name] = v
 		end
+	end
+	-- ...and run them
+	--
+	-- @note Was running "prepare_" functions and updating builder while
+	--  iterating the table, which was causing random bugs, like some
+	--  functions being called twice, or even never =S
+	for field, func in pairs (prepare_funcs) do
+		builder[field] = func (builder[field], input_filename)
 	end
 	-- the new build
 	local new_cmd = util.substField (builder, 'cmd')

@@ -36,6 +36,11 @@ using TopoSorted = vector<Build *>;
  */
 class JobManager {
 public:
+	/**
+	 * Ctor
+	 *
+	 * @param[in] sorted A reference to the TopoSorted BuildGraph
+	 */
 	JobManager (TopoSorted *sorted);
 	/**
 	 * Process the TopoSorted graph, `opts.j' jobs in parallel
@@ -47,27 +52,29 @@ public:
 private:
 	/// Our topologically sorted Graph (reference to it)
 	TopoSorted *sorted;
-	/// Condition variable, for syncing the threads
-	condition_variable cv_waitDeps;
-	/// Mutex for protecting stuff
-	mutex mtx;
-	mutex waitDeps;
-	/// How many jobs were asked
-	int numJobs;
+	/// Which Build (index) is it currently processing?
+	unsigned int currentBuild {0};
+	/// Workers always wanna know: is there any more work, or can we go home?
+	bool theresMoreWork {true};
 
-	int currentBuild {0};
-	bool moreWork {true};
+
+	/// Condition variable, for syncing the waiting workers
+	condition_variable cv_waitDeps;
+	/// Mutex for protecting `currentBuild'
+	mutex mtx;
+	/// Mutex for protecting `builds->depsLeft'
+	mutex waitDeps;
 
 	/**
 	 * Task performed by a thread: find next Build, and process it
 	 */
-	void task ();
+	void workerTask ();
 
 	/**
 	 * Finds the next available Build in `sorted', starting from `index'
 	 *
 	 * @return Next Build, if available
-	 * @return nullptr if none found
+	 * @return nullptr if no Build is left
 	 */
 	Build *findNextBuild ();
 };

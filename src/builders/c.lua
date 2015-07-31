@@ -86,7 +86,7 @@ function gcc.shared.prepare_input (i, b)
 			input = ii,
 			deps = getGccMMDeps (ii, b),
 			prepare_input = false,
-			prepare_flags = util.id,
+			prepare_flags = false,
 			prepare_output = function (_, input)
 				return util.changeExtension (input, hell.os.obj_ext)
 			end
@@ -94,8 +94,8 @@ function gcc.shared.prepare_input (i, b)
 	end)
 end
 
--- default C builder (cuz it's the only one we have), so that the build function
--- can find it easily from the file's extension
+-- default C builder (cuz it's the only one we have yet), so that the build
+-- function can find it easily from the file's extension
 c = gcc
 
 -- Auxiliary function: checks package in `pkg-config`
