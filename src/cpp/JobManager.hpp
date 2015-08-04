@@ -24,12 +24,13 @@
 #include "Build.hpp"
 #include "commonLib.hpp"
 
-#include <vector>
+#include <deque>
+#include <future>
 #include <condition_variable>
 
 using namespace std;
 /// Topologically sorted BuildGraph representation
-using TopoSorted = vector<Build *>;
+using TopoSorted = deque<Build *>;
 
 /**
  * Our Job Manager, which manages parallel jobs
@@ -47,16 +48,17 @@ public:
 	 *
 	 * @throws Command execution error status
 	 */
-	void process () throw (int);
+	void process ();
 
 private:
 	/// Our topologically sorted Graph (reference to it)
 	TopoSorted *sorted;
-	/// Which Build (index) is it currently processing?
-	unsigned int currentBuild {0};
 	/// Workers always wanna know: is there any more work, or can we go home?
 	bool theresMoreWork {true};
+	/// How many jobs can we have?
+	int numJobs;
 
+	promise<void> prom;
 
 	/// Condition variable, for syncing the waiting workers
 	condition_variable cv_waitDeps;
@@ -78,5 +80,4 @@ private:
 	 */
 	Build *findNextBuild ();
 };
-
 

@@ -26,9 +26,6 @@ void BuildGraph::processBuilds () {
 	try {
 		// toposort graph (so we build things accordingly to their dependency)
 		auto sorted = topoSort ();
-		//for (auto & build : sorted) {
-			//cout << build->depsLeft << ' ';
-		//}
 
 		auto numJobs = Opts::getInstance ().get_numJobs ();
 		// no parallelism here, so process every build in order;
@@ -43,17 +40,14 @@ void BuildGraph::processBuilds () {
 			jm.process ();
 		}
 	}
-	// some command failed
-	catch (int ret) {
-		hellErrMsg ("error trying to run command. Exited [" +
-				to_string (ret) + "]");
-	}
 	// oops, cycle found!
 	catch (string cycle) {
 		hellErrMsg (cycle);
 	}
-	catch (exception e) {
-		hellErrMsg (e.what ());
+	// some command failed
+	catch (int ret) {
+		hellErrMsg ("error trying to run command. Exited [" +
+				to_string (ret) + "]");
 	}
 }
 
@@ -77,6 +71,8 @@ TopoSorted BuildGraph::topoSort () throw (string) {
 
 void BuildGraph::visit (TopoSorted& sorted, Build *current, CycleLogger& log) throw (string) {
 	if (current->processed != Build::State::Done) {
+		// WARNING, gray node -> cycle detected!
+		// (this may be ignored, be our guest)
 		if (current->processed == Build::State::Working) {
 			log.setNode (current);
 			return;
@@ -99,14 +95,23 @@ void BuildGraph::visit (TopoSorted& sorted, Build *current, CycleLogger& log) th
 			}
 		}
 
-		sorted.push_back (current);
+		// enqueue current Build, and check if it needs to be rebuilt
+		if (current->depsLeft) {
+			sorted.push_back (current);
+		}
+		// if no dependency is needed, push `current' in the front
+		else {
+			sorted.push_front (current);
+		}
 		current->checkNeedRebuild ();
+		// aaaand we're done ;]
 		current->processed = Build::State::Done;
 	}
 }
 
 
 BuildGraph::~BuildGraph () {
+	// delete the C++ Builds
 	for (auto & build : AllBuilds) {
 		delete build.second;
 	}
