@@ -8,8 +8,8 @@ else
 end
 
 -- install paths
-local libPrefix = util.makePath (prefix, 'lib', 'hell')
-local exePrefix = util.makePath (prefix, 'bin')
+local libPrefix = util.makePath ('lib', 'hell')
+local exePrefix = 'bin'
 
 -- lua
 install (feedHellFire 'lua/hellfire', libPrefix)

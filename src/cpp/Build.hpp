@@ -116,8 +116,7 @@ public:
 	 * in input list if they modified, memoizing the modification times.
 	 * The first input newer than output immediately marks as need to rebuild.
 	 */
-	void checkNeedRebuild ();
-	bool needRebuild {true};
+	bool checkNeedRebuild ();
 	/// Stores how many dependencies are left so we can build `this'
 	int depsLeft {0};
 

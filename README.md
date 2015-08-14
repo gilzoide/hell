@@ -6,6 +6,15 @@ Hell is an open source build system.
 It's use is based on _Builders_ for any kind of stuff, that can be created or
 modified on the fly very easily, which brings flexibility and extensibility.
 
+Dependencies
+------------
+
+Build dependencies: [liblua >= 5.2](http://www.lua.org/), POSIX API,
+ C++11 compiler, [make](https://www.gnu.org/software/make/) (or you can write
+ the commands directly on your shell, but build systems are all about making
+ our lives nicer).
+Run dependencies: [lua runtime >= 5.2](http://www.lua.org/).
+
 Building
 --------
 
@@ -13,7 +22,7 @@ For building hell, you can use make
 
     $ make
 
-Or, you can use hell itself!
+Or you can use hell itself!
 
     $ hell
 
@@ -29,5 +38,6 @@ or, with hell
 More Info
 ---------
 
-For more info, check out the _\*Design\*_ files, they explain the whole idea (pt\_BR).
-The design will also be written in the Wiki soon (en and pt\_BR)
+Check out the Wiki (both en and pt\_BR), it's got almost all for understanding
+hell. For some info in the design, check out the _\*Design\*_ files, they
+explain the whole idea (pt\_BR).

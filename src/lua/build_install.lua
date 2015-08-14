@@ -257,7 +257,7 @@ local function _install (in_build, dir, permission)
 			"Can't install something that's not a build", 2)
 	int.assert_quit (type (dir) == 'string',
 			"Can't install without knowing where to (second parameter should be a string).", 2)
-	dir = util.lazyPrefix (dir, (prefix or hell.os.prefix) .. (dir ~= '' and hell.os.dir_sep or ''))
+	dir = util.makeRelative (dir, (prefix or hell.os.prefix) .. (dir ~= '' and hell.os.dir_sep or ''))
 
 	local filename = util.takeFilename (in_build.output)
 
@@ -269,7 +269,7 @@ local function _install (in_build, dir, permission)
 	}
 	-- install's input and output
 	builder = installBuilder:extend {
-		input =  { in_build.output },
+		input = { in_build.output },
 		output = util.makePath (dir, filename)
 	}
 

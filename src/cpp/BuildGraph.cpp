@@ -103,7 +103,6 @@ void BuildGraph::visit (TopoSorted& sorted, Build *current, CycleLogger& log) th
 		else {
 			sorted.push_front (current);
 		}
-		current->checkNeedRebuild ();
 		// aaaand we're done ;]
 		current->processed = Build::State::Done;
 	}
