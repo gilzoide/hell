@@ -9,7 +9,7 @@ Opts &Opts::getInstance () {
 }
 
 bool Opts::setOpts (int numJobs, Verbosity verbose, bool dryRun, bool timer, 
-		bool C) {
+		bool C, bool depTree) {
 	if (numJobs < 1 || numJobs > 100) {
 		// wrong number of jobs: tell hell that it's wrong (must
 		// be caught in a `assert_quit`)
@@ -20,6 +20,7 @@ bool Opts::setOpts (int numJobs, Verbosity verbose, bool dryRun, bool timer,
     this->dryRun = dryRun;
     this->timer = timer;
 	this->C = C;
+	this->depTree = depTree;
 
 	return true;
 }

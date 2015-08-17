@@ -1,6 +1,18 @@
 #include "BuildGraph.hpp"
 #include <exception>
 
+
+/**
+ * Show to the user the dependency trees
+ *
+ * @note As we have the graph topologically sorted and we know the dependencies,
+ *  and who depends on each Build, it's easy to print our tree =]
+ */
+void showDepTree (const TopoSorted& sorted) {
+
+}
+
+
 BuildGraph::BuildGraph (lua_State *L) {
 	lua_pushnil (L);
 	while (lua_next (L, 1)) {
@@ -27,17 +39,37 @@ void BuildGraph::processBuilds () {
 		// toposort graph (so we build things accordingly to their dependency)
 		auto sorted = topoSort ();
 
-		auto numJobs = Opts::getInstance ().get_numJobs ();
-		// no parallelism here, so process every build in order;
-		// straightforward, to avoid multithread management overhead)
-		if (numJobs == 1) {
-			for (auto & build : sorted) {
-				build->process ();
+		// build stuff
+		if (!Opts::getInstance ().get_depTree ()) {
+			auto numJobs = Opts::getInstance ().get_numJobs ();
+			// no parallelism here, so process every build in order;
+			// straightforward, to avoid multithread management overhead)
+			if (numJobs == 1) {
+				// no multithread: checkFunc is plain old `checkNeedRebuild`
+				Build::checkFunc = [] (Build *build) { 
+					return build->checkNeedRebuild ();
+				};
+				for (auto & build : sorted) {
+					build->process ();
+				}
+			}
+			else {
+				// multithread: checkFunc is a thread safe
+				// version of `checkNeedRebuild`
+				Build::checkFunc = [] (Build *build) { 
+					static mutex mtx;
+					mtx.lock ();
+					auto aux = build->checkNeedRebuild ();
+					mtx.unlock ();
+					return aux;
+				};
+				JobManager jm (&sorted);
+				jm.process ();
 			}
 		}
+		// show us the dependency trees
 		else {
-			JobManager jm (&sorted);
-			jm.process ();
+			showDepTree (sorted);
 		}
 	}
 	// oops, cycle found!

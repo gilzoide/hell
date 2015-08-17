@@ -36,6 +36,7 @@ hellp.hell_options = {
 	{'H', 'help-options', nil, "Give this help list"},
 	{'u', 'usage', nil, "Show usage"},
 	{'hb', 'help-builder', 'BUILDER', "Show Builder's hellp"},
+	{'d', 'dependency-trees', nil, "Show target's dependency trees"},
 	{'n', 'no-exec', nil, "Don't execute commands, just print them"},
 	{'c', 'clean-outdir', nil, "Clean hell.outdir (if defined), instead of each output separately"},
 	{'V', 'version', nil, "Print program version"},

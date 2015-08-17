@@ -44,7 +44,8 @@ public:
     /**
      * Set options, please
      */
-    bool setOpts (int j, Verbosity verbose, bool dryRun, bool timer, bool C);
+    bool setOpts (int j, Verbosity verbose, bool dryRun, bool timer,
+			bool C, bool depTree);
     /**
      * Gets the only instance by reference
      */
@@ -74,6 +75,8 @@ public: \
     withGetter (bool, timer);
 	/// Ignore cyclic dependency?
 	withGetter (bool, C);
+	/// Show dependency tree?
+	withGetter (bool, depTree);
 };
 
 /**

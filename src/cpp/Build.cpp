@@ -113,7 +113,7 @@ void Build::process (string threadId) throw (int) {
 	auto opts = Opts::getInstance ();
 	bool dryRun = opts.get_dryRun ();
 
-	if (dryRun || checkNeedRebuild ()) {
+	if (dryRun || checkFunc (this)) {
 		if (opts.get_verbose () == Verbosity::Default) {
 			cout << threadId << (echo.empty () ? cmd : echo) << endl;
 		}
@@ -147,12 +147,12 @@ time_t getModTime (const char *filename) {
 
 bool Build::checkNeedRebuild () {
 	// first, let's check for the output modification time
-	time_t outTime = getModTime (output.data ());
+	auto outTime = getModTime (output.data ());
 
 	// output doesn't exist: build!
 	if (outTime < 0) {
 		// we'll build it, so store that we did it
-		modTimes[output.data ()] = time (nullptr);
+		modTimes.emplace (output.data (), time (nullptr));
 		return true;
 	}
 	else {
@@ -172,7 +172,7 @@ bool Build::checkNeedRebuild () {
 			// some error, or input is newer: let's rebuild then
 			if (inTime < 0 || inTime >= outTime) {
 				// we'll build it, so store that we did it
-				modTimes[output.data ()] = time (nullptr);
+				modTimes.emplace (output.data (), time (nullptr));
 				return true;
 			}
 		}
@@ -182,3 +182,4 @@ bool Build::checkNeedRebuild () {
 }
 
 ModTimeMap Build::modTimes;
+function<bool (Build *)> Build::checkFunc;

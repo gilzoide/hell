@@ -171,9 +171,13 @@ int cppSetOpts (lua_State *L) {
 
     lua_getfield (L, 1, "C");
     bool C = !lua_isnil (L, -1);
+
+    lua_getfield (L, 1, "d");
+    bool depTree = !lua_isnil (L, -1);
     
-    bool isNumJobsValid = Opts::getInstance ().setOpts (numJobs, verbose, dryRun, timer, C);
-    lua_pop (L, 5);
+    bool isNumJobsValid = Opts::getInstance ().setOpts (numJobs, verbose,
+			dryRun, timer, C, depTree);
+    lua_pop (L, 6);
 
 	lua_pushboolean (L, isNumJobsValid);
     return 1;

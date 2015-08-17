@@ -26,6 +26,7 @@
 #include <lua.hpp>
 #include <iostream>
 #include <sstream>
+#include <functional>
 
 #include <forward_list>
 #include <vector>
@@ -38,6 +39,7 @@ class Build;
 using BuildMap = map<const void *, Build *>;
 /// Our file modification times map
 using ModTimeMap = map<const char *, time_t>;
+
 
 /**
  * Hell's builds, mapped exactly as Lua's
@@ -107,6 +109,7 @@ public:
 	} processed {State::NotYet};
 
     /// The file modification times map
+	/// @note It's a pointer so that we can use our own thread safe version
     static ModTimeMap modTimes;
 
 	/**
@@ -115,8 +118,13 @@ public:
 	 * Checks if output exists. If not, rebuild. Else, checks all entries 
 	 * in input list if they modified, memoizing the modification times.
 	 * The first input newer than output immediately marks as need to rebuild.
+	 *
+	 * @return Should this Build be rebuilt?
 	 */
 	bool checkNeedRebuild ();
+	/// Function for checking if need to rebuild 
+	/// Default: plain checkNeedRebuild
+	static function<bool (Build *)> checkFunc;
 	/// Stores how many dependencies are left so we can build `this'
 	int depsLeft {0};
 
