@@ -1,6 +1,21 @@
 #include "BuildGraph.hpp"
 #include <exception>
+#include <sstream>
 
+void recurseTree (Build *current, stringstream& str, int depth) {
+	if (current->processed == Build::State::NotYet) {
+		str << endl;
+		for (int i = 0; i < depth; i++) {
+			str << "| ";
+		}
+		str << "+-" << current->output;
+
+		current->processed = Build::State::Done;
+		for (auto & dep : current->deps) {
+			recurseTree (dep, str, depth + 1);
+		}
+	}
+}
 
 /**
  * Show to the user the dependency trees
@@ -9,7 +24,14 @@
  *  and who depends on each Build, it's easy to print our tree =]
  */
 void showDepTree (const TopoSorted& sorted) {
-
+	stringstream str;
+	for (auto & build : sorted) {
+		build->processed = Build::State::NotYet;
+	}
+	for (auto it = sorted.rbegin (); it != sorted.rend (); it++) {
+		recurseTree (*it, str, 0);
+	}
+	hellMsg ("Dependency Trees:\n" + str.str ());
 }
 
 

@@ -29,7 +29,7 @@ Opts Opts::instance;
 
 
 // Hell Messaging API
-void hellMsg (string msg) {
+void hellMsg (const string& msg) {
 	hellMsg (msg.data ());
 }
 void hellMsg (const char *msg) {
@@ -39,7 +39,7 @@ void hellMsg (const char *msg) {
 }
 
 
-void hellErrMsg (string msg) {
+void hellErrMsg (const string& msg) {
 	hellErrMsg (msg.data ());
 }
 void hellErrMsg (const char *msg) {

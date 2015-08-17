@@ -82,10 +82,10 @@ public: \
 /**
  * Writes a Hell message at stdout
  */
-void hellMsg (string msg);
+void hellMsg (const string& msg);
 void hellMsg (const char *msg);
 /**
  * Writes a Hell message at stderr (with a warning "!!!" mark)
  */
-void hellErrMsg (string msg);
+void hellErrMsg (const string& msg);
 void hellErrMsg (const char *msg);
