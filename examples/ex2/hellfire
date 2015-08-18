@@ -1,0 +1,10 @@
+-- using the 'builder' field. In this case, just copy the input
+build {
+	input = "another.c",
+	builder = copy
+}
+
+-- now using the Builder. Does exactly the same as the example above
+copy {
+	input = "another.c"
+}

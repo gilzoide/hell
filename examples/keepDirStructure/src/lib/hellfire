@@ -1,0 +1,3 @@
+return gcc.shared {
+	input = 'util.c'
+}

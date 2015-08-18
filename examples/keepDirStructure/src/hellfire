@@ -1,0 +1,8 @@
+-- if we are in the "src/hellfire" script, this build
+-- will copy the "test" file to the "build/src" directory
+build {
+	input = {'app.cpp', 'app2.cpp'},
+	links = 'util',
+	libDirs = hell.outdir,
+}
+feedHellFire 'lib/hellfire'

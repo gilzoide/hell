@@ -1,0 +1,4 @@
+-- building a program written in the C language. Uses the 'c' Builder
+build {
+	input = 'hello_world.c'
+}

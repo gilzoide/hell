@@ -4,7 +4,7 @@ local util = hell.utils
 -- If there ain't a pkg-config for it, just add the '-l' preffix
 local function pkgconfig_link (links)
 	return links and util.fmap (links, function (pkg)
-			return util.shell ('pkg-config --silence-errors --libs-only-l ' .. pkg) or '-l' .. util.makeRelative (pkg, util.getcwd () .. hell.os.dir_sep)
+			return util.shell ('pkg-config --silence-errors --libs-only-l ' .. pkg) or '-l' .. pkg
 		end) or ''
 end
 local function pkgconfig_lib_dirs (libDirs)
@@ -73,7 +73,9 @@ function gcc.prepare_input (i, b)
 			input = ii,
 			deps = deps,
 			links = '',
+			libDirs = '',
 			prepare_links = false,
+			prepare_libDirs = false,
 			prepare_input = false,
 			prepare_output = function (_, input)
 				return util.changeExtension (input, hell.os.obj_ext)

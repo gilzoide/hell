@@ -148,8 +148,7 @@ local function _build (builder)
 	builder.input = new_prepare_input (builder.input, builder)
 	builder.prepare_input = nil
 	-- @note that input_filename == fileName only if not keepDirStructure
-	local input_filename = builder.keepDirStructure and builder.input[1] or
-			util.takeFilename (builder.input[1])
+	local input_filename = util.takeFilename (builder.input[1])
 	builder.output = new_prepare_output (builder.output, input_filename)
 	builder.prepare_output = nil
 	-- find "prepare_" functions...
