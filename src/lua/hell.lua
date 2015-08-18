@@ -62,6 +62,7 @@ local OSes = {
 
 local os = OSes[int.cpp.getOS ()] or OSes.unix
 os.name = int.cpp.getOS ()
+os.arch = int.cpp.getArch ()
 os.dir_sep = package.config:sub (1, 1)
 
 --[[		hell: the table that controls everything that's going on		]]--

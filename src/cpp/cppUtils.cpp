@@ -24,6 +24,31 @@ int getOS (lua_State *L) {
 }
 
 
+/// Get the OS architecture
+// Lua return: OS architecture
+int getArch (lua_State *L) {
+#if defined(__i386__) || defined(_M_IX86) || defined(_M_I86)
+    const char *archName = "x86";
+#elif defined(__x86_64__) || defined(_M_X64)
+    const char *archName = "x86_64";
+#elif defined(__ia64__) || defined(_M_IA64)
+	const char *archName = "ia64";
+#elif defined(__ppc__) || defined(_M_PPC)
+	const char *archName = "ppc";
+#elif __aarch64__
+	const char *archName = "arm64";
+#elif defined(__arm__) || defined(_M_ARM)
+	const char *archName = "arm";
+#elif __mips__
+	const char *archName = "mips";
+#else
+    const char *archName = "unknown";
+#endif
+    lua_pushstring (L, archName);
+    return 1;
+}
+
+
 /// Call hellErrMsg
 // Lua params:
 //     msg: String with the message
@@ -241,6 +266,7 @@ int cppGetCwd (lua_State *L) {
 const struct luaL_Reg cppUtilsLib [] = {
 	{"processBI", processBI},
 	{"getOS", getOS},
+	{"getArch", getArch},
 	{"glob", cppGlob},
 	{"lazyPrefix", cppLazyPrefix},
 	{"hellErrMsg", cppHellErrMsg},
