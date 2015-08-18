@@ -4,7 +4,12 @@ local util = hell.utils
 -- If there ain't a pkg-config for it, just add the '-l' preffix
 local function pkgconfig_link (links)
 	return links and util.fmap (links, function (pkg)
-			return util.shell ('pkg-config --silence-errors --libs ' .. pkg) or '-l' .. util.makeRelative (pkg, util.getcwd () .. hell.os.dir_sep)
+			return util.shell ('pkg-config --silence-errors --libs-only-l ' .. pkg) or '-l' .. util.makeRelative (pkg, util.getcwd () .. hell.os.dir_sep)
+		end) or ''
+end
+local function pkgconfig_lib_dirs (libDirs)
+	return libDirs and util.fmap (libDirs, function (pkg)
+			return util.shell ('pkg-config --silence-errors --libs-only-L ' .. pkg) or '-L' .. util.makeRelative (pkg, util.getcwd () .. hell.os.dir_sep)
 		end) or ''
 end
 local function pkgconfig_include_dirs (includes)
@@ -24,12 +29,18 @@ gcc = Builder {
 	links = nil,
 	flags = '-Wall',
 	includes = nil,
+	libDirs = nil,
 	std = nil,
+	skipDepCheck = nil,
 	prepare_links = pkgconfig_link,
+	prepare_libDirs = pkgconfig_lib_dirs,
 	prepare_includes = pkgconfig_include_dirs,
 	prepare_std = prepare_std,
-	cmd = '$bin -o $output $input $std $flags $includes $links',
-	help = "Compiles a C program, pipeBuilding all of the input files as objects first"
+	cmd = '$bin -o $output $input $std $flags $includes $libDirs $links',
+	help = [[Compiles a C program, pipeBuilding all of the input files as objects
+first
+By default, it checks for dependencies with `gcc -MM`, which may be too slow if
+your project is too big. For those cases, specify field 'skipDepCheck' as true]]
 }
 
 
@@ -55,11 +66,12 @@ end
 -- In C, we must first build the object files, then the executable, so do it!
 function gcc.prepare_input (i, b)
 	return util.fmap (i, function (ii)
+		deps = b.skipDepCheck and {} or getGccMMDeps (ii, b)
 		-- and now build the object file!
 		return pipeBuild (b, {
 			flags = '&-c',
 			input = ii,
-			deps = getGccMMDeps (ii, b),
+			deps = deps,
 			links = '',
 			prepare_links = false,
 			prepare_input = false,
