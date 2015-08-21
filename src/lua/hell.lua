@@ -114,10 +114,24 @@ for i = #build_scripts, 1, -1 do
 	end
 end
 
--- well, let's say the user asked for help but there's no hellbuild to source
--- no need to let him down, right?
-if not script and opts.h then
-	hellp ()
+-- well, let's say the user asked for help, ... 
+if opts.h then
+	-- ...but there's no hellbuild to source, no need to let him down, right?
+	if not script then
+		hellp ()
+	-- ...let's not read the entire build script tree
+	-- for custom help, just do until we find it
+	else
+		function hell.__newindex (t, k, v)
+			if k == 'help' then
+				hellp (v)
+			else
+				rawset (t, k, v)
+			end
+		end
+
+		setmetatable (hell, hell)
+	end
 end
 
 -- don't let script use require with hell's internals
@@ -136,9 +150,9 @@ int.cpp.chdir (int.getPath (0))
 
 int.hellMsg ("all set, let's see what we got\n")
 
--- Called for help?
+-- Called for help, and no custom help appeared? No worries, print the default
 if opts.h then
-	hellp (hell.help)
+	hellp ()
 end
 
 opts.target = opts.target or ''
