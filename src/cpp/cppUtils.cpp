@@ -72,28 +72,58 @@ int cppHellMsg (lua_State *L) {
 // some definitions so we can track down the time spent
 using namespace std::chrono;
 using clk = steady_clock;
+/// The timer starting point
+clk::time_point start = clk::now ();
+
+/// Start the timer
+void startTimer () {
+    start = clk::now ();
+}
+
+/// startTimer Lua wrapper
+int cppStartTimer (lua_State *L) {
+	startTimer ();
+	return 0;
+}
+
+/// Shows time elapsed between `start' and now, in seconds (3 decimal places)
+void showElapsedTime (const char *job) {
+    if (Opts::getInstance ().get_timer ()) {
+		const auto dt = duration_cast<milliseconds> (clk::now () - start)
+				.count () / 1000.0;
+		ostringstream str;
+		str << job << " time: " << fixed << setprecision (3) << dt << "s";
+		hellMsg (str.str ());
+	}
+}
+
+/// showElapsedTime Lua wrapper
+// Lua params:
+//     jobName: the job's name (what job the timer was measuring)
+int cppShowElapsedTime (lua_State *L) {
+	const char *jobName = luaL_checkstring (L, 1);
+	showElapsedTime (jobName);
+
+	return 0;
+}
+
 
 /// Process the Builds/Installs
 // Lua params:
 //     BI: Table with the Builds
 int processBI (lua_State *L) {
 	// starting clock, so we can measure the elapsed time
-    clk::time_point start = clk::now ();
+	startTimer ();
 
 	BuildGraph G {L};
 	G.processBuilds ();
 
 	// if asked to show the time elapsed, let'sa do it!
-	// It is in seconds, 3 decimal places
-    if (Opts::getInstance ().get_timer ()) {
-		const auto dt = duration_cast<milliseconds> (clk::now () - start)
-				.count () / 1000.0;
-		ostringstream str;
-		str << "Processing time: " << fixed << setprecision (3) << dt << "s";
-		hellMsg (str.str ());
-	}
+	showElapsedTime ("Build processing");
+
 	return 0;
 }
+
 
 
 /// Makes a POSIX glob pattern matching
@@ -275,6 +305,8 @@ const struct luaL_Reg cppUtilsLib [] = {
 	{"setOpts", cppSetOpts},
 	{"chdir", cppChDir},
 	{"getcwd", cppGetCwd},
+	{"startTimer", cppStartTimer},
+	{"showElapsedTime", cppShowElapsedTime},
     {NULL, NULL}
 };
 

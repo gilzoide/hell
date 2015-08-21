@@ -31,7 +31,7 @@ hellp.hell_options = {
 	{'s', 'silent', nil, "Suppress stdout output"},
 	{'v', 'verbose', nil, "Print all the commands executed, surpassing the build's 'echo' field"},
 	{'l', 'list-targets', nil, "List all available targets"},
-	{'t', 'timer', nil, "Show builds/installs' process time"},
+	{'t', 'timer', nil, "Show script read and builds/installs' process time"},
 	{'h', 'help', nil, "Show script's custom help, or this one"},
 	{'H', 'help-options', nil, "Give this help list"},
 	{'u', 'usage', nil, "Show usage"},

@@ -126,7 +126,9 @@ package.cpath = oldcpath
 
 -- process root build script
 int.assert_quit (script, "Can't find any build scripts. Tried \"" .. table.concat (build_scripts, '", "') .. '"')
+int.cpp.startTimer ()
 script ()
+int.cpp.showElapsedTime ('Script reading')
 
 -- remove root hellbuild from path, so commands are rightly executed
 table.remove (int.path)
