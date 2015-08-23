@@ -31,6 +31,8 @@ BI.installs = {}
 function BI.getBI (t, meta)
 	if type (t) ~= 'table' then
 		return nil
+	elseif getmetatable (t) == meta then
+		return {t}
 	end
 
 	local ret = {}

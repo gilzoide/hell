@@ -104,22 +104,22 @@ end
 
 --- Maps a function over a table
 --
--- @param field The target
+-- @param t The target table
 -- @param f The function
 -- @param force_table Bool: do you want the result to be a table, even if
---  `target' ain't a table?
+--  `t' ain't a table?
 --
 -- @return table with the results
-function utils.fmap (field, f, force_table)
+function utils.fmap (t, f, force_table)
 	int.assert_quit (type (f) == 'function', "[fmap] Can't map a function if it ain't a function!", 2)
 
-	if type (field) ~= 'table' then
-		return force_table and { f (field) } or f (field)
+	if type (t) ~= 'table' then
+		return force_table and { f (t) } or f (t)
 	end
 
-	-- apply function over every value in field, keeping changes
+	-- apply function over every value in `t', keeping changes
 	local results = {}
-	for i, v in ipairs (field) do
+	for i, v in ipairs (t) do
 		results[i] = f (v)
 	end
 
@@ -222,16 +222,6 @@ function utils.substField (builder, field)
 end
 
 
---- Auxiliary recursion function for t.getNestedField
-local function getNestedField (t, field)
-	if not field or not t then
-		return t
-	else
-		local current, rest = field:match ('(.-)%.(.+)')
-		current = current or field
-		return getNestedField (t[current], rest)
-	end
-end
 --- Gets the nested field inside table t.
 --
 -- It works by recursing over tables until there's no more '.' in field name.
@@ -241,10 +231,22 @@ end
 --
 -- @return Field asked for, whole table if empty field name
 function utils.getNestedField (t, field)
+	--- Auxiliary recursion function for getNestedField
+	local function recGetNestedField (t, field)
+		if not field or not t then
+			return t
+		else
+			local current, rest = field:match ('(.-)%.(.+)')
+			current = current or field
+			return recGetNestedField (t[current], rest)
+		end
+	end
+
+
 	if field == '' then
 		return t
 	else
-		return getNestedField (t, field)
+		return recGetNestedField (t, field)
 	end
 end
 

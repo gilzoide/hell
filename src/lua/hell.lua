@@ -120,7 +120,7 @@ if opts.h then
 	if not script then
 		hellp ()
 	-- ...let's not read the entire build script tree
-	-- for custom help, just do until we find it
+	-- for custom help, just search until we find it
 	else
 		function hell.__newindex (t, k, v)
 			if k == 'help' then
