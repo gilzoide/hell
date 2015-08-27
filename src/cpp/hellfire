@@ -1,12 +1,10 @@
-local util = hell.utils
-
 -- the lua library, package may be named `lua5.2' or `lua'
-lualib = util.checkPkgConfig ('lua5.2') or 'lua'
+lualib = utils.checkPkgConfig ('lua5.2') or 'lua'
 -- the threads libraries for windows are different from *nix
 threadlib = hell.os.name == 'windows' and '-mthreads' or '-pthread'
 
 return cpp.shared {
-	input = util.glob '*.cpp',
+	input = utils.glob '*.cpp',
 	std = 'c++11',
 	flags = '-Wall -g -O2 ' .. threadlib,
 	links = lualib,

@@ -19,7 +19,6 @@
 -- along with Hell.  If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-local util = require 'hellutils'
 local int = require 'internals'
 
 local BI = {}
@@ -123,22 +122,22 @@ local function _build (builder)
 	-- both input and outputs will have, apart from the original "prepare_"
 	-- function, another one. Thus we need to apply the original within the new
 	-- one
-	local original_prepare_input = builder.prepare_input or util.id
-	local original_prepare_output = builder.prepare_output or util.id
+	local original_prepare_input = builder.prepare_input or utils.id
+	local original_prepare_output = builder.prepare_output or utils.id
 
 	local new_prepare_input = function (i, b)
 		local parcial_result = original_prepare_input (i, b)
 		-- only prefix input path if it's not a pipeBuild
 		if not builder.pipe then
-			parcial_result = util.fmap (parcial_result, function (i) 
-						return util.makeRelative (i, int.getPath ())
+			parcial_result = utils.fmap (parcial_result, function (i) 
+						return utils.makeRelative (i, int.getPath ())
 					end)
 		end
-		return util.fmap (parcial_result, util.id, true)
+		return utils.fmap (parcial_result, utils.id, true)
 	end
 	local new_prepare_output = function (o, input)
 		local parcial_result = original_prepare_output (o, input)
-		return util.makeRelative (parcial_result or input, int.getBuildPath (builder))
+		return utils.makeRelative (parcial_result or input, int.getBuildPath (builder))
 	end
 	
 	-- call all the "prepare_" functions, starting with "output"
@@ -150,7 +149,7 @@ local function _build (builder)
 	builder.input = new_prepare_input (builder.input, builder)
 	builder.prepare_input = nil
 	-- @note that input_filename == fileName only if not keepDirStructure
-	local input_filename = util.takeFilename (builder.input[1])
+	local input_filename = utils.takeFilename (builder.input[1])
 	builder.output = new_prepare_output (builder.output, input_filename)
 	builder.prepare_output = nil
 	-- find "prepare_" functions...
@@ -172,7 +171,7 @@ local function _build (builder)
 		builder[field] = func (builder[field], input_filename)
 	end
 	-- the new build
-	local new_cmd = util.substField (builder, 'cmd')
+	local new_cmd = utils.substField (builder, 'cmd')
 
 	local new = {
 		__metatable = 'build',
@@ -232,7 +231,7 @@ Needed a string, got a " .. type (builder.cmd) .. '.', 2)
 	local all_builds
 	-- support for multinput: 
 	if builder.multinput then
-		all_builds = util.fmap (builder.input, function (i) 
+		all_builds = utils.fmap (builder.input, function (i) 
 			return builder:extend { input = i }
 		end, true)
 	else
@@ -241,7 +240,7 @@ Needed a string, got a " .. type (builder.cmd) .. '.', 2)
 
 	-- return all builds unpacked (if not multinput, return the only
 	-- build as it would normally do
-	return table.unpack (util.fmap (all_builds, _build))
+	return table.unpack (utils.fmap (all_builds, _build))
 end
 
 
@@ -258,9 +257,9 @@ local function _install (in_build, dir, permission)
 			"Can't install something that's not a build", 2)
 	int.assert_quit (type (dir) == 'string',
 			"Can't install without knowing where to (second parameter should be a string).", 2)
-	dir = util.makeRelative (dir, (prefix or hell.os.prefix) .. (dir ~= '' and hell.os.dir_sep or ''))
+	dir = utils.makeRelative (dir, (prefix or hell.os.prefix) .. (dir ~= '' and hell.os.dir_sep or ''))
 
-	local filename = util.takeFilename (in_build.output)
+	local filename = utils.takeFilename (in_build.output)
 
 	--- Install Builder: the one that installs stuff (in Windows, it's just copy)
 	local installBuilder = hell.os.name == 'windows' and copy or Builder {
@@ -271,7 +270,7 @@ local function _install (in_build, dir, permission)
 	-- install's input and output
 	builder = installBuilder:extend {
 		input = { in_build.output },
-		output = util.makePath (dir, filename)
+		output = utils.makePath (dir, filename)
 	}
 
 	local new = {
@@ -279,7 +278,7 @@ local function _install (in_build, dir, permission)
 		input = builder.input,
 		output = builder.output,
 		deps = { in_build },
-		cmd = util.substField (builder, 'cmd')
+		cmd = utils.substField (builder, 'cmd')
 	}
 	setmetatable (new, new)
 
@@ -304,7 +303,7 @@ function install (in_builds, dir, permission)
 		return _install (in_build, dir, permission)
 	end
 
-	return table.unpack (util.fmap (all_installs, curryInstall))
+	return table.unpack (utils.fmap (all_installs, curryInstall))
 end
 
 --- Function for transforming builds in cleans

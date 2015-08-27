@@ -5,9 +5,9 @@ hs = Builder {
 		local outdir = hell.outdir and ' -outputdir ' .. hell.outdir or ''
 		return f .. outdir
 	end,
-	prepare_input = hell.utils.concat,
+	prepare_input = utils.concat,
 	prepare_output = function (out, input)
-		return out or util.changeExtension (input, hell.os.exe_ext)
+		return out or utils.changeExtension (input, hell.os.exe_ext)
 	end,
 	cmd = '$bin $flags $input -o $output'
 }

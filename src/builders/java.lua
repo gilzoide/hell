@@ -1,5 +1,3 @@
-local util = hell.utils
-
 java = Builder {
 	bin = 'javac',
 	flags = '',
@@ -13,7 +11,7 @@ function java.prepare_sourcepath (srcpth, input)
 end
 
 function java.prepare_output (out, input)
-	return util.changeExtension (input, 'class')
+	return utils.changeExtension (input, 'class')
 end
 
 function java.prepare_flags (f, input)

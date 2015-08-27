@@ -23,7 +23,7 @@
 
 local int = require 'internals'
 
-local utils = {}
+utils = {}
 
 --- Gets hell's version
 function utils.getVersion ()
@@ -40,6 +40,17 @@ end
 --- Gets root hellbuild path
 function utils.getPath ()
 	return int.getPath ()
+end
+
+
+--- Get option value from `int.opts` table
+--
+-- @note Valid `opt' values (which don't always return nil):
+--   - any short options described in "hellp.lua"
+--   - command ('build', 'install', 'clean', 'uninstall')
+--   - target (the most useful one, IMHO)
+function utils.getOption (opt)
+	return int.opts[opt]
 end
 
 

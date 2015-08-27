@@ -22,7 +22,6 @@
 local hellp = {}
 
 local int = require 'internals'
-local util = hell.utils
 
 -- all the hell options
 hellp.hell_options = {
@@ -46,7 +45,7 @@ hellp.hell_options = {
 
 
 function hellp.getBuilderHellp (builderName)
-	local builder = util.getNestedField (_ENV, builderName)
+	local builder = utils.getNestedField (_ENV, builderName)
 	local msg
 
 	if builder then

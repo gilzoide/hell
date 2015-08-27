@@ -1,5 +1,3 @@
-local util = require 'hellutils'
-
 local unix_copy = {
 	bin = 'cp',
 	flags = '-r',

@@ -35,7 +35,7 @@ package.cpath = hellInstallPath .. '/?.so'
 
 local int = require 'internals'
 int.hellInstallPath = hellInstallPath
-local util = require 'hellutils'
+local util = require 'utils'
 
 -- get OS. As linux/freebsd/solaris are all alike, we gather them as unix.
 -- note that MacOSX is called "darwin" here
@@ -61,7 +61,20 @@ local OSes = {
 }
 
 local os = OSes[int.cpp.getOS ()] or OSes.unix
+-- OS name:
+--   'windows'
+--   'darwin'
+--   'unix'
 os.name = int.cpp.getOS ()
+-- OS processor architecture:
+--   'x86'
+--   'x86_64'
+--   'ia64'
+--   'ppc'
+--   'arm'
+--   'arm64'
+--   'mips'
+--   'unknown'
 os.arch = int.cpp.getArch ()
 os.dir_sep = package.config:sub (1, 1)
 

@@ -22,7 +22,6 @@
 
 require 'build_install'
 local int = require 'internals'
-local util = hell.utils
 
 --- Auxiliary function for merging two fields
 --
@@ -74,7 +73,7 @@ function builder:extend (appendix)
 	for k, v in pairs (self) do
 		local new_field = mergeFields (v, appendix[k])
 		if type (new_field) == 'table' then
-			new_field = util.cloneTable (new_field)
+			new_field = utils.cloneTable (new_field)
 		end
 		new[k] = new_field
 	end
@@ -121,6 +120,6 @@ function Builder (initializer)
 end
 
 --[[		Load all builders from the builders directory		]]--
-for _, f in ipairs (util.glob (int.hellInstallPath .. '/builders/*.lua')) do
+for _, f in ipairs (utils.glob (int.hellInstallPath .. '/builders/*.lua')) do
 	dofile (f)
 end
