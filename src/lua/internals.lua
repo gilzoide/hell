@@ -137,7 +137,7 @@ function int.getBuildPath (builder)
 
 	-- update build path with script path
 	if int.path[2] then
-		str = int.cpp.lazyPrefix (str, int.path[2] .. hell.os.dir_sep)
+		str = int.cpp.lazyPrefix (int.path[2] .. hell.os.dir_sep, str)
 	end
 
 	return str

@@ -162,13 +162,13 @@ int cppGlob (lua_State *L) {
 
 /// Prefix string with prefix, if not already done
 // Lua params:
-//     str: String to be prefixed if needed
 //     prefix: String with the prefix
+//     str: String to be prefixed if needed
 // Lua return: final string
 int cppLazyPrefix (lua_State *L) {
-	const char *str = luaL_checkstring (L, 1);
 	size_t size;
-	const char *prefix = luaL_checklstring (L, 2, &size);
+	const char *prefix = luaL_checklstring (L, 1, &size);
+	const char *str = luaL_checkstring (L, 2);
 
 	// no match, so we need to prefix str
 	if (strncmp (prefix, str, size)) {

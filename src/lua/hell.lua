@@ -169,7 +169,7 @@ if opts.h then
 end
 
 opts.target = opts.target or ''
-local target = int.assert_quit (util.getNestedField (env, opts.target),
+local target = int.assert_quit (util.getNestedField (opts.target, env),
 		"Can't find target \"" .. opts.target .. '"')
 
 -- maybe get available targets?

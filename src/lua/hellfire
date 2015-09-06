@@ -15,7 +15,7 @@ end
 -- executable is one build
 executable = copy {
 	input = mainScript,
-	output = util.changeExtension (mainScript, '')
+	output = util.changeExtension ('', mainScript)
 }
 
 -- and libs are another

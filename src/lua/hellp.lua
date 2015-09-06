@@ -45,7 +45,7 @@ hellp.hell_options = {
 
 
 function hellp.getBuilderHellp (builderName)
-	local builder = utils.getNestedField (_ENV, builderName)
+	local builder = utils.getNestedField (builderName, _ENV)
 	local msg
 
 	if builder then

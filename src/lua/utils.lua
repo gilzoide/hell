@@ -109,19 +109,19 @@ function utils.recursiveGlob (pattern, base)
 	end
 
 	base = base or '.'
-	return recGlob (pattern, utils.lazyPrefix (hell.os.dir_sep, base))
+	return recGlob (pattern, utils.lazyPrefix (base, hell.os.dir_sep))
 end
 
 
 --- Maps a function over a table
 --
--- @param t The target table
 -- @param f The function
+-- @param t The target table
 -- @param force_table Bool: do you want the result to be a table, even if
 --  `t' ain't a table?
 --
 -- @return table with the results
-function utils.fmap (t, f, force_table)
+function utils.fmap (f, t, force_table)
 	int.assert_quit (type (f) == 'function', "[fmap] Can't map a function if it ain't a function!", 2)
 
 	if type (t) ~= 'table' then
@@ -138,31 +138,34 @@ function utils.fmap (t, f, force_table)
 end
 
 
+--- Curries a function `func' with the arguments, applying it partially
+-- 
+-- Functional programming stuff =]
+--
+-- @param func The function that'll be partially applied
+-- @param ... The arguments to be applied
+--
+-- @return The new partially applied function
+function utils.curry (func, ...)
+	local applied_args = {...}
+	return function (...) return func (table.unpack (applied_args), ...) end
+end
+
+
 --- Prefix a string `str' with `prefix'
 function utils.prefix (str, prefix)
 	return prefix .. str
 end
 
 
---- Curried version of `prefix' function
-function utils.curryPrefix (prefix)
-	return function (str) return utils.prefix (str, prefix) end
-end
-
-
 --- Prefix `str' with `prefix', if it ain't already prefixed by it.
 --
--- @param str The string
 -- @param prefix The prefix to be used if needed
+-- @param str The string
 --
 -- @return The final string
-function utils.lazyPrefix (str, prefix)
-	return int.cpp.lazyPrefix (str, prefix)
-end
-
---- Curry the `lazyPrefix' function, just as @ref curryPrefix does
-function utils.curryLazyPrefix (prefix)
-	return function (str) return utils.lazyPrefix (str, prefix) end
+function utils.lazyPrefix (prefix, str)
+	return int.cpp.lazyPrefix (prefix, str)
 end
 
 
@@ -180,32 +183,32 @@ end
 --
 -- @return The field unpacked and concatenated, or unaltered
 function utils.concat (field)
-	return table.concat (utils.fmap (field, utils.id, true), ' ')
+	return table.concat (utils.fmap (utils.id, field, true), ' ')
 end
 
 
---- Changes a file name's extension to the `new' one
-function utils.changeExtension (file_name, new)
+--- Changes a `file_name's extension to the `new_ext' one
+function utils.changeExtension (new_ext, file_name)
 	-- drop the dot from filename, if there should be no extension
-	if new ~= '' then
-		new = '.' .. new
+	if new_ext ~= '' then
+		new_ext = '.' .. new_ext
 	end
-	return file_name:gsub ('(%.?.-)%..*', '%1' .. new)
+	return file_name:gsub ('(%.?.-)%..*', '%1' .. new_ext)
 end
 
 
 --- Substitute the fields in a command
 --
 -- @note When a field from t is nil, it's entry is substituted with ''
--- (just like shell would do).
+--  (just like shell would do).
 -- @note This function updates the fields in the builder, aswell as consumes
--- the `prepare_*' functions, so be careful!
+--  the `prepare_*' functions, so be careful!
 --
 -- @param builder The table with the fields
 -- @param str The string to be substituted
 --
 -- @return A string with the substituted stuff
-function utils.subst (builder, str)
+function utils.subst (str, builder)
 	int.assert_quit (type (str) == 'string', "[subst] Can't substitute parameter: it isn't a string", 3)
 
 	-- build the command substituting anything that starts with a '$'
@@ -224,12 +227,12 @@ end
 
 --- Wrapper for the subst function, which uses a builder's field as string
 --
--- @param builder The table with the fields
 -- @param field Builder's field to be substituted
+-- @param builder The table with the fields
 --
 -- @return A string with the substituted stuff
-function utils.substField (builder, field)
-	return utils.subst (builder, builder[field])
+function utils.substField (field, builder)
+	return utils.subst (builder[field], builder)
 end
 
 
@@ -237,19 +240,19 @@ end
 --
 -- It works by recursing over tables until there's no more '.' in field name.
 --
+-- @param field Field name (string)
 -- @param t The table which will be searched
--- @param field 
 --
 -- @return Field asked for, whole table if empty field name
-function utils.getNestedField (t, field)
+function utils.getNestedField (field, t)
 	--- Auxiliary recursion function for getNestedField
-	local function recGetNestedField (t, field)
+	local function recGetNestedField (field, t)
 		if not field or not t then
 			return t
 		else
 			local current, rest = field:match ('(.-)%.(.+)')
 			current = current or field
-			return recGetNestedField (t[current], rest)
+			return recGetNestedField (rest, t[current])
 		end
 	end
 
@@ -257,7 +260,7 @@ function utils.getNestedField (t, field)
 	if field == '' then
 		return t
 	else
-		return recGetNestedField (t, field)
+		return recGetNestedField (field, t)
 	end
 end
 
@@ -282,13 +285,13 @@ end
 
 --- Finds a relative path between `path' and `base' paths
 --
--- @param path The file path to be processed
 -- @param base Base file path, used as reference
+-- @param path The file path to be processed
 --
 -- @returns Relative path
-function utils.makeRelative (path, base)
+function utils.makeRelative (base, path)
 	-- first of all, lazyPrefix base path
-	local prefixed = utils.lazyPrefix (path, base)
+	local prefixed = utils.lazyPrefix (base, path)
 	-- return value. If prefixed starts with a '/', don't discard it
 	local ret = { prefixed:sub (1, 1) == '/' and '' or nil }
 	-- now, remove any combination "dir/../", in any level

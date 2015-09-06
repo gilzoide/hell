@@ -125,19 +125,17 @@ local function _build (builder)
 	local original_prepare_input = builder.prepare_input or utils.id
 	local original_prepare_output = builder.prepare_output or utils.id
 
-	local new_prepare_input = function (i, b)
+	local function new_prepare_input (i, b)
 		local parcial_result = original_prepare_input (i, b)
 		-- only prefix input path if it's not a pipeBuild
 		if not builder.pipe then
-			parcial_result = utils.fmap (parcial_result, function (i) 
-						return utils.makeRelative (i, int.getPath ())
-					end)
+			parcial_result = utils.fmap (utils.curry (utils.makeRelative, int.getPath ()), parcial_result)
 		end
-		return utils.fmap (parcial_result, utils.id, true)
+		return utils.fmap (utils.id, parcial_result, true)
 	end
-	local new_prepare_output = function (o, input)
+	local function new_prepare_output (o, input)
 		local parcial_result = original_prepare_output (o, input)
-		return utils.makeRelative (parcial_result or input, int.getBuildPath (builder))
+		return utils.makeRelative (int.getBuildPath (builder), parcial_result or input)
 	end
 	
 	-- call all the "prepare_" functions, starting with "output"
@@ -171,7 +169,7 @@ local function _build (builder)
 		builder[field] = func (builder[field], input_filename)
 	end
 	-- the new build
-	local new_cmd = utils.substField (builder, 'cmd')
+	local new_cmd = utils.substField ('cmd', builder)
 
 	local new = {
 		__metatable = 'build',
@@ -231,16 +229,16 @@ Needed a string, got a " .. type (builder.cmd) .. '.', 2)
 	local all_builds
 	-- support for multinput: 
 	if builder.multinput then
-		all_builds = utils.fmap (builder.input, function (i) 
+		all_builds = utils.fmap (function (i) 
 			return builder:extend { input = i }
-		end, true)
+		end, builder.input, true)
 	else
 		all_builds = { builder }
 	end
 
 	-- return all builds unpacked (if not multinput, return the only
 	-- build as it would normally do
-	return table.unpack (utils.fmap (all_builds, _build))
+	return table.unpack (utils.fmap (_build, all_builds))
 end
 
 
@@ -257,7 +255,7 @@ local function _install (in_build, dir, permission)
 			"Can't install something that's not a build", 2)
 	int.assert_quit (type (dir) == 'string',
 			"Can't install without knowing where to (second parameter should be a string).", 2)
-	dir = utils.makeRelative (dir, (prefix or hell.os.prefix) .. (dir ~= '' and hell.os.dir_sep or ''))
+	dir = utils.makeRelative ((prefix or hell.os.prefix) .. (dir ~= '' and hell.os.dir_sep or ''), dir)
 
 	local filename = utils.takeFilename (in_build.output)
 
@@ -277,8 +275,8 @@ local function _install (in_build, dir, permission)
 		__metatable = 'install',
 		input = builder.input,
 		output = builder.output,
-		deps = { in_build },
-		cmd = utils.substField (builder, 'cmd')
+		deps = {},
+		cmd = utils.substField ('cmd', builder)
 	}
 	setmetatable (new, new)
 
@@ -303,7 +301,7 @@ function install (in_builds, dir, permission)
 		return _install (in_build, dir, permission)
 	end
 
-	return table.unpack (utils.fmap (all_installs, curryInstall))
+	return table.unpack (utils.fmap (curryInstall, all_installs))
 end
 
 --- Function for transforming builds in cleans
