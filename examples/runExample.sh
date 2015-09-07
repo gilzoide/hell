@@ -6,6 +6,7 @@ then
 	exit
 fi
 
+# buffers file name (argument 1) and discard it from argv
 arg1=$1
 shift
 

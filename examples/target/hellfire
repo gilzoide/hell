@@ -1,0 +1,7 @@
+hello = build {
+	input = 'hello.java'
+}
+
+-- make a target with name "hello"
+-- when listing targets, "hello" will be there =]
+target ('hello', hello)

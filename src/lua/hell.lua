@@ -169,13 +169,13 @@ if opts.h then
 end
 
 opts.target = opts.target or ''
-local target = int.assert_quit (util.getNestedField (opts.target, env),
+local target = int.assert_quit (opts.target == '' or BI.targets[opts.target],
 		"Can't find target \"" .. opts.target .. '"')
 
 -- maybe get available targets?
 if opts.l then
 	int.hellMsg ("Listing available targets:")
-	BI.listTargets (env)
+	BI.listTargets ()
 	return
 end
 

@@ -25,6 +25,7 @@ local BI = {}
 
 BI.builds = {}
 BI.installs = {}
+BI.targets = {}
 
 --- Auxiliary function for getting the builds/installs from a table
 function BI.getBI (t, meta)
@@ -42,55 +43,6 @@ function BI.getBI (t, meta)
 	end
 
 	return ret
-end
-
-
---- List all targets from table `t'
---
--- @note ListTargets uses rawpairs, so that we don't recurse over tables we
--- know won't have any builds/installs (as lua libs)
---
--- @param The table (should be called with the first script environment)
-function BI.listTargets (t)
-	local ret = {}
-	local acum = {}
-
-	--- Get all available targets in table `t'
-	--
-	-- @param acum Table acumulating the current table name
-	--  (with dot notation "outer.inner"), so we can write it nicely
-	-- @param t The value being checked (probably a table)
-	-- @param current Name of the current value being checked, so that we don't
-	--  always need to be pushing and popping from `acum'
-	local function listTargets (t, current)
-		if type (t) ~= 'table' then
-			return nil
-		elseif getmetatable (t) == 'build' or getmetatable (t) == 'install' then
-			return true
-		end
-
-		local thisIsATarget = false
-
-		table.insert (acum, current)
-		-- look at every entry in `t': if any have a "build"/"install" metatable
-		-- inside, mark this as target
-		for k, v in int.rawpairs (t) do
-			if listTargets (v, k) then
-				thisIsATarget = true
-			end
-		end
-
-		if thisIsATarget and current then
-			table.insert (ret, table.concat (acum, '.'))
-		end
-		table.remove (acum)
-	end
-
-	listTargets (t)
-	-- print targets in reverse, as the recursion fetches them in this order
-	for i = #ret, 1, -1 do
-		print (ret[i])
-	end
 end
 
 
@@ -290,7 +242,7 @@ end
 -- @return All processed installs, more than one if in_builds is a table
 function install (in_builds, dir, permission)
 	local all_installs
-	-- if in_builds isn't a build, we suppose it's a table containing builds
+	-- if `in_builds' isn't a build, we suppose it's a table containing builds
 	if getmetatable (in_builds) ~= 'build' then
 		all_installs = in_builds
 	else
@@ -303,6 +255,23 @@ function install (in_builds, dir, permission)
 
 	return table.unpack (utils.fmap (curryInstall, all_installs))
 end
+
+
+--- Makes `tbl' a target, adding it to the `BI.targets' table
+function target (name, tbl)
+	int.assert_quit (type (name) == 'string', 'Target name should be a string')
+	int.assert_quit (type (tbl) == 'table', 'Target should be a build, or a table with builds')
+	BI.targets[name] = tbl
+end
+
+
+--- List all targets, which are saved in `BI.targets'
+function BI.listTargets ()
+	for name, _ in pairs (BI.targets) do
+		print (name)
+	end
+end
+
 
 --- Function for transforming builds in cleans
 function BI.makeClean (builds)

@@ -13,6 +13,7 @@ Build dependencies: [liblua >= 5.2](http://www.lua.org/), POSIX API,
  C++11 compiler, [make](https://www.gnu.org/software/make/) (or you can write
  the commands directly on your shell, but build systems are all about making
  our lives nicer).
+
 Run dependencies: [lua runtime >= 5.2](http://www.lua.org/).
 
 Building
