@@ -259,8 +259,8 @@ end
 
 --- Makes `tbl' a target, adding it to the `BI.targets' table
 function target (name, tbl)
-	int.assert_quit (type (name) == 'string', 'Target name should be a string')
-	int.assert_quit (type (tbl) == 'table', 'Target should be a build, or a table with builds')
+	int.assert_quit (type (name) == 'string', 'Target name should be a string', 2)
+	int.assert_quit (type (tbl) == 'table', 'Target should be a build, or a table with builds', 2)
 	BI.targets[name] = tbl
 end
 
