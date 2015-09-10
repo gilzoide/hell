@@ -1,7 +1,10 @@
-hello = build {
-	input = 'hello.java'
+-- executable, written in C
+exe = build {
+	input = 'main.c'
 }
-
--- make a target with name "hello"
--- when listing targets, "hello" will be there =]
-target ('hello', hello)
+-- shared library, also written in C
+c.shared {
+	input = 'lib.c'
+}
+-- creates the "executable" target, which only builds the executable
+target ('executable', exe)

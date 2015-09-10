@@ -1,9 +1,11 @@
 --- Run command Builder
 command = Builder {
-	cmd = 'please put your command here (including "./" if needed)',
+	cmd = '$command $args',
 	-- if this command is a "run" target, set `run' to true, and it'll only be
 	-- executed when calling the "run" target (which is common practice to have)
 	runTarget = nil,
+	-- command line arguments, to be put after command
+	args = nil,
 	-- force execution by setting output to something that'll never exist
 	prepare_output = function () return '*!please/force/execution!*' end,
 	prepare_input = function (_, b)

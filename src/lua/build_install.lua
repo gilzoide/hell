@@ -137,7 +137,11 @@ local function _build (builder)
 	}
 	setmetatable (new, new)
 
-	table.insert (BI.builds, new)
+	-- only push build if there's a non blank command
+	if new.cmd:match ('%S') then
+		table.insert (BI.builds, new)
+	end
+
 	return new
 end
 
