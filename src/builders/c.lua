@@ -30,15 +30,27 @@ gcc = Builder {
 	libDirs = nil,
 	std = nil,
 	skipDepCheck = nil,
-	prepare_links = pkgconfig_link,
+	prepare_links = hell.os.name ~= 'darwin' and pkgconfig_link, -- ignore links on darwin
 	prepare_libDirs = pkgconfig_lib_dirs,
 	prepare_includes = pkgconfig_include_dirs,
 	prepare_std = prepare_std,
 	cmd = '$bin -o $output $input $std $flags $includes $libDirs $links',
-	help = [[Compiles a C program, pipeBuilding all of the input files as objects
-first
+	help = [[Compiles a C program, pipeBuilding all of the input files as objects first
+
 By default, it checks for dependencies with `gcc -MM`, which may be too slow if
-your project is too big. For those cases, specify field 'skipDepCheck' as true]]
+your project is too big. For those cases, specify field 'skipDepCheck' as true
+
+Fields:
+=======
+bin - Compiler command. Default = "gcc"
+output - The output name, suffixed with '.exe' if necessary
+flags - The compilation general flags. Default = "-Wall"
+std - The standard to be used
+includes - Header path, found with `pkg-config --cflags-only-I` or prefixed with '-I'
+links - Shared libraries links, found with `pkg-config --libs-only-l` or prefixed with '-l'. Ignored on darwin
+libDirs - Linker path, found with `pkg-config --libs-only-L` or prefixed with '-L'
+skipDepCheck - Should we skip dependency check with `gcc -MM`?
+]]
 }
 
 
