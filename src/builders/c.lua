@@ -30,7 +30,7 @@ gcc = Builder {
 	libDirs = nil,
 	std = nil,
 	skipDepCheck = nil,
-	prepare_links = hell.os.name ~= 'darwin' and pkgconfig_link, -- ignore links on darwin
+	prepare_links = pkgconfig_link,
 	prepare_libDirs = pkgconfig_lib_dirs,
 	prepare_includes = pkgconfig_include_dirs,
 	prepare_std = prepare_std,
@@ -47,7 +47,7 @@ output - The output name, suffixed with '.exe' if necessary
 flags - The compilation general flags. Default = "-Wall"
 std - The standard to be used
 includes - Header path, found with `pkg-config --cflags-only-I` or prefixed with '-I'
-links - Shared libraries links, found with `pkg-config --libs-only-l` or prefixed with '-l'. Ignored on darwin
+links - Shared libraries links, found with `pkg-config --libs-only-l` or prefixed with '-l'
 libDirs - Linker path, found with `pkg-config --libs-only-L` or prefixed with '-L'
 skipDepCheck - Should we skip dependency check with `gcc -MM`?
 ]]

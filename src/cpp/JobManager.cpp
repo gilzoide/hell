@@ -47,9 +47,8 @@ void JobManager::workerTask () {
 		catch (int ret) {
 			hellErrMsg ("error trying to run command. Exited [" +
 					to_string (ret) + "]");
-			// error, let's get outta here ASAP (no need
-			// to cleanup properly, anyway)
-			quick_exit (1);
+			// error, let's get outta here ASAP
+			exit (1);
 		}
 
 		// if someone depends on this build, let it know we are done here
