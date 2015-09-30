@@ -270,6 +270,23 @@ function target (name, tbl)
 end
 
 
+--- Makes `tbl' a target, cleaning it's command if it ain't the chosen target
+function exclusiveTarget (name, tbl)
+	if utils.getOption 'target' ~= name then
+		-- ensure tbl is a table
+		if getmetatable (tbl) == 'build' then
+			tbl = { tbl }
+		end
+		--- Function that clears the cmd
+		local function clearCmd (t)
+			t.cmd = ''
+		end
+		utils.fmap (clearCmd, tbl)
+	end
+	target (name, tbl)
+end
+
+
 --- List all targets, which are saved in `BI.targets'
 function BI.listTargets ()
 	for name, _ in pairs (BI.targets) do

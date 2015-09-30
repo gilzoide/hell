@@ -108,25 +108,28 @@ string Build::to_str () {
 
 
 void Build::process (string threadId) throw (int) {
-	// verify if really need to rebuild, checking in the input list
-	// do it if not in a dryRun
-	auto opts = Opts::getInstance ();
-	bool dryRun = opts.get_dryRun ();
+	// process Build only if there's a command
+	if (!cmd.empty ()) {
+		// verify if really need to rebuild, checking in the input list
+		// do it if not in a dryRun
+		auto opts = Opts::getInstance ();
+		bool dryRun = opts.get_dryRun ();
 
-	if (dryRun || checkFunc (this)) {
-		if (opts.get_verbose () == Verbosity::Default) {
-			cout << threadId << (echo.empty () ? cmd : echo) << endl;
-		}
-		else if (opts.get_verbose () == Verbosity::Verbose) {
-			cout << threadId << cmd << endl;
-		}
+		if (dryRun || checkFunc (this)) {
+			if (opts.get_verbose () == Verbosity::Default) {
+				cout << threadId << (echo.empty () ? cmd : echo) << endl;
+			}
+			else if (opts.get_verbose () == Verbosity::Verbose) {
+				cout << threadId << cmd << endl;
+			}
 
-		if (!dryRun) {
-			// run command effectively
-			int ret = system (cmd.data ());
-			// if something went wrong, throw it's result
-			if (ret) {
-				throw WEXITSTATUS (ret);
+			if (!dryRun) {
+				// run command effectively
+				int ret = system (cmd.data ());
+				// if something went wrong, throw it's result
+				if (ret) {
+					throw WEXITSTATUS (ret);
+				}
 			}
 		}
 	}
