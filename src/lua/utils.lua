@@ -122,7 +122,7 @@ end
 --
 -- @return table with the results
 function utils.fmap (f, t, force_table)
-	int.assert_quit (type (f) == 'function', "[fmap] Can't map a function if it ain't a function!", 2)
+	int.assert_quit (type (f) == 'function', "[fmap] Can't map a function if it ain't a function!")
 
 	if type (t) ~= 'table' then
 		return force_table and { f (t) } or f (t)
@@ -209,7 +209,7 @@ end
 --
 -- @return A string with the substituted stuff
 function utils.subst (str, builder)
-	int.assert_quit (type (str) == 'string', "[subst] Can't substitute parameter: it isn't a string", 3)
+	int.assert_quit (type (str) == 'string', "[subst] Can't substitute parameter: it isn't a string")
 
 	-- build the command substituting anything that starts with a '$'
 	-- (unless it's escaped with another '$')

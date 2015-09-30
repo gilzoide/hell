@@ -54,14 +54,14 @@ local function getDefaultBuilder (builder)
 		if type (builder.input) == 'table' then
 			input_example = builder.input[1]
 		else
-			input_example = builder.input
+			input_example = builder.input or ''
 		end
 
 		local ext = input_example:match ('.-%.(%S+)')
 		auto_builder = _ENV[ext] or copy
 	else
 		int.assert_quit (getmetatable (builder.builder) == 'hellbuilder',
-				"Trying to use an invalid Builder", 2)
+				"Trying to use an invalid Builder")
 		-- calling build with explicit builder field
 		auto_builder = builder.builder
 	end
@@ -79,6 +79,7 @@ local function _build (builder)
 
 	local function new_prepare_input (i, b)
 		local parcial_result = original_prepare_input (i, b)
+		int.assert_quit (parcial_result, "No input found in builder, even after preparing")
 		-- only prefix input path if it's not a pipeBuild
 		if not builder.pipe then
 			parcial_result = utils.fmap (utils.curry (utils.makeRelative, int.getPath ()), parcial_result)
@@ -156,7 +157,7 @@ end
 --  input
 function pipeBuild (target, source)
 	int.assert_quit (getmetatable (target) == 'hellbuilder',
-			"Can't pipe a build into something that ain't a hellbuilder.", 2)
+			"Can't pipe a build into something that ain't a hellbuilder.")
 
 	source.pipe = false
 	local new = _build (target:extend (source))
@@ -180,7 +181,7 @@ function build (builder)
 	-- we need a command, man
 	int.assert_quit (type (builder.cmd) == 'string',
 			"Can't build something without a command.\
-Needed a string, got a " .. type (builder.cmd) .. '.', 2)
+Needed a string, got a " .. type (builder.cmd) .. '.')
 
 	local all_builds
 	-- support for multinput: 
@@ -208,9 +209,9 @@ end
 -- @param permission Unix `install` permission. Windows ignores it. Default: 755
 local function _install (in_build, dir, permission)
 	int.assert_quit (getmetatable (in_build) == 'build',
-			"Can't install something that's not a build", 2)
+			"Can't install something that's not a build")
 	int.assert_quit (type (dir) == 'string',
-			"Can't install without knowing where to (second parameter should be a string).", 2)
+			"Can't install without knowing where to (second parameter should be a string).")
 	dir = utils.makeRelative ((prefix or hell.os.prefix) .. (dir ~= '' and hell.os.dir_sep or ''), dir)
 
 	local filename = utils.takeFilename (in_build.output)
@@ -263,8 +264,8 @@ end
 
 --- Makes `tbl' a target, adding it to the `BI.targets' table
 function target (name, tbl)
-	int.assert_quit (type (name) == 'string', 'Target name should be a string', 2)
-	int.assert_quit (type (tbl) == 'table', 'Target should be a build, or a table with builds', 2)
+	int.assert_quit (type (name) == 'string', 'Target name should be a string')
+	int.assert_quit (type (tbl) == 'table', 'Target should be a build, or a table with builds')
 	BI.targets[name] = tbl
 end
 

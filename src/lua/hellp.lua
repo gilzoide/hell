@@ -38,6 +38,7 @@ hellp.hell_options = {
 	{'d', 'dependency-trees', nil, "Show target's dependency trees"},
 	{'n', 'no-exec', nil, "Don't execute commands, just print them"},
 	{'c', 'clean-outdir', nil, "Clean hell.outdir (if defined), instead of each output separately"},
+	{'g', 'debug', nil, "Print entire stack traceback on failed asserts"},
 	{'V', 'version', nil, "Print program version"},
 	{'C', 'ignore-cyclic-dependency', nil, [[Ignores cyclic dependencies, signing the following contract:
 "I am aware that my build may have cyclic dependencies, and declare hell's developer innocent if my PC burns"]]},

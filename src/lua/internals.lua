@@ -24,13 +24,11 @@ local int = {}
 int.cpp = require 'cppUtils'
 
 --- Hell's current version
-int.version = '0.1.0'
+int.version = '0.2.0'
 
 
 --- Prints a message from hell execution
-function int.hellMsg (msg)
-	int.cpp.hellMsg (msg)
-end
+int.hellMsg = int.cpp.hellMsg
 
 
 --- Quits the program with a message, and sign possible error
@@ -46,18 +44,27 @@ end
 --  be called.
 -- @param msg The message to be displayed. There's no default, please
 --  provide one.
--- @param level Debug level, for showing where the problem happend.
---  Set the level just like you would in debug.getinfo, as assert_quit already
---  increments itself in the level.
 --
 -- @return If condition is true, it's returned (just like assert does)
-function int.assert_quit (cond, msg, level)
+function int.assert_quit (cond, msg)
 	if not cond then
-		-- maybe we want to trace where the problem happened, so...
-		if level then
-			-- need to set level+1, so we don't count assert_quit itself
-			local script = debug.getinfo (level + 1)
-			msg = script.short_src .. ':' .. script.currentline .. ': ' .. msg
+		-- if called hell with the debug option, print the whole traceback
+		if utils.getOption 'g' then
+			msg = debug.traceback (msg)
+		else
+			local script	-- function info
+			local level = 1	-- call stack level
+			-- iterate through levels, until we find a script name
+			-- that's not hell's internals
+			repeat
+				-- get function information
+				script = debug.getinfo (level)
+				if not script.short_src:match ('^' .. int.hellInstallPath) then
+					msg = script.short_src .. ':' .. script.currentline .. ': ' .. msg
+					break
+				end
+				level = level + 1
+			until not script
 		end
 		int.quit (msg, true)
 	end
