@@ -36,8 +36,8 @@ local skip
 
 -- Save the `arg' global variable, and clean it, so that it holds only
 -- arguments after the '--' short option
-local args = _G['arg']
-_G['arg'] = {}
+local args = _ENV['arg']
+_ENV['arg'] = {}
 
 --[[	Parse the opts	]]--
 for i, arg in ipairs (args) do
@@ -83,8 +83,8 @@ Check `hell -H` for help.", true)
 			end
 		-- stop reading command line options, setting `arg' to the right value
 		elseif short == '-' then
-			-- use _G['arg'] so there's no clash with our local `arg' variable
-			_G['arg'] = table.pack (select (i + 1, table.unpack (args)))
+			-- use _ENV['arg'] so there's no clash with our local `arg' variable
+			_ENV['arg'] = table.pack (select (i + 1, table.unpack (args)))
 			break
 		else
 			int.quit ("Short option not recognized.\

@@ -110,18 +110,17 @@ end
 --[[		And now, source our first hellbuild script.
 	It looks respectively into 'opts.file', './hellfire', './hellbuild'		]]--
 -- first script to load
-local script, err, env
+local script, err
 local build_scripts = { './hellbuild', './hellfire', opts.f }
 
 int.hellMsg ('reading build script(s)')
 for i = #build_scripts, 1, -1 do
-	script, err = int._addHellBuild (build_scripts[i], true, 1)
+	script, err = int._addHellBuild (build_scripts[i], true)
 	if not script then
 		if not err:match ('open') then
 			int.quit ("lua: " .. err, true)
 		end
 	else
-		env = err
 		break
 	end
 end

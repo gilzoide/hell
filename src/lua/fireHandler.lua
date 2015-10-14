@@ -33,7 +33,6 @@ local int = require 'internals'
 -- @return The script loaded, and it's env (which may be canged) if file loaded
 -- @return Nil and error message, if didn't load well
 function int._addHellBuild (script, scope)
-	level = level or 3
 	local env = scope and setmetatable ({}, { __index = _ENV }) or _ENV
 
 	local file, err = loadfile (script, nil, env)
