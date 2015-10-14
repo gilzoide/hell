@@ -77,6 +77,7 @@ setmetatable (hellp, {__call =
 				local long = v[2] .. (v[3] and '=' .. v[3] or '') 
 				table.insert (optionsString, string.format ('%-40s %s', '    -' .. short .. ', --' .. long, v[4]))
 			end
+			table.insert (optionsString, string.format ('%-40s %s', '    --', "Stop reading options. Whatever remains will be the `arg' table"))
 			table.insert (optionsString, [[ 
 All arguments to short options and their long counterpart are mandatory.
 

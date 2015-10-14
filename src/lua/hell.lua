@@ -92,8 +92,7 @@ hell = {
 	utils = util
 }
 
--- parse our opts, from args
-hell.args = {...}
+-- parse our opts, from arg
 require 'parseOpts'
 -- extract hell opts
 local opts = int.opts

@@ -106,7 +106,7 @@ gcc.shared = Builder {
 function gcc.shared.prepare_input (i, b)
 	return utils.fmap (function (ii)
 		return pipeBuild (b, {
-			flags = '&-c -fPIC',
+			flags = '&-c' .. (hell.os.name == 'windows' and '' or ' -fPIC'),
 			input = ii,
 			deps = getGccMMDeps (ii, b),
 			prepare_input = false,

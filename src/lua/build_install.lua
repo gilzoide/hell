@@ -277,9 +277,10 @@ function exclusiveTarget (name, tbl)
 		if getmetatable (tbl) == 'build' then
 			tbl = { tbl }
 		end
-		--- Function that clears the cmd
+		--- Function that clears the cmd and dependencies
 		local function clearCmd (t)
 			t.cmd = ''
+			t.deps = {}
 		end
 		utils.fmap (clearCmd, tbl)
 	end
