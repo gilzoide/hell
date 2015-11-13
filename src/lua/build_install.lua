@@ -162,9 +162,10 @@ function pipeBuild (target, source)
 	source.pipe = false
 	local new = _build (target:extend (source))
 
+	-- flag that shows `target' is formed by pipe builds
 	target.pipe = true
 	table.insert (target.deps, new)
-	-- flag that shows `target' is formed by pipe builds
+
 	return new.output
 end
 

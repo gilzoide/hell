@@ -59,7 +59,7 @@ function hellp.getBuilderHellp (builderName)
 	return msg
 end
 
-hellp.usage = "Usage: hell [OPTIONS...] [TARGET] { build | clean | install | uninstall } [var=value]"
+hellp.usage = "Usage: hell [OPTIONS...] [TARGET] [build | clean | install | uninstall] [var=value]"
 
 -- Make hellp table callable
 setmetatable (hellp, {__call = 

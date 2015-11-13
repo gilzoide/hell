@@ -44,8 +44,13 @@ BuildGraph::BuildGraph (lua_State *L) {
 		// only emplace element at map if it doesn't already exist
 		auto it = AllBuilds.find (tableRef);
 		if (it == AllBuilds.end ()) {
-			auto newBuild = new Build {L, AllBuilds};
-			AllBuilds.emplace (tableRef, newBuild);
+			// create new Build and emplace in the map, but only if it
+			// have a valid command
+			try {
+				auto newBuild = new Build {L, AllBuilds};
+				AllBuilds.emplace (tableRef, newBuild);
+			}
+			catch (...) {}
 		}
 
 		lua_pop (L, 1);

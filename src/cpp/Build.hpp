@@ -68,7 +68,7 @@ public:
 	 *
 	 * @throws Int regarding exit failure
 	 */
-	void process (string threadId = "") throw (int);
+	void process () throw (int);
 
 	/// Echo field, line to be echoed when running command; optional
 	string echo {""};
@@ -134,7 +134,7 @@ public:
 	 *
 	 * @param[in] L The using lua_State
 	 */
-	void getInputList (lua_State *L);
+	void getInputList (lua_State *L, int buildTableIdx);
 	/**
 	 * Gets a dependency from a Lua Table
 	 *

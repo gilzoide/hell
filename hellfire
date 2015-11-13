@@ -3,12 +3,14 @@ hell.help = [[
 Wellcome to hell's hellfire build script!
 =========================================
 
-Please, note that hell is still under development, so many functionalities
+Please, note that hell is still under development, so some functionalities
 may not exist, or be somewhat buggy.
 
 Prefix may be set from command line, it will change the base installation path.
 Hell's libs are installed in the "$prefix/lib/hell/" directory, and the
-executable is installed as "$prefix/bin/hell".]]
+executable is installed as "$prefix/bin/hell".
+
+Debug flags may be passed to the compilation with "Debug=1" attribution.]]
 
 -- call sources hellfire
 feedHellFire 'src/hellfire'

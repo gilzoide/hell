@@ -1,12 +1,14 @@
 -- the lua library, package may be named `lua5.2' or `lua'
 lualib = utils.checkPkgConfig ('lua5.2') or 'lua'
 -- the threads libraries for windows are different from *nix
-threadlib = hell.os.name == 'windows' and '-mthreads' or '-pthread'
+threadlib = ' ' .. (hell.os.name == 'windows' and '-mthreads' or '-pthread')
+-- put debug flag if asked for
+gFlag = Debug and ' -g' or ''
 
 return cpp.shared {
 	input = utils.glob '*.cpp',
 	std = 'c++11',
-	flags = '-Wall -g -O2 ' .. threadlib,
+	flags = '-Wall -O2' .. gFlag .. threadlib,
 	links = lualib,
 	includes = lualib,
 	output = 'cppUtils.so'

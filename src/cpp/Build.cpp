@@ -2,8 +2,8 @@
 #include <sys/stat.h>
 #include <ctime>
 
-void Build::getInputList (lua_State *L) {
-	lua_getfield (L, -1, "input");
+void Build::getInputList (lua_State *L, int buildTableIndex) {
+	lua_getfield (L, buildTableIndex, "input");
 	
 	// get input's length, and reserve vector's capacity so that we
 	// save memory reallocation operations
@@ -23,18 +23,26 @@ void Build::getInputList (lua_State *L) {
 
 
 Build::Build (lua_State *L, BuildMap& AllBuilds) : input (0) {
+	// the Build table index, for getting several fields
 	auto buildTable = lua_gettop (L);
-	// Add this Build to the Map, avoiding cyclic dependency infinite loops
-	AllBuilds.emplace (lua_topointer (L, buildTable), this);
 
-	// inputs
-	getInputList (L);
-	// output
-	lua_getfield (L, buildTable, "output");
-	output = luaL_checkstring (L, -1);
 	// cmd
 	lua_getfield (L, buildTable, "cmd");
 	cmd = luaL_checkstring (L, -1);
+	// if there's no command, don't even create this Build
+	if (cmd.empty ()) {
+		lua_pop (L, 1);
+		throw -1;
+	}
+
+	// add this Build to the Map, avoiding cyclic dependency infinite loops
+	AllBuilds.emplace (lua_topointer (L, buildTable), this);
+
+	// inputs
+	getInputList (L, buildTable);
+	// output
+	lua_getfield (L, buildTable, "output");
+	output = luaL_checkstring (L, -1);
 	// echo is optional
 	lua_getfield (L, buildTable, "echo");
 	if (!lua_isnil (L, -1)) {
@@ -48,12 +56,16 @@ Build::Build (lua_State *L, BuildMap& AllBuilds) : input (0) {
 		if (lua_type (L, -1) == LUA_TSTRING) {
 			input.emplace_back (luaL_checkstring (L, -1));
 		}
-		else {	// table containing a build
-			auto dep = getDependency (L, AllBuilds);
-			IDependOnYou (dep);
-			deps.push_front (dep);
-			// well, one more dependency before we can build `this'
-			depsLeft++;
+		else {	// table containing a build...
+			// ...which must have a valid command, or no deal
+			try {
+				auto dep = getDependency (L, AllBuilds);
+				IDependOnYou (dep);
+				deps.push_front (dep);
+				// well, one more dependency before we can build `this'
+				depsLeft++;
+			}
+			catch (...) {}
 		}
 		lua_pop (L, 1);
 	}
@@ -71,7 +83,12 @@ Build *Build::getDependency (lua_State *L, BuildMap& AllBuilds) {
 	auto it = AllBuilds.find (tableRef);
 	Build *newBuild;
 	if (it == AllBuilds.end ()) {
-		newBuild = new Build {L, AllBuilds};
+		try {
+			newBuild = new Build {L, AllBuilds};
+		}
+		catch (...) {
+			throw;
+		}
 	}
 	else {
 		newBuild = it->second;
@@ -107,7 +124,7 @@ string Build::to_str () {
 }
 
 
-void Build::process (string threadId) throw (int) {
+void Build::process () throw (int) {
 	// process Build only if there's a command
 	if (!cmd.empty ()) {
 		// verify if really need to rebuild, checking in the input list
@@ -117,10 +134,10 @@ void Build::process (string threadId) throw (int) {
 
 		if (dryRun || checkFunc (this)) {
 			if (opts.get_verbose () == Verbosity::Default) {
-				cout << threadId << (echo.empty () ? cmd : echo) << endl;
+				cout << (echo.empty () ? cmd : echo) << endl;
 			}
 			else if (opts.get_verbose () == Verbosity::Verbose) {
-				cout << threadId << cmd << endl;
+				cout << cmd << endl;
 			}
 
 			if (!dryRun) {

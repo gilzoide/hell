@@ -1,0 +1,11 @@
+-- comando `cp` recebe um `input' e `output'
+copy = Builder {
+	cmd = 'cp $input $output'
+}
+-- ao chamar `build`, hell substitui '$input' por 'arquivo' e '$output' por 'saida'
+build {
+	input = {'arquivo1', 'arquivo2'},
+	output = 'pastaDestino',
+	builder = copy
+}
+-- comando chamado será: "cp arquivo1 arquivo2 pastaDestino"
