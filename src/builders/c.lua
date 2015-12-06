@@ -76,23 +76,38 @@ end
 -- In C, we must first build the object files, then the executable, so do it!
 function gcc.prepare_input (i, b)
 	return utils.fmap (function (ii)
-		deps = b.skipDepCheck and {} or getGccMMDeps (ii, b)
-		-- and now build the object file!
-		return pipeBuild (b, {
-			flags = '&-c',
-			input = ii,
-			deps = deps,
-			links = '',
-			libDirs = '',
-			prepare_links = false,
-			prepare_libDirs = false,
-			prepare_input = false,
-			prepare_output = function (_, input)
-				return utils.changeExtension (hell.os.obj_ext, input)
-			end
-		})
+		-- only pipeBuild if it ain't already a compiled object
+		if not ii:match (".+%.o") then
+			deps = b.skipDepCheck and {} or getGccMMDeps (ii, b)
+			-- and now build the object file!
+			return pipeBuild (b, {
+				flags = '&-c',
+				input = ii,
+				deps = deps,
+				links = '',
+				libDirs = '',
+				prepare_links = false,
+				prepare_libDirs = false,
+				prepare_input = false,
+				prepare_output = function (_, input)
+					return utils.changeExtension (hell.os.obj_ext, input)
+				end
+			})
+		else
+			return ii
+		end
 	end, i)
 end
+
+-- Object
+gcc.obj = Builder {
+	prepare_flags = function (f) return '-c ' .. (f or '') end,
+	prepare_input = false,
+	prepare_output = function (o, input)
+		return o or utils.changeExtension (hell.os.obj_ext, input)
+	end,
+	help = "Compiles a C object"
+}
 
 -- Shared libraries!
 gcc.shared = Builder {
@@ -105,16 +120,22 @@ gcc.shared = Builder {
 
 function gcc.shared.prepare_input (i, b)
 	return utils.fmap (function (ii)
-		return pipeBuild (b, {
-			flags = '&-c' .. (hell.os.name == 'windows' and '' or ' -fPIC'),
-			input = ii,
-			deps = getGccMMDeps (ii, b),
-			prepare_input = false,
-			prepare_flags = false,
-			prepare_output = function (_, input)
-				return utils.changeExtension (hell.os.obj_ext, input)
-			end
-		})
+		-- only pipeBuild if it ain't already a compiled object
+		if not ii:match (".+%.o") then
+			deps = b.skipDepCheck and {} or getGccMMDeps (ii, b)
+			return pipeBuild (b, {
+				flags = '&-c' .. (hell.os.name == 'windows' and '' or ' -fPIC'),
+				input = ii,
+				deps = deps,
+				prepare_input = false,
+				prepare_flags = false,
+				prepare_output = function (_, input)
+					return utils.changeExtension (hell.os.obj_ext, input)
+				end
+			})
+		else
+			return ii
+		end
 	end, i)
 end
 

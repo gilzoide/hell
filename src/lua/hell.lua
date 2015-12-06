@@ -101,12 +101,6 @@ local BI = require 'build_install'
 require 'Builder'
 require 'fireHandler'
 
--- Asked for Builder's hellp, so let's do it!
-local hellp = require 'hellp'
-if opts.hb then
-	hellp (hellp.getBuilderHellp (opts.hb))
-end
-
 --[[		And now, source our first hellbuild script.
 	It looks respectively into 'opts.file', './hellfire', './hellbuild'		]]--
 -- first script to load
@@ -115,7 +109,7 @@ local build_scripts = { './hellbuild', './hellfire', opts.f }
 
 int.hellMsg ('reading build script(s)')
 for i = #build_scripts, 1, -1 do
-	script, err = int._addHellBuild (build_scripts[i], true)
+	script, err = int._addHellBuild (build_scripts[i])
 	if not script then
 		if not err:match ('open') then
 			int.quit ("lua: " .. err, true)
@@ -124,6 +118,8 @@ for i = #build_scripts, 1, -1 do
 		break
 	end
 end
+
+local hellp = require 'hellp'
 
 -- well, let's say the user asked for help, ... 
 if opts.h then
@@ -164,6 +160,9 @@ int.hellMsg ("all set, let's see what we got\n")
 -- Called for help, and no custom help appeared? No worries, print the default
 if opts.h then
 	hellp ()
+-- Or asked for Builder's hellp, so let's do it!
+elseif opts.hb then
+	hellp (hellp.getBuilderHellp (opts.hb))
 end
 
 opts.target = opts.target or ''

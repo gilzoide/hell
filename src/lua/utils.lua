@@ -187,6 +187,27 @@ function utils.concat (field)
 end
 
 
+--- Extends table `dst' with all values in `src'
+-- Lua 5.3 provides us with the `table.move` function, which serves us well,
+-- so use it
+--
+-- @param src Source table, from which the items will be read
+-- @param dst Destiny table, to whom the items will be appended
+utils.extendTable = _VERSION == 'Lua 5.3'
+-- Lua 5.3 version
+and function (src, dst)
+	return table.move (src, 1, #src, #dst + 1, dst)
+end
+-- Lua 5.2 version
+or function (src, dst)
+	for _, v in ipairs (src) do
+		table.insert (dst, v)
+	end
+
+	return dst
+end
+
+
 --- Changes a `file_name's extension to the `new_ext' one
 function utils.changeExtension (new_ext, file_name)
 	-- drop the dot from filename, if there should be no extension

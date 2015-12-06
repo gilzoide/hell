@@ -159,6 +159,12 @@ function pipeBuild (target, source)
 	int.assert_quit (getmetatable (target) == 'hellbuilder',
 			"Can't pipe a build into something that ain't a hellbuilder.")
 
+	-- if `target' depends on something, naturally its pipeBuild should too;
+	-- if `source' overrode its deps field, we should include it's parent's deps
+	if source.deps then
+		source.deps = utils.extendTable (target.deps, source.deps)
+	end
+
 	source.pipe = false
 	local new = _build (target:extend (source))
 
