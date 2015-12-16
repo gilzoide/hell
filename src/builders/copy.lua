@@ -1,7 +1,7 @@
 local unix_copy = {
 	bin = 'cp',
 	flags = '-r',
-	cmd = '$bin $flags $input $output'
+	cmd = '$bin $flags "$input" "$output"'
 }
 
 local win_copy = {

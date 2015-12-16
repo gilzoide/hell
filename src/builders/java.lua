@@ -1,12 +1,19 @@
+local utils = hell.utils
+
 java = Builder {
 	bin = 'javac',
 	flags = '',
 	sourcepath = false,
-	cmd = '$bin $flags $sourcepath $input'
+	classpath = false,
+	cmd = '$bin $flags $classpath $sourcepath $input'
 }
 
 function java.prepare_sourcepath (srcpth, input)
 	return srcpth and '-sourcepath ' .. srcpth or ''
+end
+
+function java.prepare_classpath (classpath, input)
+	return classpath and '-cp ' .. utils.concat (classpath, ':') or ''
 end
 
 function java.prepare_output (_, input)

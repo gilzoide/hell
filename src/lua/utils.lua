@@ -179,11 +179,12 @@ end
 
 --- If field is a table, table.concat it; don't do a thing otherwise
 --
--- @param field The field
+-- @param t The table, or whatever
+-- @param sep Fields separator. Default = ' ' (blank space)
 --
--- @return The field unpacked and concatenated, or unaltered
-function utils.concat (field)
-	return table.concat (utils.fmap (utils.id, field, true), ' ')
+-- @return The table unpacked and concatenated, or unaltered
+function utils.concat (t, sep)
+	return table.concat (utils.fmap (utils.id, t, true), sep or ' ')
 end
 
 
