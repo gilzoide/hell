@@ -8,8 +8,9 @@ else
 end
 
 -- install paths
-local libPrefix = util.makePath ('lib', 'hell')
-local exePrefix = 'bin'
+local libPrefix = libPrefix or util.makePath ('lib', 'hell')
+local exePrefix = exePrefix or 'bin'
+local manPrefix = manPrefix or util.makePath ('share', 'man', 'man1')
 
 -- lua
 install (feedHellFire 'lua/hellfire', libPrefix)
@@ -17,5 +18,7 @@ install (feedHellFire 'lua/hellfire', libPrefix)
 install (feedHellFire 'builders/hellfire', util.makePath (libPrefix, 'builders'))
 -- cpp
 install (feedHellFire 'cpp/hellfire', libPrefix)
+-- man page
+install (feedHellFire 'man/hellfire', manPrefix)
 -- the hell executable
 install (executable, exePrefix)

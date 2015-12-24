@@ -39,6 +39,11 @@ local skip
 local args = _ENV['arg']
 _ENV['arg'] = {}
 
+-- hue =P
+if #args == 1 and args[1] == 'bells' then
+	int.quit ([[It's "hells bells", poser (don't come aliasing on me, troos don't cheat) \m/]], true)
+end
+
 --[[	Parse the opts	]]--
 for i, arg in ipairs (args) do
 	local long = arg:match ("^%-%-(.+)")

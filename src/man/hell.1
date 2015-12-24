@@ -1,0 +1,63 @@
+.\" Man page for mos2img
+.TH HELL 1 "DECEMBER 2015"
+.SH NAME
+hell \- a software build system
+.SH SYNOPSIS
+.B hell
+[OPTIONS...] [TARGET] [build | clean | install | uninstall] [var=value...]
+
+.\".SH DESCRIPTION
+
+.SH OPTIONS
+Mandatory arguments to long options are mandatory for short options too.
+.TP
+\fB\-f\fR, \fP\-\-file\fR=\fIFILE\fR
+Specify build script name. Defaults: hellbuild or hellfire
+.TP
+\fB\-j\fR, \fP\-\-jobs\fR=\fIN\fR
+Allow at most N jobs at once. Must be between 1~100
+.TP
+\fB\-s\fR, \fP\-\-silent\fR
+Suppress stdout output
+.TP
+\fB\-v\fR, \fP\-\-verbose\fR
+Print all the commands executed, surpassing the build's 'echo' field
+.TP
+\fB\-l\fR, \fP\-\-list\-targets\fR
+List all available targets
+.TP
+\fB\-t\fR, \fP\-\-timer\fR
+Show script read and builds/installs' process time
+.TP
+\fB\-h\fR, \fP\-\-help\fR
+Show script's custom help, or default one
+.TP
+\fB\-H\fR, \fP\-\-help\-options\fR
+Gives the command line options help
+.TP
+\fB\-hb\fR, \fP\-\-help\-builder\fR=\fIBUILDER\fR
+Show BUILDER's hellp
+.TP
+\fB\-d\fR, \fP\-\-dependency\-trees\fR
+Show target's dependency trees
+.TP
+\fB\-n\fR, \fP\-\-no\-exec\fR
+Don't execute commands, just print them
+.TP
+\fB\-c\fR, \fP\-\-clean\-outdir\fR
+Clean hell.outdir (if defined), instead of each output separately
+.TP
+\fB\-g\fR, \fP\-\-debug\fR
+Print entire stack traceback on failed asserts
+.TP
+\fB\-V\fR, \fP\-\-version\fR
+Print program version
+.TP
+\fB\-C\fR, \fP\-\-ignore\-cyclic\-dependency\fR
+Ignores cyclic dependencies, signing the following contract:
+"I am aware that my build may have cyclic dependencies, and declare hell's developer innocent if my PC burns"
+.TP
+\fB\-\-\fR
+Stop reading options. Whatever remains will be the `arg' table
+.SH AUTHOR
+gilzoide <gilzoide@gmail.com>
