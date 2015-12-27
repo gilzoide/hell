@@ -1,25 +1,21 @@
-myCopy = Builder {
-    cmd = 'cp $input $output',
-    help = [[
-Copia um arquivo 'input' para 'output'
-Caso 'output' não seja especificado, usa "'copia_de_' + input" como saída]],
-    prepare_output = function (output, input)
-        return output or 'copia_de_' .. input
-    end
+copy = Builder {
+	cmd = 'cp $input $output',
+	help = [[
+Copies the 'input' file to 'output'
+If 'output' is not specified, uses "'copy_of_' + input" as output]],
+	prepare_output = function (output, input)
+		return output or 'copia_de_' .. input
+	end
 }
-
-myCopy {
-	input = 'oi'
-}
---[[ Ao chamar `hell -hb copy`, a saída será:
+--[[ When calling `hell -hb copy`, output will be:
 
 hell: reading build script(s)
 hell: all set, let's see what we got
 
 hell: !!! help:
-"myCopy" Builder
-Copia um arquivo 'input' para 'output'
-Caso 'output' não seja especificado, usa "'copia_de_' + input" como saída
+"copy" Builder
+Copies the 'input' file to 'output'
+If 'output' is not specified, uses "'copy_of_' + input" as output
 cmd: cp $input $output
 
 Use `hell -H` for more help.

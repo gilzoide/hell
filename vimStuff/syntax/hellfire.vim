@@ -26,7 +26,7 @@ syn keyword hellFireHandler	feedHellFire addHellBuild
 syn keyword hellBuilder		gcc cpp copy hs java
 syn keyword hellBuild		build install
 syn keyword hellMetatables	Builder
-syn keyword hell		hell
+syn keyword hell		hell utils
 
 
 " Default highlighting

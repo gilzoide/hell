@@ -64,7 +64,7 @@ local function getGccMMDeps (input, builder)
 	for dependency in gccMM:gmatch ('%S+[^\\%s]') do
 		-- if relative path, add root hellbuild path
 		if dependency:sub (1, 1) ~= '/' then
-			dependency = utils.makeRelative (utils.getPath (), dependency)
+			dependency = utils.makeRelative (utils.getRootPath (), dependency)
 		end
 		table.insert (gccDeps, dependency)
 	end

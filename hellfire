@@ -14,3 +14,10 @@ Debug flags may be passed to the compilation with "Debug=1" attribution.]]
 
 -- call sources' hellfire
 feedHellFire 'src/hellfire'
+
+
+-- man install path
+local manPrefix = manPrefix or utils.makePath ('share', 'man', 'man1')
+
+-- man page
+install (feedHellFire 'man/hellfire', manPrefix)

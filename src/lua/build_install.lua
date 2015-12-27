@@ -122,7 +122,7 @@ local function _build (builder)
 		builder[field] = func (builder[field], input_filename)
 	end
 	-- the new build
-	local new_cmd = utils.substField ('cmd', builder)
+	local new_cmd = utils.subst (builder.cmd, builder)
 
 	local new = {
 		__metatable = 'build',
@@ -240,7 +240,7 @@ local function _install (in_build, dir, permission)
 		input = builder.input,
 		output = builder.output,
 		deps = {},
-		cmd = utils.substField ('cmd', builder)
+		cmd = utils.subst (builder.cmd, builder)
 	}
 	setmetatable (new, new)
 

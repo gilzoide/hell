@@ -1,3 +1,5 @@
+local utils = hell.utils
+
 hs = Builder {
 	bin = 'ghc',
 	flags = '--make',

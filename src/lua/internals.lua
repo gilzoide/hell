@@ -108,6 +108,7 @@ int.path = { int.cpp.getcwd () }
 -- 		0 : hell command initial working directory
 -- 		Default = 1 : root hellbuild
 -- 		2 : script's relative path to root build
+-- @param to Which index to stop? Default: #int.path
 --
 -- @return The path trace, from `from' until the end
 function int.getPath (from, to)

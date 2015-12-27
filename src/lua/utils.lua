@@ -38,7 +38,7 @@ end
 
 
 --- Gets root hellbuild path
-function utils.getPath ()
+function utils.getRootPath ()
 	return int.getPath ()
 end
 
@@ -219,18 +219,16 @@ function utils.changeExtension (new_ext, file_name)
 end
 
 
---- Substitute the fields in a command
+--- Substitute the fields in a string
 --
 -- @note When a field from t is nil, it's entry is substituted with ''
 --  (just like shell would do).
--- @note This function updates the fields in the builder, aswell as consumes
---  the `prepare_*' functions, so be careful!
 --
--- @param builder The table with the fields
 -- @param str The string to be substituted
+-- @param t The table with the fields
 --
 -- @return A string with the substituted stuff
-function utils.subst (str, builder)
+function utils.subst (str, t)
 	int.assert_quit (type (str) == 'string', "[subst] Can't substitute parameter: it isn't a string")
 
 	-- build the command substituting anything that starts with a '$'
@@ -239,22 +237,11 @@ function utils.subst (str, builder)
 		if capture:sub (1, 1) == '$' then
 			return capture
 		else
-			return utils.concat (builder[capture]) or ''
+			return utils.concat (t[capture]) or ''
 		end
 	end
 
 	return str:gsub ('$([$%w_]+)', sub)
-end
-
-
---- Wrapper for the subst function, which uses a builder's field as string
---
--- @param field Builder's field to be substituted
--- @param builder The table with the fields
---
--- @return A string with the substituted stuff
-function utils.substField (field, builder)
-	return utils.subst (builder[field], builder)
 end
 
 
@@ -334,6 +321,7 @@ end
 --- Runs a command on the shell, and returns its output
 --
 -- @param command Command to be run
+-- @param showErr Return error messages (stderr). Default: false ('cause nil)
 --
 -- @return Command's output, or nil if no output is read
 function utils.shell (command, showErr)

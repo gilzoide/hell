@@ -1,24 +1,19 @@
-local util = hell.utils
-
 -- if prefix is to be changed, do it first, please
 if prefix then
-	print (prefix, util.shell ('sh changeInstallPath.sh ' .. prefix))
+	print (prefix, utils.shell ('sh changeInstallPath.sh ' .. prefix))
 else
 	prefix = hell.os.prefix
 end
 
 -- install paths
-local libPrefix = libPrefix or util.makePath ('lib', 'hell')
+local libPrefix = libPrefix or utils.makePath ('lib', 'hell')
 local exePrefix = exePrefix or 'bin'
-local manPrefix = manPrefix or util.makePath ('share', 'man', 'man1')
 
 -- lua
 install (feedHellFire 'lua/hellfire', libPrefix)
 -- builders
-install (feedHellFire 'builders/hellfire', util.makePath (libPrefix, 'builders'))
+install (feedHellFire 'builders/hellfire', utils.makePath (libPrefix, 'builders'))
 -- cpp
 install (feedHellFire 'cpp/hellfire', libPrefix)
--- man page
-install (feedHellFire 'man/hellfire', manPrefix)
 -- the hell executable
 install (executable, exePrefix)
