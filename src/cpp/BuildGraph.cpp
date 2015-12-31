@@ -73,11 +73,16 @@ void BuildGraph::processBuilds () {
 			// straightforward, to avoid multithread management overhead)
 			if (numJobs == 1) {
 				// no multithread: checkFunc is plain old `checkNeedRebuild`
-				Build::checkFunc = [] (Build *build) { 
-					return build->checkNeedRebuild ();
-				};
+				Build::checkFunc = mem_fn (&Build::checkNeedRebuild);
 				for (auto & build : sorted) {
-					build->process ();
+					auto ret = build->process ();
+					// some command failed
+					if (ret != 0) {
+						hellErrMsg ("error trying to run command. Exited [" +
+								to_string (ret) + "]");
+						// don't process any more builds
+						break;
+					}
 				}
 			}
 			else {
@@ -102,11 +107,6 @@ void BuildGraph::processBuilds () {
 	// oops, cycle found!
 	catch (string cycle) {
 		hellErrMsg (cycle);
-	}
-	// some command failed
-	catch (int ret) {
-		hellErrMsg ("error trying to run command. Exited [" +
-				to_string (ret) + "]");
 	}
 }
 

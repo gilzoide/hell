@@ -40,11 +40,9 @@ void JobManager::workerTask () {
 		mtx.unlock ();
 
 		// process the build, afterall, this is the whole point of this SW xD
-		try {
-			build->process ();
-		}
+		auto ret = build->process ();
 		// if command failed
-		catch (int ret) {
+		if (ret != 0) {
 			hellErrMsg ("error trying to run command. Exited [" +
 					to_string (ret) + "]");
 			// error, let's get outta here ASAP

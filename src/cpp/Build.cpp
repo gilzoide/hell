@@ -124,7 +124,7 @@ string Build::to_str () {
 }
 
 
-void Build::process () throw (int) {
+int Build::process () {
 	// process Build only if there's a command
 	if (!cmd.empty ()) {
 		// verify if really need to rebuild, checking in the input list
@@ -142,14 +142,12 @@ void Build::process () throw (int) {
 
 			if (!dryRun) {
 				// run command effectively
-				int ret = system (cmd.data ());
-				// if something went wrong, throw it's result
-				if (ret) {
-					throw WEXITSTATUS (ret);
-				}
+				auto ret = system (cmd.data ());
+				return WEXITSTATUS (ret);
 			}
 		}
 	}
+	return 0;
 }
 
 time_t getModTime (const char *filename) {

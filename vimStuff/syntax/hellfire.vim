@@ -24,7 +24,7 @@ endif
 " hellfire extensions
 syn keyword hellFireHandler	feedHellFire addHellBuild
 syn keyword hellBuilder		gcc cpp copy hs java
-syn keyword hellBuild		build install
+syn keyword hellBuild		build install target exclusiveTarget
 syn keyword hellMetatables	Builder
 syn keyword hell		hell utils
 

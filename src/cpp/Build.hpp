@@ -66,9 +66,10 @@ public:
 	/**
 	 * Runs the command, echoing Build::echo or Build::command, if not silent
 	 *
-	 * @throws Int regarding exit failure
+	 * @return Command exit status
+	 * @return 0 on dry run or empty command
 	 */
-	void process () throw (int);
+	int process ();
 
 	/// Echo field, line to be echoed when running command; optional
 	string echo {""};
