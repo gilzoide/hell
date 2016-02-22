@@ -68,12 +68,19 @@ void BuildGraph::processBuilds () {
 
 		// build stuff
 		if (!Opts::getInstance ().get_depTree ()) {
+			// if called with "--force", always rebuild stuff
+			if (Opts::getInstance ().get_force ()) {
+				Build::checkFunc = [] (Build *build) { return true; };
+			}
 			auto numJobs = Opts::getInstance ().get_numJobs ();
 			// no parallelism here, so process every build in order;
 			// straightforward, to avoid multithread management overhead)
 			if (numJobs == 1) {
 				// no multithread: checkFunc is plain old `checkNeedRebuild`
-				Build::checkFunc = mem_fn (&Build::checkNeedRebuild);
+				// (if not "--force")
+				if (!Build::checkFunc) {
+					Build::checkFunc = mem_fn (&Build::checkNeedRebuild);
+				}
 				for (auto & build : sorted) {
 					auto ret = build->process ();
 					// some command failed
@@ -87,14 +94,16 @@ void BuildGraph::processBuilds () {
 			}
 			else {
 				// multithread: checkFunc is a thread safe
-				// version of `checkNeedRebuild`
-				Build::checkFunc = [] (Build *build) { 
-					static mutex mtx;
-					mtx.lock ();
-					auto aux = build->checkNeedRebuild ();
-					mtx.unlock ();
-					return aux;
-				};
+				// version of `checkNeedRebuild` (if not "--force")
+				if (!Build::checkFunc) {
+					Build::checkFunc = [] (Build *build) { 
+						static mutex mtx;
+						mtx.lock ();
+						auto aux = build->checkNeedRebuild ();
+						mtx.unlock ();
+						return aux;
+					};
+				}
 				JobManager jm (&sorted);
 				jm.process ();
 			}

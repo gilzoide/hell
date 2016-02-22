@@ -37,6 +37,7 @@ hellp.hell_options = {
 	{'hb', 'help-builder', 'BUILDER', "Show Builder's hellp"},
 	{'d', 'dependency-trees', nil, "Show target's dependency trees"},
 	{'n', 'no-exec', nil, "Don't execute commands, just print them"},
+	{'F', 'force', nil, "Force all builds to be run"},
 	{'c', 'clean-outdir', nil, "Clean hell.outdir (if defined), instead of each output separately"},
 	{'g', 'debug', nil, "Print entire stack traceback on failed asserts"},
 	{'V', 'version', nil, "Print program version"},

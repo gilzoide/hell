@@ -1,6 +1,6 @@
 hell.outdir = 'build'
 hell.help = [[
-Wellcome to hell's hellfire build script!
+Welcome to hell's hellfire build script!
 =========================================
 
 Please, note that hell is still under development, so some functionalities

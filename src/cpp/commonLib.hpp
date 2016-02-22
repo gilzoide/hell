@@ -44,7 +44,7 @@ public:
     /**
      * Set options, please
      */
-    bool setOpts (int j, Verbosity verbose, bool dryRun, bool timer,
+    bool setOpts (int j, Verbosity verbose, bool dryRun, bool force, bool timer,
 			bool C, bool depTree);
     /**
      * Gets the only instance by reference
@@ -71,6 +71,8 @@ public: \
     withGetter (Verbosity, verbose);
     /// Is it a dryRun?
     withGetter (bool, dryRun);
+	/// Should we force rebuild?
+	withGetter (bool, force);
     /// Should we count the processing time?
     withGetter (bool, timer);
 	/// Ignore cyclic dependency?

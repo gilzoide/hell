@@ -221,6 +221,9 @@ int cppSetOpts (lua_State *L) {
     lua_getfield (L, 1, "n");
     bool dryRun = !lua_isnil (L, -1);
 
+    lua_getfield (L, 1, "F");
+    bool force = !lua_isnil (L, -1);
+
     lua_getfield (L, 1, "t");
     bool timer = !lua_isnil (L, -1);
 
@@ -231,8 +234,8 @@ int cppSetOpts (lua_State *L) {
     bool depTree = !lua_isnil (L, -1);
     
     bool isNumJobsValid = Opts::getInstance ().setOpts (numJobs, verbose,
-			dryRun, timer, C, depTree);
-    lua_pop (L, 6);
+			dryRun, force, timer, C, depTree);
+    lua_pop (L, 7);
 
 	lua_pushboolean (L, isNumJobsValid);
     return 1;

@@ -132,7 +132,7 @@ int Build::process () {
 		auto opts = Opts::getInstance ();
 		bool dryRun = opts.get_dryRun ();
 
-		if (dryRun || checkFunc (this)) {
+		if (checkFunc (this)) {
 			if (opts.get_verbose () == Verbosity::Default) {
 				cout << (echo.empty () ? cmd : echo) << endl;
 			}
