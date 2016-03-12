@@ -229,6 +229,10 @@ local function _install (in_build, dir, permission)
 		permission = permission or '755',
 		cmd = '$bin -m $permission $input $output'
 	}
+
+	-- create install dir, if needed
+	int.cpp.createDirIfNeeded (dir)
+
 	-- install's input and output
 	builder = installBuilder:extend {
 		input = { in_build.output },
@@ -253,19 +257,21 @@ end
 --
 -- @return All processed installs, more than one if in_builds is a table
 function install (in_builds, dir, permission)
-	local all_installs
-	-- if `in_builds' isn't a build, we suppose it's a table containing builds
-	if getmetatable (in_builds) ~= 'build' then
-		all_installs = in_builds
-	else
-		all_installs = { in_builds }
-	end
+	if int.opts.command == 'install' or int.opts.command == 'uninstall' then
+		local all_installs
+		-- if `in_builds' isn't a build, we suppose it's a table containing builds
+		if getmetatable (in_builds) ~= 'build' then
+			all_installs = in_builds
+		else
+			all_installs = { in_builds }
+		end
 
-	local function curryInstall (in_build)
-		return _install (in_build, dir, permission)
-	end
+		local function curryInstall (in_build)
+			return _install (in_build, dir, permission)
+		end
 
-	return table.unpack (utils.fmap (curryInstall, all_installs))
+		return table.unpack (utils.fmap (curryInstall, all_installs))
+	end
 end
 
 
