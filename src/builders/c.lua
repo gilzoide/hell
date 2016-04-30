@@ -78,7 +78,7 @@ function gcc.prepare_input (i, b)
 	return utils.fmap (function (ii)
 		-- only pipeBuild if it ain't already a compiled object
 		if not ii:match (".+%.o") then
-			deps = b.skipDepCheck and {} or getGccMMDeps (ii, b)
+			local deps = b.skipDepCheck and {} or getGccMMDeps (ii, b)
 			-- and now build the object file!
 			return pipeBuild (b, {
 				flags = '&-c',
@@ -122,7 +122,7 @@ function gcc.shared.prepare_input (i, b)
 	return utils.fmap (function (ii)
 		-- only pipeBuild if it ain't already a compiled object
 		if not ii:match (".+%.o") then
-			deps = b.skipDepCheck and {} or getGccMMDeps (ii, b)
+			local deps = b.skipDepCheck and {} or getGccMMDeps (ii, b)
 			return pipeBuild (b, {
 				flags = '&-c' .. (hell.os.name == 'windows' and '' or ' -fPIC'),
 				input = ii,

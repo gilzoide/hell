@@ -44,8 +44,8 @@ public:
     /**
      * Set options, please
      */
-    bool setOpts (int j, Verbosity verbose, bool dryRun, bool force, bool timer,
-			bool C, bool depTree);
+	bool setOpts (int numJobs, Verbosity verbose, bool dryRun, bool force,
+			bool timer, bool C, bool depTree);
     /**
      * Gets the only instance by reference
      */

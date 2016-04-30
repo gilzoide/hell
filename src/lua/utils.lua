@@ -197,15 +197,13 @@ end
 utils.extendTable = _VERSION == 'Lua 5.3'
 -- Lua 5.3 version
 and function (src, dst)
-	return table.move (src, 1, #src, #dst + 1, dst)
+	table.move (src, 1, #src, #dst + 1, dst)
 end
 -- Lua 5.2 version
 or function (src, dst)
 	for _, v in ipairs (src) do
 		table.insert (dst, v)
 	end
-
-	return dst
 end
 
 

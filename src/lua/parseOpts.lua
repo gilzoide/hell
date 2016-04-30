@@ -110,6 +110,9 @@ Check `hell -H` for help.', true)
 	end
 end
 
+-- set internals' opts, so all across hell we have access to it =]
+int.opts = opts
+
 -- ensure arg[0] is 'hell', not 'lua'
 arg[0] = 'hell'
 
@@ -134,6 +137,3 @@ end
 -- set the opts important to C++ in the singleton `Opts' class
 int.assert_quit (int.cpp.setOpts (opts),
 		'Invalid number of jobs: must be between 1 and 100')
-
--- set internals' opts, so all across hell we have access to it =]
-int.opts = opts

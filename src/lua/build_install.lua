@@ -127,7 +127,9 @@ local function _build (builder)
 	local new = {
 		__metatable = 'build',
 		echo = builder.echo,
-		deps = builder.deps,
+		-- clone the table, so that any dependency addition isn't reflected in
+		-- the original one
+		deps = utils.cloneTable (builder.deps),
 		input = builder.input,
 		output = builder.output,
 		cmd = new_cmd,
@@ -153,17 +155,14 @@ end
 -- That means `source' will be built as a dependency for `target', and will
 -- not be returned, so that only `target' has its reference.
 --
+-- @warning Pipebuild doesn't append target's dependencies
+--
 -- @return Source's output file name, as it may be needed for setting `target's
 --  input
 function pipeBuild (target, source)
 	int.assert_quit (getmetatable (target) == 'hellbuilder',
 			"Can't pipe a build into something that ain't a hellbuilder.")
 
-	-- if `target' depends on something, naturally its pipeBuild should too;
-	-- if `source' overrode its deps field, we should include it's parent's deps
-	if source.deps then
-		source.deps = utils.extendTable (target.deps, source.deps)
-	end
 
 	source.pipe = false
 	local new = _build (target:extend (source))
