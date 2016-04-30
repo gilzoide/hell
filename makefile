@@ -1,7 +1,8 @@
 ## Hell Build System Makefile ##
 
 prefix = /usr
-install_path = $(prefix)/lib/hell
+lib_install_path = $(prefix)/lib/hell
+bin_install_path = $(prefix)/bin
 
 # The source files
 lua_src = src/lua/*.lua
@@ -32,11 +33,11 @@ builddir :
 
 # INSTALL #
 install :
-	install -d $(install_path) $(install_path)/builders
-	install -m $(permissions) build/*.lua $(install_path)
-	install -m $(permissions) build/*.so $(install_path)
-	install -m $(permissions) build/builders/*.lua $(install_path)/builders
-	install -m $(permissions) build/hell.lua $(prefix)/bin/hell
+	install -d $(lib_install_path) $(lib_install_path)/builders $(bin_install_path)
+	install -m $(permissions) build/*.lua $(lib_install_path)
+	install -m $(permissions) build/*.so $(lib_install_path)
+	install -m $(permissions) build/builders/*.lua $(lib_install_path)/builders
+	install -m $(permissions) build/hell.lua $(bin_install_path)/hell
 
 
 .PHONY : clean
