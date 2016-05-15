@@ -2,10 +2,10 @@ local utils = hell.utils
 
 java = Builder {
 	bin = 'javac',
-	flags = '',
-	sourcepath = false,
-	classpath = false,
-	cmd = '$bin $flags $classpath $sourcepath $input'
+	flags = nil,
+	sourcepath = nil,
+	classpath = nil,
+	cmd = '$bin $outdir $flags $classpath $sourcepath $input'
 }
 
 function java.prepare_sourcepath (srcpth, input)
@@ -20,6 +20,7 @@ function java.prepare_output (_, input)
 	return utils.changeExtension ('class', input)
 end
 
-function java.prepare_flags (flags, input)
-	return (flags or '') .. (hell.outdir and ' -d ' .. hell.outdir or '')
+function java.prepare_outdir (outdir, input)
+	local outdir = outdir or hell.outdir
+	return outdir and '-d ' .. outdir or ''
 end

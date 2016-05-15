@@ -126,7 +126,7 @@ end
 
 --- Get the build path, it's important for the commands to be executed 
 function int.getBuildPath (builder)
-	-- initial buildPath == outdir, from builder or from the hell table
+	-- initial buildPath = outdir, from builder or from the hell table
 	local str = builder.outdir or hell.outdir
 
 	if str then
