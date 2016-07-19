@@ -145,5 +145,6 @@ c = gcc
 
 -- Auxiliary function: checks package in `pkg-config`
 function utils.checkPkgConfig (pkg)
-	return utils.shell ('pkg-config --list-all | grep ' .. pkg) and pkg
+	return utils.shell ('pkg-config --list-all | grep -E \''
+			.. utils.concat (pkg, '|') .. '\'') and pkg
 end

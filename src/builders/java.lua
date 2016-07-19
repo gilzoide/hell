@@ -5,7 +5,7 @@ java = Builder {
 	flags = nil,
 	sourcepath = nil,
 	classpath = nil,
-	cmd = '$bin $outdir $flags $classpath $sourcepath $input'
+	cmd = '$bin $outdir $flags $classpath $sourcepath $input',
 }
 
 function java.prepare_sourcepath (srcpth, input)
@@ -23,4 +23,21 @@ end
 function java.prepare_outdir (outdir, input)
 	local outdir = outdir or hell.outdir
 	return outdir and '-d ' .. outdir or ''
+end
+
+
+-- JAR Builder
+jar = Builder {
+	bin = 'jar',
+	flags = 'cf',
+	cmd = "$bin $flags $output $input",
+	help = [[
+Java JAR file creator
+
+To insert custom manifest, set `flags = '&m <your_manifest>'
+]],
+}
+
+function jar.prepare_output (output, input)
+	return utils.changeExtension ('jar', input)
 end

@@ -1,0 +1,3 @@
+- Fazer documentação estilo ldoc
+- Arrumar mensagens de erro bacanas das funções 'prepare_', incluindo nome da
+  função e pá
