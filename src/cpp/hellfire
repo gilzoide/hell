@@ -1,5 +1,5 @@
 -- the lua library, package may be named `lua5.2' or `lua'
-lualib = utils.checkPkgConfig ('lua5.2') or 'lua'
+lualib = utils.checkPkgConfig ('lua5.2', 'lua')
 -- the threads libraries for windows are different from *nix
 threadlib = hell.os.name == 'windows' and '-mthreads' or '-pthread'
 -- put debug flag if asked for

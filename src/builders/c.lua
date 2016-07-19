@@ -143,8 +143,14 @@ end
 -- function can find it easily from the file's extension
 c = gcc
 
--- Auxiliary function: checks package in `pkg-config`
-function utils.checkPkgConfig (pkg)
-	return utils.shell ('pkg-config --list-all | grep -E \''
-			.. utils.concat (pkg, '|') .. '\'') and pkg
+--- Auxiliary function: checks packages in `pkg-config`
+-- @return First package that exists
+-- @return nil if none matches
+function utils.checkPkgConfig (...)
+	local allPkgs = utils.fmap (utils.id, {...}, true)
+	for _, pkg in ipairs (allPkgs) do
+		if utils.shell ('pkg-config --list-all | grep -E \'' .. pkg .. "\\s'") then
+			return pkg
+		end
+	end
 end
