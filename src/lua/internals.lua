@@ -143,7 +143,12 @@ function int.getBuildPath (builder)
 	end
 
 	-- assert that the build directory exists, before we can use it
-	int.cpp.createDirIfNeeded (int.getPath (0, 1) .. str)
+	-- like `mkdir -p`, create any intermediate directories
+	local rootPath = int.getPath (0, 1):sub (1, -2)
+	for dir in str:gmatch ('(.-)/') do
+		rootPath = utils.makePath (rootPath, dir)
+		int.cpp.createDirIfNeeded (rootPath)
+	end
 
 	-- update build path with script path
 	if int.path[2] then
