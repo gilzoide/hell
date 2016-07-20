@@ -119,7 +119,15 @@ local function _build (builder)
 	--  iterating the table, which was causing random bugs, like some
 	--  functions being called twice, or even never =S
 	for field, func in pairs (prepare_funcs) do
-		builder[field] = func (builder[field], input_filename)
+		-- try to run the function
+		local status, ret = pcall (func, builder[field], input_filename)
+		-- in case anything went wrong, tell us right away!
+		if not status then
+			int.assert_quit (false, table.concat {
+				"Error on builder \'prepare_", field, "\' function: \"", ret, '"'
+			}, true)
+		end
+		builder[field] = ret
 	end
 	-- the new build
 	local new_cmd = utils.subst (builder.cmd, builder)

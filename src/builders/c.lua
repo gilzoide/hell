@@ -2,21 +2,24 @@
 -- If there ain't a pkg-config for it, just add the '-l' preffix
 local function pkgconfig_link (links)
 	return links and utils.fmap (function (pkg)
-			return utils.shell ('pkg-config --silence-errors --libs-only-l ' .. pkg) or '-l' .. pkg
-		end, links) or ''
+		return utils.shell ('pkg-config --silence-errors --libs-only-l ' .. pkg)
+				or utils.lazyPrefix ('-l', pkg)
+	end, links) or ''
 end
 local function pkgconfig_lib_dirs (libDirs)
 	return libDirs and utils.fmap (function (pkg)
-			return utils.shell ('pkg-config --silence-errors --libs-only-L ' .. pkg) or '-L' .. utils.makeRelative (utils.getcwd () .. hell.os.dir_sep, pkg)
-		end, libDirs) or ''
+		return utils.shell ('pkg-config --silence-errors --libs-only-L ' .. pkg)
+				or utils.lazyPrefix ('-L', utils.makeRelative (utils.getcwd () .. hell.os.dir_sep, pkg))
+	end, libDirs) or ''
 end
 local function pkgconfig_include_dirs (includes)
 	return includes and utils.fmap (function (pkg)
-			return utils.shell ('pkg-config --silence-errors --cflags-only-I ' .. pkg) or '-I' .. utils.makeRelative (utils.getcwd () .. hell.os.dir_sep, pkg)
-		end, includes) or ''
+		return utils.shell ('pkg-config --silence-errors --cflags-only-I ' .. pkg)
+				or utils.lazyPrefix ('-I', utils.makeRelative (utils.getcwd () .. hell.os.dir_sep, pkg))
+	end, includes) or ''
 end
 local function prepare_std (std)
-	return std and '-std=' .. std or ''
+	return std and utils.lazyPrefix ('-std=', std) or ''
 end
 
 gcc = Builder {
@@ -127,6 +130,10 @@ function gcc.shared.prepare_input (i, b)
 				flags = '&-c' .. (hell.os.name == 'windows' and '' or ' -fPIC'),
 				input = ii,
 				deps = deps,
+				links = '',
+				libDirs = '',
+				prepare_links = false,
+				prepare_libDirs = false,
 				prepare_input = false,
 				prepare_flags = false,
 				prepare_output = function (_, input)
@@ -147,7 +154,7 @@ c = gcc
 -- @return First package that exists
 -- @return nil if none matches
 function utils.checkPkgConfig (...)
-	local allPkgs = utils.fmap (utils.id, {...}, true)
+	local allPkgs = {...}
 	for _, pkg in ipairs (allPkgs) do
 		if utils.shell ('pkg-config --list-all | grep -E \'' .. pkg .. "\\s'") then
 			return pkg

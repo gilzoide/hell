@@ -60,7 +60,9 @@ function int.assert_quit (cond, msg)
 				-- get function information
 				script = debug.getinfo (level)
 				if not script.short_src:match ('^' .. int.hellInstallPath) then
-					msg = script.short_src .. ':' .. script.currentline .. ': ' .. msg
+					msg = table.concat {
+						'[', script.short_src, ':', script.currentline, '] ', msg
+					}
 					break
 				end
 				level = level + 1
