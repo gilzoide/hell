@@ -16,6 +16,13 @@ Build dependencies: [liblua >= 5.2](http://www.lua.org/), POSIX API,
 
 Run dependencies: [lua runtime >= 5.2](http://www.lua.org/).
 
+LuaRocks
+--------
+
+Hell can be installed directly from LuaRocks!
+
+    # luarocks install --server=http://luarocks.org/dev hell
+
 Building
 --------
 
@@ -30,9 +37,15 @@ Or you can use hell itself!
 Installing
 ----------
 
+Using LuaRocks locally
+
+    # luarocks make
+
+or directly with make
+
     # make install
 
-or, with hell
+or with hell
 
     # hell install
 

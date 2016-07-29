@@ -24,7 +24,7 @@ local int = {}
 int.cpp = require 'hell.cppUtils'
 
 --- Hell's current version
-int.version = '0.3.0'
+int.version = '0.3.1'
 
 
 --- Prints a message from hell execution
@@ -53,15 +53,23 @@ function int.assert_quit (cond, msg)
 		-- if called hell with the debug option, print the whole traceback
 		if utils.getOption 'g' then
 			msg = debug.traceback (msg)
+		-- no hellfires yet, I know exactly where problem is
+		elseif #int.path < 2 then
+			local script = debug.getinfo (2)
+			msg = table.concat {
+				'[', script.short_src, ':', script.currentline, '] ', msg
+			}
 		else
 			local script	-- function info
 			local level = 1	-- call stack level
+			local lastPath = int.path[#int.path]
 			-- iterate through levels, until we find a script name
 			-- that's not hell's internals
 			repeat
 				-- get function information
 				script = debug.getinfo (level)
-				if not script.short_src:match ('^' .. int.hellInstallPath) then
+				if script.short_src:match (lastPath .. '/[^/]+') then
+					::foundErrorSource::
 					msg = table.concat {
 						'[', script.short_src, ':', script.currentline, '] ', msg
 					}

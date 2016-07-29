@@ -1,7 +1,7 @@
 package = 'hell'
-version = '0.3.0-1'
+version = 'scm-2'
 source = {
-	url = 'https://github.com/gilzoide/hell',
+	url = 'git://github.com/gilzoide/hell',
 }
 description = {
 	summary = 'Hell build system: "to hell with building software!"',
