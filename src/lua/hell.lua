@@ -21,21 +21,8 @@
 -- along with Hell.  If not, see <http://www.gnu.org/licenses/>.
 --]]
 
---- Hell's install path, for our LUAPATH and CPATH to be defined right, and
--- builders be loaded fine. It may be easily modified from this sed script:
--- '/^local hellInstallPath/ c local hellInstallPath = $whateverYouWant'
-local hellInstallPath = '/usr/lib/hell'
-
--- let `hell` require it's components from hell's lib directory
-local oldpath = package.path
-local oldcpath = package.cpath
-package.path = hellInstallPath .. '/?.lua'
-package.cpath = hellInstallPath .. '/?.so'
-
-
-local int = require 'internals'
-int.hellInstallPath = hellInstallPath
-local util = require 'utils'
+local int = require 'hell.internals'
+local util = require 'hell.utils'
 
 -- get OS. As linux/freebsd/solaris are all alike, we gather them as unix.
 -- note that MacOSX is called "darwin" here
@@ -86,6 +73,8 @@ hell = {
 	-- if nil/false, do the builds in the build scripts' own path
 	-- note that if `outdir = '.'`, hell uses the root script's path
 	outdir = nil,
+	-- Builder directory, from where hell loads it's Builders
+	builder_dir = nil,
 	-- table with some SO especific stuff
 	os = os,
 	-- let users use the utils!
@@ -93,13 +82,13 @@ hell = {
 }
 
 -- parse our opts, from arg
-require 'parseOpts'
+require 'hell.parseOpts'
 -- extract hell opts
 local opts = int.opts
 -- require builder stuff
-local BI = require 'build_install'
-require 'Builder'
-require 'fireHandler'
+local BI = require 'hell.build_install'
+require 'hell.Builder'
+require 'hell.fireHandler'
 
 --[[		And now, source our first hellbuild script.
 	It looks respectively into 'opts.file', './hellfire', './hellbuild'		]]--
@@ -119,7 +108,7 @@ for i = #build_scripts, 1, -1 do
 	end
 end
 
-local hellp = require 'hellp'
+local hellp = require 'hell.hellp'
 
 -- well, let's say the user asked for help, ... 
 if opts.h then

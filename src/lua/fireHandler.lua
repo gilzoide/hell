@@ -19,7 +19,7 @@
 -- along with Hell.  If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-local int = require 'internals'
+local int = require 'hell.internals'
 
 
 --- Function for sourcing a hell build script.

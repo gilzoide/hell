@@ -1,11 +1,18 @@
 ## Hell Build System Makefile ##
 
-prefix = /usr
-lib_install_path = $(prefix)/lib/hell
-bin_install_path = $(prefix)/bin
+
+# LuaRocks/install stuff
+pkgName = hell
+PREFIX = /usr
+BINDIR = $(PREFIX)/bin
+LIBDIR = $(PREFIX)/lib/lua/5.3/$(pkgName)
+LUADIR = $(PREFIX)/share/lua/5.3/$(pkgName)
+CONFDIR = $(PREFIX)/share/$(pkgName)
+BUILDERS_DIR = $(CONFDIR)/builders
 
 # The source files
-lua_src = src/lua/*.lua
+lua_dir = src/lua
+lua_src = $(lua_dir)/*.lua
 cpp_dir = src/cpp
 cpp_src = $(cpp_dir)/*.cpp
 builders = src/builders
@@ -20,7 +27,8 @@ all : builddir lua cpp
 
 # build lua stuff (just copy =P)
 lua : $(lua_src)
-	cp $(lua_src) build
+	cp $(lua_src) build/hell
+	cp $(lua_dir)/hell.lua build
 	cp -R $(builders) build
 
 # call make for cpp stuff
@@ -28,16 +36,16 @@ cpp :
 	$(MAKE) -C $(cpp_dir)
 
 builddir :
-	@mkdir -p $(BUILD)
+	@mkdir -p $(BUILD)/hell
 
 
 # INSTALL #
 install :
-	install -d $(lib_install_path) $(lib_install_path)/builders $(bin_install_path)
-	install -m $(permissions) build/*.lua $(lib_install_path)
-	install -m $(permissions) build/*.so $(lib_install_path)
-	install -m $(permissions) build/builders/*.lua $(lib_install_path)/builders
-	install -m $(permissions) build/hell.lua $(bin_install_path)/hell
+	install -d $(BUILDERS_DIR) $(BINDIR) $(LUADIR) $(LIBDIR)
+	install -m $(permissions) build/hell/*.lua $(LUADIR)
+	install -m $(permissions) build/*.so $(LIBDIR)
+	install -m $(permissions) build/builders/*.lua $(BUILDERS_DIR)
+	install -m $(permissions) build/hell.lua $(BINDIR)/hell
 
 
 .PHONY : clean

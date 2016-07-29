@@ -21,14 +21,16 @@
 
 local int = {}
 
-int.cpp = require 'cppUtils'
+int.cpp = require 'hell.cppUtils'
 
 --- Hell's current version
-int.version = '0.2.0'
+int.version = '0.3.0'
 
 
 --- Prints a message from hell execution
 int.hellMsg = int.cpp.hellMsg
+--- Prints a message from hell execution to stderr
+int.hellErrMsg = int.cpp.hellErrMsg
 
 
 --- Quits the program with a message, and sign possible error

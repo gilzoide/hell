@@ -315,7 +315,7 @@ const struct luaL_Reg cppUtilsLib [] = {
 
 
 extern "C" {
-	int luaopen_cppUtils (lua_State *L) {
+	int luaopen_hell_cppUtils (lua_State *L) {
 		luaL_newlib (L, cppUtilsLib);
 		return 1;
 	}

@@ -1,18 +1,15 @@
--- if prefix is to be changed, do it first, please
-if prefix then
-	print (prefix, utils.shell ('sh changeInstallPath.sh ' .. prefix))
-else
-	prefix = hell.os.prefix
-end
-
+-- first, check if Lua 5.2 or 5.3
+local luaVersion = _VERSION:match '(%d%.%d)'
 -- install paths
-local libPrefix = libPrefix or utils.makePath ('lib', 'hell')
+local luaPrefix = luaPrefix or utils.makePath ('share', 'lua', luaVersion, 'hell')
+local libPrefix = libPrefix or utils.makePath ('lib', 'lua', luaVersion, 'hell')
+local buildersPrefix = buildersPrefix or utils.makePath ('share', 'hell', 'builders')
 local exePrefix = exePrefix or 'bin'
 
 -- lua
-install (feedHellFire 'lua/hellfire', libPrefix)
+install (feedHellFire 'lua/hellfire', luaPrefix)
 -- builders
-install (feedHellFire 'builders/hellfire', utils.makePath (libPrefix, 'builders'))
+install (feedHellFire 'builders/hellfire', buildersPrefix)
 -- cpp
 install (feedHellFire 'cpp/hellfire', libPrefix)
 -- the hell executable

@@ -21,11 +21,12 @@
 
 local hellp = {}
 
-local int = require 'internals'
+local int = require 'hell.internals'
 
 -- all the hell options
 hellp.hell_options = {
 	{'f', 'file', 'FILE', "Specify build script name. Defaults: hellbuild or hellfire"},
+	{'B', 'builder-dir', 'DIR', "Specify a directory to be where Builders scripts are loaded from"},
 	{'j', 'jobs', 'N', "Allow N jobs at once. Must be between 1~100"},
 	{'s', 'silent', nil, "Suppress stdout output"},
 	{'v', 'verbose', nil, "Print all the commands executed, surpassing the build's 'echo' field"},

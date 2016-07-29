@@ -20,8 +20,8 @@
 --]]
 
 
-require 'build_install'
-local int = require 'internals'
+require 'hell.build_install'
+local int = require 'hell.internals'
 
 --- Auxiliary function for merging two fields
 --
@@ -120,6 +120,6 @@ function Builder (initializer)
 end
 
 --[[		Load all builders from the builders directory		]]--
-for _, f in ipairs (utils.glob (int.hellInstallPath .. '/builders/*.lua')) do
+for _, f in ipairs (utils.glob (hell.builder_dir .. '/*.lua')) do
 	dofile (f)
 end

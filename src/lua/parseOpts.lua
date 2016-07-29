@@ -19,8 +19,8 @@
 -- along with Hell.  If not, see <http://www.gnu.org/licenses/>.
 --]]
 
-local int = require 'internals'
-local hellp = require 'hellp'
+local int = require 'hell.internals'
+local hellp = require 'hell.hellp'
 
 -- associate each short and long flags with their table
 for _, v in ipairs (hellp.hell_options) do
@@ -133,6 +133,11 @@ if not (opts.h or opts.hb or opts.l) then
 else
 	opts.command = nil
 end
+
+
+-- set Builder directory. Defaults are different in Windows and Unix, and
+-- either of them can be overriden by configuration (not yet, though...)
+hell.builder_dir = opts.B or (hell.os.name == 'windows' and hell.os.prefix or '/usr/share/hell/builders')
 
 -- set the opts important to C++ in the singleton `Opts' class
 int.assert_quit (int.cpp.setOpts (opts),
