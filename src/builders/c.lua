@@ -25,7 +25,7 @@ end
 gcc = Builder {
 	bin = 'gcc',
 	prepare_output = function (o, input)
-		return o or utils.changeExtension (hell.os.exe_ext, input)
+		return utils.changeExtension (hell.os.exe_ext, o or input)
 	end,
 	links = nil,
 	flags = '-Wall',
@@ -107,7 +107,7 @@ gcc.obj = Builder {
 	prepare_flags = function (f) return '-c ' .. (f or '') end,
 	prepare_input = false,
 	prepare_output = function (o, input)
-		return o or utils.changeExtension (hell.os.obj_ext, input)
+		return utils.changeExtension (hell.os.obj_ext, o or input)
 	end,
 	help = "Compiles a C object"
 }
@@ -116,7 +116,7 @@ gcc.obj = Builder {
 gcc.shared = Builder {
 	prepare_flags = function (f) return '-shared ' .. (f or '') end,
 	prepare_output = function (o, input)
-		return o or utils.changeExtension (hell.os.shared_ext, input)
+		return utils.changeExtension (hell.os.shared_ext, o or input)
 	end,
 	help = "Compiles a C shared library, pipeBuilding all of the input files as PIC objects first"
 }

@@ -213,7 +213,8 @@ function utils.changeExtension (new_ext, file_name)
 	if new_ext ~= '' then
 		new_ext = '.' .. new_ext
 	end
-	return file_name:gsub ('(%.?.-)%..*', '%1' .. new_ext)
+	-- if file doesn't have any extension, just add it
+	return (file_name:match ('(%.?.-)%..*') or file_name) .. new_ext
 end
 
 
